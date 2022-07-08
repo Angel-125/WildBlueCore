@@ -12,9 +12,9 @@ namespace WildBlueCore.KerbalGear
     public delegate Transform GetAttachTransformDelegate(BodyLocations bodyLocation);
     #endregion
 
-    public class WBIPropOffsetGUI: Dialog<WBIPropOffsetGUI>
+    internal class WBIPropOffsetGUI: Dialog<WBIPropOffsetGUI>
     {
-        public Dictionary<string, List<ModuleWearableProp>> wearablePartProps;
+        public Dictionary<string, List<SWearableProp>> wearablePartProps;
         public GetAttachTransformDelegate getAttachTransform;
         public KerbalEVA kerbalEVA;
 
@@ -51,7 +51,7 @@ namespace WildBlueCore.KerbalGear
 
         string selectedPropName = string.Empty;
         GameObject selectedProp = null;
-        ModuleWearableProp wearableProp;
+        SWearableProp wearableProp;
         string[] partPropNames = null;
         #endregion
 
@@ -72,7 +72,7 @@ namespace WildBlueCore.KerbalGear
             {
                 partPropNames = wearablePartProps.Keys.ToArray();
 
-                List<ModuleWearableProp> wearableProps = wearablePartProps[partPropNames[0]];
+                List<SWearableProp> wearableProps = wearablePartProps[partPropNames[0]];
                 wearableProp = wearableProps[0];
 
                 selectedPropName = wearableProp.name;
@@ -94,9 +94,9 @@ namespace WildBlueCore.KerbalGear
             // Selectable props to edit
             scrollPos = GUILayout.BeginScrollView(scrollPos, propPanelOptions);
 
-            List<ModuleWearableProp> wearableProps;
+            List<SWearableProp> wearableProps;
             int count;
-            ModuleWearableProp partProp;
+            SWearableProp partProp;
             for (int index = 0; index < partPropNames.Length; index++)
             {
                 GUILayout.Label(string.Format("<color=white>{0:s}</color>", partPropNames[index]));

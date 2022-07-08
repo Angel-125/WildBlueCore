@@ -13,6 +13,20 @@ namespace WildBlueCore
     /// While it is possible to duplicate multiple copies of a single transform, research shows that the part's radial attachment
     /// system gets messed up when you do that. So for now, we have a grid that is limited by the total number of meshes in the model.
     /// </summary>
+    /// <example>
+    /// <code>
+    /// MODULE
+    /// {
+    ///     name = ModulePartGridVariants
+    ///     totalRows = 6
+    ///     totalColumns = 6
+    ///     elementTransformName = yardFrameAngled37-30
+    ///     elementLength = 3.75
+    ///     elementWidth = 3.75
+    ///     elementHeight = 0.1875
+    /// }
+    /// </code>
+    /// </example>
     public class ModulePartGridVariants : BasePartModule, IPartCostModifier, IPartMassModifier, IModuleInfo
     {
         #region Constants
@@ -315,8 +329,22 @@ namespace WildBlueCore
             // Update drag cubes
             part.DragCubes.ForceUpdate(true, true, true);
 
-            // Finally, refresh the highlighter
+            // Refresh the highlighter
             part.RefreshHighlighter();
+
+            // Fire event
+            ConfigNode node = new ConfigNode("VARIANT");
+            node.AddValue("name", "modulePartGridVariants");
+            node.AddValue("displayName", "modulePartGridVariants");
+            ConfigNode extraInfoNode = new ConfigNode("EXTRA_INFO");
+            int elementCount = (rowIndex + 1) * (columnIndex + 1);
+            extraInfoNode.AddValue("volumeMultiplier", elementCount.ToString());
+            node.AddNode(extraInfoNode);
+
+            PartVariant partVariant = new PartVariant("modulePartGridVariants", "modulePartGridVariants", new List<AttachNode>());
+            partVariant.Load(node);
+
+            GameEvents.onVariantApplied.Fire(part, partVariant);
         }
 
         private void moveAttachmentNodes()

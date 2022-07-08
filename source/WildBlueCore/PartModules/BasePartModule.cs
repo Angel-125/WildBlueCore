@@ -10,10 +10,26 @@ using KSP.Localization;
 namespace WildBlueCore
 {
     /// <summary>
-    /// Just a simple base class to handle common functionality
+    /// This is a simple base class that defines common functionality. Part modules should derive from it; it's not intended to be used directly in a part config.
     /// </summary>
+    /// <example>
+    /// <code>
+    /// MODULE
+    /// {
+    ///     name = BasePartModule
+    ///     moduleId = warpEngine
+    ///     debugMode = true
+    /// }
+    /// </code>
+    /// </example>
     public class BasePartModule: PartModule
     {
+        /// <summary>
+        /// Flag to indicate whether or not the module is in debug mode.
+        /// </summary>
+        [KSPField]
+        public bool debugMode = false;
+
         /// <summary>
         /// ID of the module. Used to find the proper config node.
         /// </summary>

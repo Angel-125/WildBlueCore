@@ -4,15 +4,34 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
-using Buffalo2.Wrappers;
+using WildBlueCore.Wrappers;
 
 namespace WildBlueCore
 {
     /// <summary>
     /// This class works in conjunction with the stock ModulePartVariants. When the event onVariantApplied is received from the same part that has ModuleIVAVariants,
     /// and the name of the new variant matches the name of one of ModuleIVAVariants' VARIANT nodes, then the GAMEOBJECTS in the node will be enabled/disabled accordingly.
-    /// The meshes must appear in the IVA meshes or in the depth mask.
+    /// The meshes must appear in the IVA meshes or in the depth mask. The format of the IVA's VARIANT node follows the same format of ModulePartVariants.
     /// </summary>
+    /// <example>
+    /// <code>
+    /// MODULE
+    /// {
+    ///     name = ModuleIVAVariants
+    ///     VARIANT
+    ///     {
+    ///         name = Rover
+    ///         GAMEOBJECTS
+    ///         {
+    ///             roverCeilingMed = true
+    ///             stationCeilingMed = false
+    ///             roverMask = true
+    ///             stationMask = false
+    ///             superstructureMask = false
+    ///         }
+    ///     }
+    /// </code>
+    /// </example>
     public class ModuleIVAVariants: BasePartModule
     {
         #region Constants
@@ -20,6 +39,9 @@ namespace WildBlueCore
         #endregion
 
         #region Fields
+        /// <summary>
+        /// The currently selected IVA Variant.
+        /// </summary>
         [KSPField(isPersistant = true)]
         public string selectedVariant = string.Empty;
         #endregion

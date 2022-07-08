@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace Buffalo2.Wrappers
+namespace WildBlueCore.Wrappers
 {
     public class WBTWrapper
     {

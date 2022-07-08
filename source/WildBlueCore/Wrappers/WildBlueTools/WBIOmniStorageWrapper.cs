@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Reflection;
 
-namespace Buffalo2.Wrappers
+namespace WildBlueCore.Wrappers
 {
     public class WBIOmniStorageWrapper
     {

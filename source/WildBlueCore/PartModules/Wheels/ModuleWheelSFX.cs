@@ -8,12 +8,31 @@ using ModuleWheels;
 
 namespace WildBlueCore
 {
-    public class ModuleWheelSFX: PartModule
+    /// <summary>
+    /// This part module adds sound effects to wheels when their motors are engaged. Effects are defined via the standard EFFECT config node.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// MODULE
+    /// {
+    ///     name = ModuleWheelSFX
+    ///     runningEffect = running
+    ///     revTime = 0.05
+    /// }
+    /// </code>
+    /// </example>
+    public class ModuleWheelSFX: BasePartModule
     {
         #region Fields
+        /// <summary>
+        /// The name of the effect to play when the wheel is running (motors are producing torque).
+        /// </summary>
         [KSPField]
         public string runningEffect = string.Empty;
 
+        /// <summary>
+        /// How quickly, in %, to play the effect from 0 (fully off) to 1 (fully on)
+        /// </summary>
         [KSPField]
         public float revTime = 0.05f;
         #endregion

@@ -9,7 +9,7 @@ namespace WildBlueCore.KerbalGear
 {
     #region BodyLocations
     /// <summary>
-    /// Various locations where an wearable item can be placed.
+    /// Various locations where an wearable item can be placed. This is primarily used for ModuleWearableItem.
     /// </summary>
     public enum BodyLocations
     {
@@ -46,8 +46,27 @@ namespace WildBlueCore.KerbalGear
     #endregion
 
     /// <summary>
-    /// A helper class for wearable items.
+    /// This module represents an equippable cargo item that appears as a 3D model on the kerbal. When equipping the item, this part module can also
+    /// activate one or more part modules on the kerbal that provide various abilities. For example, an item can activate the ModuleEVAOverrides to improve the kerbal's swim speed.
+    /// The activated part modules are defined in KERBAL_EVA_MODULES config nodes.
+    /// You can have more than one ModuleWearableItem part module per cargo part.
     /// </summary>
+    /// <example>
+    /// <code>
+    ///    MODULE
+    ///    {
+    ///         name = ModuleWearableItem
+    ///         moduleID = SCUBA Tank
+    ///         bodyLocation = back
+    ///         anchorTransform = scubaTank
+    ///         meshTransform = tankMesh
+    ///         positionOffset = 0.0000, 0.0200, 0.0900
+    ///         positionOffsetJetpack = 0,0,0
+    ///         rotationOffset = -70.0000, 0.0000, 0.0000
+    ///         evaModules = ModuleEVADiveComputer
+    ///    }
+    /// </code>
+    /// </example>
     public class ModuleWearableItem : BasePartModule
     {
         #region Constants
@@ -61,7 +80,7 @@ namespace WildBlueCore.KerbalGear
         public string moduleID;
 
         /// <summary>
-        /// Where to place the item, such as on the back of the kerbal, the end of the backpack. etc.
+        /// Where to place the item, such as on the back of the kerbal, the end of the backpack. etc. See [[BodyLocations|KerbalGear.BodyLocations]].
         /// </summary>
         [KSPField]
         public BodyLocations bodyLocation;
@@ -79,13 +98,13 @@ namespace WildBlueCore.KerbalGear
         public string meshTransform;
 
         /// <summary>
-        /// Position offsets
+        /// Position offsets (x,y,z).
         /// </summary>
         [KSPField]
         public Vector3 positionOffset;
 
         /// <summary>
-        /// Position offset that is used when the kerbal has a jetpack in addition to the wearable item.
+        /// Position offset that is used when the kerbal has a jetpack in addition to the wearable item (x,y,z).
         /// Requires bodyLocation = backOrJetpack
         /// </summary>
         [KSPField]

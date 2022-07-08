@@ -11,8 +11,16 @@ namespace WildBlueCore.KerbalGear
 {
 
     /// <summary>
-    /// A handy part module for in-flight wardrobe changes.
+    /// This part module allows kerbals to change their outfits after the vessel leaves the VAB/SPH.
     /// </summary>
+    /// <example>
+    /// <code>
+    /// MODULE
+    /// {
+    ///     name = ModuleSuitSwitcher
+    /// }
+    /// </code>
+    /// </example>
     [KSPModule("#LOC_WILDBLUECORE_suitSwitcherTitle")]
     public class ModuleSuitSwitcher : BasePartModule
 
@@ -57,11 +65,6 @@ namespace WildBlueCore.KerbalGear
             if (crew.name == component1.helmetSuitPickerWindow.crew.name)
                 component1.helmetSuitPickerWindow.SetupSuitTypeButtons(crewListItem, crew, component1.helmetSuitPickerWindow.kerbalType);
             */
-        }
-
-        void testEventMethod()
-        {
-            ScreenMessages.PostScreenMessage("Test successful", 3.0f, ScreenMessageStyle.UPPER_CENTER);
         }
         #endregion
 

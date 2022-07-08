@@ -7,10 +7,54 @@ using System.Threading.Tasks;
 namespace WildBlueCore.KerbalGear
 {
     /// <summary>
-    /// A Utility class to alter a kerbal's buoyancy.
+    /// This module modifies the statistics of the kerbal that equips a cargo part that has a ModuleWearableItem part module.
+    /// It can adjust the kerbal's swim speed, buoyancy, and maximum pressure, as well as other statistics. Overrides are defined by EVA_OVERRIDES config nodes that are
+    /// placed in the wearable cargo part's config file. EVA_OVERRIDES is placed at the same level as a MODULE config node.
+    /// DO NOT PLACE THIS MODULE IN A PART CONFIG!
     /// </summary>
+    /// <example>
+    /// <code>
+    /// // Adding EVA_OVERRIDES to a part
+    /// PART
+    /// {
+    ///     ...
+    ///     MODULE
+    ///     {
+    ///         name = ModuleWearableItem
+    ///         ...
+    ///         // Be sure to add ModuleEVAOverrides to the list of evaModules, and add EVA_OVERRIDES to the part config to specify the overidden values.
+    ///         evaModules = ModuleEVAOverrides
+    ///     }
+    ///     
+    ///     EVA_OVERRIDES
+    ///     {
+    ///         // A value <= 0 will cause the kerbal to sink while a value >= 1 will keep it afloat. In between 0 and 1 the kerbal will be partially submerged.
+    ///         buoyancy = 1.5
+    ///         
+    ///         // max pressure in kPA
+    ///         maxPressure = 90000
+    ///         
+    ///         // How much to multiply the kerbal's standard swim speed by.
+    ///         swimSpeedMultiplier = 2
+    ///     }
+    /// }
+    /// </code>
+    /// <remarks>
+    /// ModuleEVAOverrides is added to the baseline KERBAL_EVA_MODULES config node. DO NOT place it in a part config file.
+    /// </remarks>
+    /// <code>
+    /// KERBAL_EVA_MODULES
+    /// {
+    ///     MODULE
+    ///     {
+    ///         name = ModuleEVAOverrides
+    ///     }
+    /// }
+    /// </code>
+    /// </example>
     public class ModuleEVAOverrides : BasePartModule
     {
+        #region Fields
         /// <summary>
         /// The buoyancy override
         /// </summary>
@@ -22,7 +66,9 @@ namespace WildBlueCore.KerbalGear
         /// </summary>
         [KSPField]
         public string evaOverrideParts = string.Empty;
+        #endregion
 
+        #region Housekeeping
         KerbalEVA kerbalEVA;
         bool setInitialValues = false;
         double originalMaxPressure;
@@ -31,7 +77,9 @@ namespace WildBlueCore.KerbalGear
         double maxPressureOverride = 0;
         float maxBuoyancy = 0;
         float swimSpeedMultiplier = 0;
+        #endregion
 
+        #region Overrides
         public override void OnStart(StartState state)
         {
             base.OnStart(state);
@@ -93,7 +141,9 @@ namespace WildBlueCore.KerbalGear
             part.buoyancy = buoyancyOverride;
             setInitialValues = true;
         }
+        #endregion
 
+        #region Helpers
         void updatePartOverrides(string partName)
         {
             // Get the part config
@@ -130,5 +180,6 @@ namespace WildBlueCore.KerbalGear
             if (pressureOverride > maxPressureOverride)
                 maxPressureOverride = pressureOverride;
         }
+        #endregion
     }
 }

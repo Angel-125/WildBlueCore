@@ -7,12 +7,12 @@ using UnityEngine;
 
 namespace WildBlueCore.KerbalGear
 {
-    #region ModuleWearableProp
+    #region SWearableProp
     /// <summary>
-    /// Represents an instance of a wearable prop. One ModuleWearableProp corresponds to a part's ModuleWearableItem part module.
-    /// Since ModuleWearableItem is created in relation to the part prefab, we use ModuleWearableProp per kerbal on EVA.
+    /// Represents an instance of a wearable prop. One SWearableProp corresponds to a part's ModuleWearableItem part module.
+    /// Since ModuleWearableItem is created in relation to the part prefab, we use SWearableProp per kerbal on EVA.
     /// </summary>
-    public struct ModuleWearableProp
+    internal struct SWearableProp
     {
         /// <summary>
         /// The game object representing the prop.
@@ -57,8 +57,20 @@ namespace WildBlueCore.KerbalGear
     #endregion
 
     /// <summary>
-    /// A utility class to handle wearable items and the part modules associated with them.
+    /// A utility class to handle wearable items and the part modules associated with them. This part module is added to a kerbal via a KERBAL_EVA_MODULES config node, NOT a standard KSP part.
     /// </summary>
+    /// <example>
+    /// <code>
+    /// KERBAL_EVA_MODULES
+    /// {
+    ///     MODULE
+    ///     {
+    ///         name = ModuleWearablesController
+    ///         debugMode = false
+    ///     }
+    /// }
+    /// </code>
+    /// </example>
     public class ModuleWearablesController : BasePartModule
     {
         #region Constants
@@ -77,7 +89,7 @@ namespace WildBlueCore.KerbalGear
         KerbalEVA kerbalEVA;
         ModuleInventoryPart inventory;
         WBIPropOffsetGUI propOffsetView = null;
-        Dictionary<string, List<ModuleWearableProp>> wearablePartProps;
+        Dictionary<string, List<SWearableProp>> wearablePartProps;
         Dictionary<string, string[]> wearablePartModules;
         #endregion
 
@@ -180,8 +192,8 @@ namespace WildBlueCore.KerbalGear
             StoredPart storedPart;
             int[] storedPartKeys = inventory.storedParts.Keys.ToArray();
             string[] moduleNames;
-            List<ModuleWearableProp> wearableProps;
-            ModuleWearableProp wearableProp;
+            List<SWearableProp> wearableProps;
+            SWearableProp wearableProp;
             int count;
 
             for (int index = 0; index < storedPartKeys.Length; index++)
@@ -232,7 +244,7 @@ namespace WildBlueCore.KerbalGear
         private void hideAllProps()
         {
             // Hide the props
-            List<ModuleWearableProp> wearableProps;
+            List<SWearableProp> wearableProps;
             string[] keys = wearablePartProps.Keys.ToArray();
             int count;
             for (int index = 0; index < keys.Length; index++)
@@ -265,8 +277,8 @@ namespace WildBlueCore.KerbalGear
 
         private bool hasBackpackProp()
         {
-            List<ModuleWearableProp> wearableProps;
-            ModuleWearableProp wearableProp;
+            List<SWearableProp> wearableProps;
+            SWearableProp wearableProp;
             string[] keys = wearablePartProps.Keys.ToArray();
             int count;
             for (int index = 0; index < keys.Length; index++)
@@ -342,10 +354,10 @@ namespace WildBlueCore.KerbalGear
             GameObject prop;
             Transform attachTransform;
             Collider[] colliders;
-            ModuleWearableProp wearableProp;
-            List<ModuleWearableProp> wearableProps;
+            SWearableProp wearableProp;
+            List<SWearableProp> wearableProps;
 
-            wearablePartProps = new Dictionary<string, List<ModuleWearableProp>>();
+            wearablePartProps = new Dictionary<string, List<SWearableProp>>();
             wearablePartModules = new Dictionary<string, string[]>();
 
             for (int index = 0; index < count; index++)
@@ -356,7 +368,7 @@ namespace WildBlueCore.KerbalGear
                     wearableItems = availablePart.partPrefab.FindModulesImplementing<ModuleWearableItem>();
 
                     // Setup our wearable props for this part.
-                    wearableProps = new List<ModuleWearableProp>();
+                    wearableProps = new List<SWearableProp>();
                     wearablePartProps.Add(availablePart.name, wearableProps);
 
                     // Setup the props- Special thanks to Vali and Issac for showing the way how!
@@ -366,7 +378,7 @@ namespace WildBlueCore.KerbalGear
                         wearableItem = wearableItems[itemIndex];
 
                         // Create new wearable prop instance.
-                        wearableProp = new ModuleWearableProp();
+                        wearableProp = new SWearableProp();
                         wearableProp.name = wearableItem.moduleID;
                         wearableProp.partName = availablePart.name;
                         wearableProp.bodyLocation = wearableItem.bodyLocation;

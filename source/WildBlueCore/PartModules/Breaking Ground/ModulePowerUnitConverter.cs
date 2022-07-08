@@ -12,6 +12,18 @@ namespace WildBlueCore
     /// <summary>
     /// This module converts Power Units from Breaking Ground Science to Electric Charge and vice-versa.
     /// </summary>
+    /// <example>
+    /// <code>
+    /// MODULE
+    /// {
+    ///     name = ModulePowerUnitConverter
+    ///     isActive = true
+    ///     isConsuming = false
+    ///     ecPerPowerUnit = 0.25
+    ///     maxPowerUnitsProduced = 10
+    /// }
+    /// </code>
+    /// </example>
     public class ModulePowerUnitConverter: BasePartModule
     {
         #region Constants
@@ -22,21 +34,21 @@ namespace WildBlueCore
         /// <summary>
         /// Indicates whether or not the converter is running.
         /// </summary>
-        [KSPField(isPersistant = true, guiName = "#LOC_BUFFALO_coverterStatus", guiActive = true, guiActiveEditor = true, guiActiveUnfocused = true, unfocusedRange = 5.0f)]
-        [UI_Toggle(enabledText = "#LOC_BUFFALO_coverterOn", disabledText = "#LOC_BUFFALO_coverterOff")]
+        [KSPField(isPersistant = true, guiName = "#LOC_WILDBLUECORE_coverterStatus", guiActive = true, guiActiveEditor = true, guiActiveUnfocused = true, unfocusedRange = 5.0f)]
+        [UI_Toggle(enabledText = "#LOC_WILDBLUECORE_coverterOn", disabledText = "#LOC_WILDBLUECORE_coverterOff")]
         public bool isActive = true;
 
         /// <summary>
         /// Indicates whether or not the converter is consuming (true) or sharing (false).
         /// </summary>
-        [KSPField(isPersistant = true, guiName = "#LOC_BUFFALO_coverterMode", guiActive = true, guiActiveEditor = true, guiActiveUnfocused = true, unfocusedRange = 5.0f)]
-        [UI_Toggle(enabledText = "#LOC_BUFFALO_coverterModeConsumer", disabledText = "#LOC_BUFFALO_coverterModeDistributor")]
+        [KSPField(isPersistant = true, guiName = "#LOC_WILDBLUECORE_coverterMode", guiActive = true, guiActiveEditor = true, guiActiveUnfocused = true, unfocusedRange = 5.0f)]
+        [UI_Toggle(enabledText = "#LOC_WILDBLUECORE_coverterModeConsumer", disabledText = "#LOC_WILDBLUECORE_coverterModeDistributor")]
         public bool isConsuming = true;
 
         /// <summary>
         /// The maximum number of Power Units that the part may produce. This value ranges between 1 and maxPowerUnitsProduced.
         /// </summary>
-        [KSPField(isPersistant = true, guiName = "#LOC_BUFFALO_converterMaxPowerUnits", guiActive = true, guiActiveEditor = true)]
+        [KSPField(isPersistant = true, guiName = "#LOC_WILDBLUECORE_converterMaxPowerUnits", guiActive = true, guiActiveEditor = true)]
         [UI_FloatRange(stepIncrement = 1f, maxValue = 4f, minValue = 1f)]
         public float maxPowerAvailable = 4f;
 
@@ -106,7 +118,7 @@ namespace WildBlueCore
 
         public override string GetInfo()
         {
-            return Localizer.Format("#LOC_BUFFALO_converterModuleInfo");
+            return Localizer.Format("#LOC_WILDBLUECORE_converterModuleInfo");
         }
 
         public override void OnUpdate()
@@ -158,6 +170,9 @@ namespace WildBlueCore
         #endregion
 
         #region API
+        /// <summary>
+        /// Indicates whether or not the power converter can distribute Electric Charge.
+        /// </summary>
         public bool CanDistributeEC
         {
             get
@@ -166,6 +181,9 @@ namespace WildBlueCore
             }
         }
 
+        /// <summary>
+        /// Indicates whether or not the power converter can consume Electric Charge.
+        /// </summary>
         public bool CanConsumeEC
         {
             get
@@ -174,6 +192,12 @@ namespace WildBlueCore
             }
         }
 
+        /// <summary>
+        /// Returns the number of Power Units available.
+        /// </summary>
+        /// <param name="totalConverterCount">An int containing the total number of converters to distribute power to.</param>
+        /// <param name="deltaTime">A double containing the current time duration.</param>
+        /// <returns>An int containing the total Power Units available.</returns>
         public int GetPowerAvailable(int totalConverterCount, double deltaTime)
         {
             // Get total EC in the vessel.
@@ -207,6 +231,10 @@ namespace WildBlueCore
             return powerProduced;
         }
 
+        /// <summary>
+        /// Asks the converter to convert the supplied available power into Electric Charge and distribute it throughout the vessel.
+        /// </summary>
+        /// <param name="availablePower">An int containing the total Power Units to distribute.</param>
         public void DistributePower(float availablePower)
         {
             double ecToDistribute = availablePower * ecPerPowerUnit * TimeWarp.fixedDeltaTime;

@@ -12,6 +12,14 @@ namespace WildBlueCore
     /// Manages power unit to electric charge distribution.
     /// Add this module to parts with a ModuleGroundExpControl (Probodobodyne Experiment Control Station is one example)
     /// </summary>
+    /// <example>
+    /// <code>
+    /// MODULE
+    /// {
+    ///     name = ModulePowerUnitDistributor
+    /// }
+    /// </code>
+    /// </example>
     public class ModulePowerUnitDistributor: BasePartModule
     {
         #region Housekeeping
