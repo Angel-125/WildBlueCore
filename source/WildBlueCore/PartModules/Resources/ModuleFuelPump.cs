@@ -53,6 +53,17 @@ namespace WildBlueCore.PartModules.Resources
     /// </example>
     public class ModuleFuelPump: BasePartModule
     {
+        #region Constants
+        const double kAmountThreshold = 1e-8;
+        #endregion
+
+        #region Custom GameEvents
+        /// <summary>
+        /// Signals when the isActivated and/or remotePumpMode changes.
+        /// </summary>
+        public static EventData<ModuleFuelPump> onPumpStateChanged = new EventData<ModuleFuelPump>("onPumpStateChanged");
+        #endregion
+
         #region Fields
         [KSPField(guiActive = true, groupName = "FuelPump", groupDisplayName = "#LOC_WILDBLUECORE_fuelPumpTitle", guiName = "#LOC_WILDBLUECORE_fuelPumpStatus")]
         string pumpStatus = string.Empty;
@@ -83,6 +94,7 @@ namespace WildBlueCore.PartModules.Resources
         int loadedVesselsCount = -1;
         ModuleFuelPump[] remoteFuelPumps;
         bool prevPumpMode = false;
+        bool wasActivated = false;
         #endregion
 
         #region Overrides
@@ -106,6 +118,7 @@ namespace WildBlueCore.PartModules.Resources
 
             // Capture previous pump mode.
             prevPumpMode = remotePumpMode;
+            wasActivated = isActivated;
 
             // Add events
             GameEvents.onVesselPartCountChanged.Add(onVesselPartCountChanged);
@@ -115,11 +128,94 @@ namespace WildBlueCore.PartModules.Resources
             GameEvents.onPartResourceEmptyFull.Add(onPartResourceEmptyFull);
             GameEvents.onPartResourceFullEmpty.Add(onPartResourceFullEmpty);
             GameEvents.onPartPriorityChanged.Add(onPartPriorityChanged);
+            onPumpStateChanged.Add(pumpStateChanged);
         }
 
         public override string GetInfo()
         {
             return Localizer.Format("#LOC_WILDBLUECORE_fuelPumpModuleInfo");
+        }
+        #endregion
+
+        #region Actions
+        /// <summary>
+        /// Toggles the fuel pump on/off.
+        /// </summary>
+        /// <param name="param">A KSPActionParam containing the action parameters.</param>
+        [KSPAction("#LOC_WILDBLUECORE_fuelPumpActionToggle")]
+        public void ActionFuelPumpToggle(KSPActionParam param)
+        {
+            isActivated = !isActivated;
+            updatePumpActivationState();
+        }
+
+        /// <summary>
+        /// Turns the fuel pump on
+        /// </summary>
+        /// <param name="param">A KSPActionParam containing the action parameters.</param>
+        [KSPAction("#LOC_WILDBLUECORE_fuelPumpActionOn")]
+        public void ActionFuelPumpOn(KSPActionParam param)
+        {
+            isActivated = true;
+            updatePumpActivationState();
+        }
+
+        /// <summary>
+        /// Turns the fuel pump off
+        /// </summary>
+        /// <param name="param">A KSPActionParam containing the action parameters.</param>
+        [KSPAction("#LOC_WILDBLUECORE_fuelPumpActionOff")]
+        public void ActionFuelPumpOff(KSPActionParam param)
+        {
+            isActivated = false;
+            updatePumpActivationState();
+        }
+
+        /// <summary>
+        /// Toggles the pump mode from local to remote and vice-versa.
+        /// </summary>
+        /// <param name="param">A KSPActionParam containing the action parameters.</param>
+        [KSPAction("#LOC_WILDBLUECORE_fuelPumpActionModeToggle")]
+        public void ActionFuelPumpModeToggle(KSPActionParam param)
+        {
+            remotePumpMode = !remotePumpMode;
+            updatePumpMode();
+        }
+
+        /// <summary>
+        /// Sets the pump mode to local.
+        /// </summary>
+        /// <param name="param"></param>
+        [KSPAction("#LOC_WILDBLUECORE_fuelPumpActionModeLocal")]
+        public void ActionFuelPumpModeLocal(KSPActionParam param)
+        {
+            remotePumpMode = true;
+            updatePumpMode();
+        }
+
+        /// <summary>
+        /// Sets the pump mode to remote.
+        /// </summary>
+        /// <param name="param">A KSPActionParam containing the action parameters.</param>
+        [KSPAction("#LOC_WILDBLUECORE_fuelPumpActionModeRemote")]
+        public void ActionFuelPumpModeRemote(KSPActionParam param)
+        {
+            remotePumpMode = false;
+            updatePumpMode();
+        }
+
+        private void updatePumpMode()
+        {
+            prevPumpMode = remotePumpMode;
+            rebuildPartSet();
+            if (isActivated && pumpState != FuelPumpState.pumping)
+                pumpState = FuelPumpState.pumping;
+        }
+
+        private void updatePumpActivationState()
+        {
+            wasActivated = isActivated;
+            rebuildPartSet();
         }
         #endregion
 
@@ -129,6 +225,14 @@ namespace WildBlueCore.PartModules.Resources
             if (!HighLogic.LoadedSceneIsFlight)
                 return;
 
+            // If current activation state doesn't match the previous state then update the previous state and fire the pump changed event.
+            if (isActivated != wasActivated)
+            {
+                wasActivated = isActivated;
+                onPumpStateChanged.Fire(this);
+            }
+
+            // If we're not activated then we're done.
             if (!isActivated)
             {
                 pumpState = FuelPumpState.disabled;
@@ -144,15 +248,21 @@ namespace WildBlueCore.PartModules.Resources
                 pumpState = FuelPumpState.pumping;
 
             // Check previous pump mode. If it's changed then reset the pump state since we might be stuck.
-            if (prevPumpMode != remotePumpMode && pumpState != FuelPumpState.pumping)
+            if (prevPumpMode != remotePumpMode)
             {
                 prevPumpMode = remotePumpMode;
-                pumpState = FuelPumpState.pumping;
+                onPumpStateChanged.Fire(this);
+
+                if (pumpState != FuelPumpState.pumping)
+                    pumpState = FuelPumpState.pumping;
             }
 
             // Check pump state
             if (pumpState != FuelPumpState.pumping)
+            {
+                checkForResources();
                 return;
+            }
 
             // Distribute resources
             DistributeResources();
@@ -189,7 +299,7 @@ namespace WildBlueCore.PartModules.Resources
                     resource.info.resourceFlowMode == ResourceFlowMode.NULL ||
                     !resource.flowState ||
                     resource.flowMode == PartResource.FlowMode.None ||
-                    resource.amount <= 0
+                    resource.amount <= kAmountThreshold
                     )
                     continue;
 
@@ -198,14 +308,16 @@ namespace WildBlueCore.PartModules.Resources
 
                 // Calculate transfer amount
                 transferAmount = resource.maxAmount * (pumpRate / 100f) * TimeWarp.fixedDeltaTime;
-                if (transferAmount >= resource.maxAmount)
+                if (transferAmount >= resource.amount)
                 {
-                    transferAmount = resource.maxAmount;
+                    transferAmount = resource.amount;
                     resource.amount = 0;
                 }
                 else
                 {
                     resource.amount -= transferAmount;
+                    if (resource.amount < 0)
+                        resource.amount = 0;
                 }
 
                 // Distribute the resource.
@@ -223,6 +335,8 @@ namespace WildBlueCore.PartModules.Resources
             // If !tanksWereFilled then all the destination tanks are full and we should wait until one or more of them has room.
             else if (!tanksWereFilled)
                 pumpState = FuelPumpState.destinationsAreFull;
+
+
         }
 
         /// <summary>
@@ -260,7 +374,7 @@ namespace WildBlueCore.PartModules.Resources
             }
 
             // Not all was tranferred? Give back what we didn't use.
-            else if (!Equals(transferAmount, amountTransferred))
+            else if (!Equals(Math.Abs(transferAmount), Math.Abs(amountTransferred)))
             {
                 tanksWereFilled = true;
                 resource.amount += Math.Abs(transferAmount) - Math.Abs(amountTransferred);
@@ -333,6 +447,14 @@ namespace WildBlueCore.PartModules.Resources
         {
             if (changedPart.vessel == hostPart.vessel)
                 rebuildPartSet();
+        }
+
+        private void pumpStateChanged(ModuleFuelPump fuelPump)
+        {
+            if (fuelPump.hostPart.vessel != hostPart.vessel || fuelPump == this)
+                return;
+
+            rebuildPartSet();
         }
         #endregion
 
@@ -435,6 +557,7 @@ namespace WildBlueCore.PartModules.Resources
             GameEvents.onPartResourceEmptyFull.Remove(onPartResourceEmptyFull);
             GameEvents.onPartResourceFullEmpty.Remove(onPartResourceFullEmpty);
             GameEvents.onPartPriorityChanged.Remove(onPartPriorityChanged);
+            onPumpStateChanged.Remove(pumpStateChanged);
         }
 
         private void rebuildPartSet()
@@ -442,7 +565,43 @@ namespace WildBlueCore.PartModules.Resources
             resourcePartSet = new MutablePartSet(hostPart.vessel);
             resourcePartSet.BuildLists(hostPart);
             resourcePartSet.RemovePartFromLists(hostPart);
-            // Should we remove all parts that have ModuleFuelPump? That might eliminate circular distributions.
+
+            List<ModuleFuelPump> fuelPumps = hostPart.vessel.FindPartModulesImplementing<ModuleFuelPump>();
+            ModuleFuelPump fuelPump;
+            int count = fuelPumps.Count;
+            for (int index = 0; index < count; index++)
+            {
+                fuelPump = fuelPumps[index];
+                if (fuelPump == this || !fuelPump.isActivated || !fuelPump.remotePumpMode)
+                    continue;
+
+                resourcePartSet.RemovePartFromLists(fuelPump.hostPart);
+            }
+        }
+
+        private void checkForResources()
+        {
+            if (!isActivated || pumpState != FuelPumpState.sourceIsEmpty)
+                return;
+
+            // Fallback: if we don't receive an event that we have resources again then check to see if we're non-empty.
+            int count = hostPart.Resources.Count;
+            PartResource resource;
+            for (int index = 0; index < count; index++)
+            {
+                resource = hostPart.Resources[index];
+
+                if (resource.info.resourceFlowMode == ResourceFlowMode.NO_FLOW ||
+                    resource.info.resourceFlowMode == ResourceFlowMode.NULL ||
+                    !resource.flowState ||
+                    resource.flowMode == PartResource.FlowMode.None ||
+                    resource.amount <= kAmountThreshold
+                    )
+                    continue;
+
+                pumpState = FuelPumpState.pumping;
+                return;
+            }
         }
         #endregion
     }

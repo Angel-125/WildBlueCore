@@ -41,10 +41,51 @@
             </code>
             </example>
         </member>
+        <member name="F:WildBlueCore.PartModules.Resources.ModuleFuelPump.onPumpStateChanged">
+            <summary>
+            Signals when the isActivated and/or remotePumpMode changes.
+            </summary>
+        </member>
         <member name="F:WildBlueCore.PartModules.Resources.ModuleFuelPump.maxRemotePumpRange">
             <summary>
             In meters, the maximum range that the fuel pump can reach when remote pumping resources. Default is 200 meters.
             </summary>
+        </member>
+        <member name="M:WildBlueCore.PartModules.Resources.ModuleFuelPump.ActionFuelPumpToggle(KSPActionParam)">
+            <summary>
+            Toggles the fuel pump on/off.
+            </summary>
+            <param name="param">A KSPActionParam containing the action parameters.</param>
+        </member>
+        <member name="M:WildBlueCore.PartModules.Resources.ModuleFuelPump.ActionFuelPumpOn(KSPActionParam)">
+            <summary>
+            Turns the fuel pump on
+            </summary>
+            <param name="param">A KSPActionParam containing the action parameters.</param>
+        </member>
+        <member name="M:WildBlueCore.PartModules.Resources.ModuleFuelPump.ActionFuelPumpOff(KSPActionParam)">
+            <summary>
+            Turns the fuel pump off
+            </summary>
+            <param name="param">A KSPActionParam containing the action parameters.</param>
+        </member>
+        <member name="M:WildBlueCore.PartModules.Resources.ModuleFuelPump.ActionFuelPumpModeToggle(KSPActionParam)">
+            <summary>
+            Toggles the pump mode from local to remote and vice-versa.
+            </summary>
+            <param name="param">A KSPActionParam containing the action parameters.</param>
+        </member>
+        <member name="M:WildBlueCore.PartModules.Resources.ModuleFuelPump.ActionFuelPumpModeLocal(KSPActionParam)">
+            <summary>
+            Sets the pump mode to local.
+            </summary>
+            <param name="param"></param>
+        </member>
+        <member name="M:WildBlueCore.PartModules.Resources.ModuleFuelPump.ActionFuelPumpModeRemote(KSPActionParam)">
+            <summary>
+            Sets the pump mode to remote.
+            </summary>
+            <param name="param">A KSPActionParam containing the action parameters.</param>
         </member>
         <member name="M:WildBlueCore.PartModules.Resources.ModuleFuelPump.DistributeResources">
             <summary>

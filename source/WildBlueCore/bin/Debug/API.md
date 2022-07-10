@@ -38,9 +38,47 @@ To pump a resource to another nearby vessel, in addition to the above conditions
         
 ## Fields
 
+### onPumpStateChanged
+Signals when the isActivated and/or remotePumpMode changes.
 ### maxRemotePumpRange
 In meters, the maximum range that the fuel pump can reach when remote pumping resources. Default is 200 meters.
 ## Methods
+
+
+### ActionFuelPumpToggle(KSPActionParam)
+Toggles the fuel pump on/off.
+> #### Parameters
+> **param:** A KSPActionParam containing the action parameters.
+
+
+### ActionFuelPumpOn(KSPActionParam)
+Turns the fuel pump on
+> #### Parameters
+> **param:** A KSPActionParam containing the action parameters.
+
+
+### ActionFuelPumpOff(KSPActionParam)
+Turns the fuel pump off
+> #### Parameters
+> **param:** A KSPActionParam containing the action parameters.
+
+
+### ActionFuelPumpModeToggle(KSPActionParam)
+Toggles the pump mode from local to remote and vice-versa.
+> #### Parameters
+> **param:** A KSPActionParam containing the action parameters.
+
+
+### ActionFuelPumpModeLocal(KSPActionParam)
+Sets the pump mode to local.
+> #### Parameters
+> **param:** 
+
+
+### ActionFuelPumpModeRemote(KSPActionParam)
+Sets the pump mode to remote.
+> #### Parameters
+> **param:** A KSPActionParam containing the action parameters.
 
 
 ### DistributeResources
