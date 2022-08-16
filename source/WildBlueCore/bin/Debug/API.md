@@ -1,6 +1,98 @@
 ﻿# WildBlueCore
 
 
+# PartModules.Decals.ModuleDecal
+            
+This part module lets you change the decal using the stock flag selector. It does so independently of the mission flag.
+        
+## Fields
+
+### decalURL
+URL to the image that's displayed by the decal.
+### isVisible
+Flag to indicate whether or not the decal is visible
+### alwaysVisible
+Override flag to ensure that the decal is always visible.
+### allowFieldEdit
+Flag to allow users to change the flag while out in the field.
+### updateSymmetry
+Flag to indicate if the decal updates symmetry parts
+### toggleDecalName
+GUI name for button that toggles decal visibility
+### selectDecalName
+GUI name for button that selects the decal.
+### decalTransforms
+List of transforms that will be changed by the decal. Separate names by semicolon
+## Methods
+
+
+### ToggleDecal
+Toggles visibility of the decal.
+
+### SelectDecal
+Changes the decal
+
+### onFlagSelected(FlagBrowser.FlagEntry)
+Private event handler to respond to flag selection.
+> #### Parameters
+> **selected:** The selected texture
+
+
+### ChangeDecal
+Changes the decal on all named transforms.
+
+# PartModules.IVA.ModuleSeatRotator
+            
+This module lets users rotate a seat in a part's IVA if the seat is occupied.
+            
+            
+> #### Example
+```
+
+            MODULE
+            {
+                name = ModuleSeatRotator
+                
+                // Name of the seat transform to rotate. This needs to be the same name as in the IVA's 3D model and in the IVA's config file.
+                seatName = Seat001
+                
+                // The name of the prop that the kerbal sits on. This is optional.
+                propName = NF_SEAT_Chair_Basic
+                
+                // If your list of props has more than one prop for the seats, then specify the index of the seat prop.
+                propIndex = 2
+                
+                // The x, y, and z axis to rotate the prop by. The default is 0,0,1
+                propRotationAxis = 0,1,0
+            }
+            
+```
+
+            
+        
+## Fields
+
+### seatName
+Name of the seat transform to rotate. This needs to be the same name as in the IVA's 3D model and in the IVA's config file. If you use a prop in addition to the seat transform, be sure to specify the propName and propIndex as well.
+### propName
+The name of the prop that the kerbals sit on. If the seat transform in your IVA's 3D model is NOT the same thing as the seat prop, then specify the propName as wel as the propIndex in order to rotate the prop along with the seat transform.
+### propRotationAxis
+The x, y, and z axis to rotate the prop by. The default is 0,0,1
+### propIndex
+If your list of props has more than one prop for the seats, then specify the index of the seat prop (as it appears in order in the config file) to rotate.
+### rotationRate
+Rate at which to rotate the seat, in degrees per second.
+### rotationAmount
+How far to rotate the seat when commanded to rotate the seat
+## Methods
+
+
+### RotateLeft
+Rotates the seat to the left.
+
+### RotateRight
+Rotates the seat to the right.
+
 # PartModules.Resources.ModuleFuelPump
             
 This part module pumps one or more resources from the host part to other parts that have the same resource. The module can be directly added to a resource tank part or to a part that is radially attached to a resource tank part. When enabled, ModuleFuelPump will automatically pump resources until either the host part's resource is empty or when the destination parts are full. In either case, it will wait until the host part gains more resources to pump or the destination parts gain more room to store the resource.

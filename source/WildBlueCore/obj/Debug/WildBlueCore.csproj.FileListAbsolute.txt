@@ -69,8 +69,8 @@ C:\Projects\KSP\WildBlueIndustries\WildBlueCore\source\WildBlueCore\bin\Debug\Un
 C:\Projects\KSP\WildBlueIndustries\WildBlueCore\source\WildBlueCore\bin\Debug\UnityEngine.XRModule.dll
 C:\Projects\KSP\WildBlueIndustries\WildBlueCore\source\WildBlueCore\bin\Debug\UnityEngine.InputModule.dll
 C:\Projects\KSP\WildBlueIndustries\WildBlueCore\source\WildBlueCore\bin\Debug\KSPAssets.XmlSerializers.dll
-C:\Projects\KSP\WildBlueIndustries\WildBlueCore\source\WildBlueCore\obj\Debug\WildBlueCore.csproj.CoreCompileInputs.cache
 C:\Projects\KSP\WildBlueIndustries\WildBlueCore\source\WildBlueCore\obj\Debug\WildBlueCore.csproj.CopyComplete
 C:\Projects\KSP\WildBlueIndustries\WildBlueCore\source\WildBlueCore\obj\Debug\WildBlueCore.dll
 C:\Projects\KSP\WildBlueIndustries\WildBlueCore\source\WildBlueCore\obj\Debug\WildBlueCore.pdb
 C:\Projects\KSP\WildBlueIndustries\WildBlueCore\source\WildBlueCore\obj\Debug\WildBlueCore.csproj.AssemblyReference.cache
+C:\Projects\KSP\WildBlueIndustries\WildBlueCore\source\WildBlueCore\obj\Debug\WildBlueCore.csproj.CoreCompileInputs.cache

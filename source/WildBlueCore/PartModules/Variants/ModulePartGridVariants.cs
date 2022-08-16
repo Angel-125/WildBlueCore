@@ -136,7 +136,7 @@ namespace WildBlueCore
                 }
 
                 // We also need to make sure that we don't move the attach nodes since they're already in place.
-                updateNodePositions = false;
+//                updateNodePositions = false;
             }
 
             // If originalNodePositions is empty, then it means that this is a new instance of a part (OnLoad isn't called when a new part is created in the editor), 
@@ -157,6 +157,9 @@ namespace WildBlueCore
             {
                 Events["EnableConstructionMode"].guiActiveUnfocused = true;
             }
+
+            // GameEvents
+            GameEvents.onVariantApplied.Add(onVariantApplied);
         }
 
         public override void OnWasCopied(PartModule copyPartModule, bool asSymCounterpart)
@@ -237,9 +240,9 @@ namespace WildBlueCore
             }
         }
 
-        public void Destroy()
+        public void OnDestroy()
         {
-
+            GameEvents.onVariantApplied.Remove(onVariantApplied);
         }
 
         public override string GetInfo()
@@ -314,7 +317,7 @@ namespace WildBlueCore
         #endregion
 
         #region Helpers
-        private void updateModelGrid()
+        private void updateModelGrid(bool fireVariantApplied = true)
         {
             if (gridElements.Count < ((rowIndex + 1) * (columnIndex + 1)))
                 return;
@@ -333,6 +336,8 @@ namespace WildBlueCore
             part.RefreshHighlighter();
 
             // Fire event
+            if (!fireVariantApplied)
+                return;
             ConfigNode node = new ConfigNode("VARIANT");
             node.AddValue("name", "modulePartGridVariants");
             node.AddValue("displayName", "modulePartGridVariants");
@@ -568,6 +573,15 @@ namespace WildBlueCore
         {
             updateNodePositions = true;
             updateModelGrid();
+        }
+
+        void onVariantApplied(Part variantPart, PartVariant variant)
+        {
+            if (part != variantPart)
+                return;
+
+            updateNodePositions = true;
+            updateModelGrid(false);
         }
         #endregion
     }

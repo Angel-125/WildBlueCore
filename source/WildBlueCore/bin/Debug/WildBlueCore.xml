@@ -4,6 +4,139 @@
         <name>WildBlueCore</name>
     </assembly>
     <members>
+        <member name="T:WildBlueCore.PartModules.Decals.ModuleDecal">
+            <summary>
+            This part module lets you change the decal using the stock flag selector. It does so independently of the mission flag.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Decals.ModuleDecal.decalURL">
+            <summary>
+            URL to the image that's displayed by the decal.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Decals.ModuleDecal.isVisible">
+            <summary>
+            Flag to indicate whether or not the decal is visible
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Decals.ModuleDecal.alwaysVisible">
+            <summary>
+            Override flag to ensure that the decal is always visible.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Decals.ModuleDecal.allowFieldEdit">
+            <summary>
+            Flag to allow users to change the flag while out in the field.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Decals.ModuleDecal.updateSymmetry">
+            <summary>
+            Flag to indicate if the decal updates symmetry parts
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Decals.ModuleDecal.toggleDecalName">
+            <summary>
+            GUI name for button that toggles decal visibility
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Decals.ModuleDecal.selectDecalName">
+            <summary>
+             GUI name for button that selects the decal.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Decals.ModuleDecal.decalTransforms">
+            <summary>
+            List of transforms that will be changed by the decal. Separate names by semicolon
+            </summary>
+        </member>
+        <member name="M:WildBlueCore.PartModules.Decals.ModuleDecal.ToggleDecal">
+            <summary>
+            Toggles visibility of the decal.
+            </summary>
+        </member>
+        <member name="M:WildBlueCore.PartModules.Decals.ModuleDecal.SelectDecal">
+            <summary>
+            Changes the decal
+            </summary>
+        </member>
+        <member name="M:WildBlueCore.PartModules.Decals.ModuleDecal.onFlagSelected(FlagBrowser.FlagEntry)">
+            <summary>
+            Private event handler to respond to flag selection.
+            </summary>
+            <param name="selected">The selected texture</param>
+        </member>
+        <member name="M:WildBlueCore.PartModules.Decals.ModuleDecal.ChangeDecal">
+            <summary>
+            Changes the decal on all named transforms.
+            </summary>
+        </member>
+        <member name="T:WildBlueCore.PartModules.IVA.ModuleSeatRotator">
+            <summary>
+            This module lets users rotate a seat in a part's IVA if the seat is occupied.
+            </summary>
+            <example>
+            <code>
+            MODULE
+            {
+                name = ModuleSeatRotator
+                
+                // Name of the seat transform to rotate. This needs to be the same name as in the IVA's 3D model and in the IVA's config file.
+                seatName = Seat001
+                
+                // The name of the prop that the kerbal sits on. This is optional.
+                propName = NF_SEAT_Chair_Basic
+                
+                // If your list of props has more than one prop for the seats, then specify the index of the seat prop.
+                propIndex = 2
+                
+                // The x, y, and z axis to rotate the prop by. The default is 0,0,1
+                propRotationAxis = 0,1,0
+            }
+            </code>
+            </example>
+        </member>
+        <member name="F:WildBlueCore.PartModules.IVA.ModuleSeatRotator.seatName">
+            <summary>
+            Name of the seat transform to rotate. This needs to be the same name as in the IVA's 3D model and in the IVA's config file.
+            If you use a prop in addition to the seat transform, be sure to specify the propName and propIndex as well.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.IVA.ModuleSeatRotator.propName">
+            <summary>
+            The name of the prop that the kerbals sit on. If the seat transform in your IVA's 3D model is NOT the same thing as the seat prop, then
+            specify the propName as wel as the propIndex in order to rotate the prop along with the seat transform.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.IVA.ModuleSeatRotator.propRotationAxis">
+            <summary>
+            The x, y, and z axis to rotate the prop by. The default is 0,0,1
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.IVA.ModuleSeatRotator.propIndex">
+            <summary>
+            If your list of props has more than one prop for the seats, then specify the index of the seat prop (as it appears in order in the config file) to rotate.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.IVA.ModuleSeatRotator.rotationRate">
+            <summary>
+            Rate at which to rotate the seat, in degrees per second.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.IVA.ModuleSeatRotator.rotationAmount">
+            <summary>
+            How far to rotate the seat when commanded to rotate the seat
+            </summary>
+        </member>
+        <member name="M:WildBlueCore.PartModules.IVA.ModuleSeatRotator.RotateLeft">
+            <summary>
+            Rotates the seat to the left.
+            </summary>
+        </member>
+        <member name="M:WildBlueCore.PartModules.IVA.ModuleSeatRotator.RotateRight">
+            <summary>
+            Rotates the seat to the right.
+            </summary>
+        </member>
         <member name="T:WildBlueCore.PartModules.Resources.ModuleFuelPump">
             <summary>
             This part module pumps one or more resources from the host part to other parts that have the same resource. The module can be directly added to a resource tank part or to a part that is
@@ -682,6 +815,17 @@
         <member name="F:WildBlueCore.ModuleWheelSFX.revTime">
             <summary>
             How quickly, in %, to play the effect from 0 (fully off) to 1 (fully on)
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:WildBlueCore.ModuleWheelSFX.ActionToggleSoundEffects(KSPActionParam)" -->
+        <member name="F:WildBlueCore.Utilities.TriggerClickWatcher.onTriggerClicked">
+            <summary>
+            Tells listeners the trigger was clicked.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.Utilities.TriggerClickWatcher.onMouseDown">
+            <summary>
+            Tells listeners the trigger was clicked.
             </summary>
         </member>
         <member name="M:WildBlueCore.Wrappers.ModuleWaterfallFXWrapper.GetWaterfallModule(Part)">

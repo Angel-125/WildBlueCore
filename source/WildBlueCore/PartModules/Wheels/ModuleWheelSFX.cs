@@ -35,11 +35,26 @@ namespace WildBlueCore
         /// </summary>
         [KSPField]
         public float revTime = 0.05f;
+
+        [KSPField(isPersistant = true, guiActive = true, guiActiveEditor = true, guiName = "#LOC_WILDBLUECORE_soundFX")]
+        [UI_Toggle(enabledText = "#LOC_WILDBLUECORE_stateOn", disabledText = "#LOC_WILDBLUECORE_stateOff")]
+        bool isActive = true;
         #endregion
 
         #region Housekeeping
         ModuleWheelMotor wheelMotor;
         float runningPowerLevel = 0f;
+        #endregion
+
+        #region Actions
+        /// Toggles the sound effects on/off.
+        /// </summary>
+        /// <param name="param">A KSPActionParam containing the action parameters.</param>
+        [KSPAction("#LOC_WILDBLUECORE_toggleSoundFX")]
+        public void ActionToggleSoundEffects(KSPActionParam param)
+        {
+            isActive = !isActive;
+        }
         #endregion
 
         #region Overrides
@@ -60,7 +75,11 @@ namespace WildBlueCore
                 return;
             }
 
-            if (wheelMotor.state == ModuleWheelMotor.MotorState.Running)
+            if (!isActive)
+            {
+                runningPowerLevel = 0f;
+            }
+            else if (wheelMotor.state == ModuleWheelMotor.MotorState.Running)
             {
                 runningPowerLevel = Mathf.Lerp(runningPowerLevel, 1, revTime);
                 if (runningPowerLevel > 0.99f)
