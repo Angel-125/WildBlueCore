@@ -22,6 +22,9 @@ namespace WildBlueCore.PartModules.IVA
         public string groupId = string.Empty;
 
         [KSPField]
+        public string subGroupId = string.Empty;
+
+        [KSPField]
         public bool allowSameVessel = false;
         #endregion
 

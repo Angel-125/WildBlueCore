@@ -35,7 +35,7 @@ namespace WildBlueCore
     public class ModuleIVAVariants: BasePartModule
     {
         #region Constants
-        const double waitDuration = 0.5;
+        const double waitDuration = 1.5;
         #endregion
 
         #region Fields
@@ -47,7 +47,7 @@ namespace WildBlueCore
         #endregion
 
         #region Housekeeping
-        double waitStartTime = 0;
+        double updateTime = 0;
         Dictionary<string, bool> objectStates;
         #endregion
 
@@ -76,13 +76,13 @@ namespace WildBlueCore
         public override void OnUpdate()
         {
             base.OnUpdate();
-            if (!HighLogic.LoadedSceneIsFlight || waitStartTime <= 0)
+            if (!HighLogic.LoadedSceneIsFlight || updateTime <= 0)
                 return;
 
             double currentTime = Planetarium.GetUniversalTime();
-            if (currentTime - waitStartTime >= waitDuration)
+            if (currentTime >= updateTime)
             {
-                waitStartTime = 0;
+                updateTime = 0;
                 applyVariant();
             }
         }
@@ -124,7 +124,7 @@ namespace WildBlueCore
                 return;
             if (part.internalModel == null)
             {
-                waitStartTime = Planetarium.GetUniversalTime();
+                updateTime = Planetarium.GetUniversalTime() + waitDuration;
                 return;
             }
             ConfigNode node = getPartConfigNode();
@@ -165,18 +165,18 @@ namespace WildBlueCore
             ProtoCrewMember astronaut = data.host;
             Part fromPart = data.from;
             Part toPart = data.to;
-            if (!HighLogic.LoadedSceneIsFlight || toPart != part)
+            if (!HighLogic.LoadedSceneIsFlight || toPart.vessel != part.vessel)
                 return;
-            waitStartTime = Planetarium.GetUniversalTime();
+            updateTime = Planetarium.GetUniversalTime() + waitDuration;
         }
 
         private void onCrewBoardVessel(GameEvents.FromToAction<Part, Part> data)
         {
             Part evaKerbal = data.from;
             Part boardedPart = data.to;
-            if (!HighLogic.LoadedSceneIsFlight || boardedPart != part)
+            if (!HighLogic.LoadedSceneIsFlight || boardedPart.vessel != part.vessel)
                 return;
-            waitStartTime = Planetarium.GetUniversalTime();
+            updateTime = Planetarium.GetUniversalTime() + waitDuration;
         }
 
         private void onVariantApplied(Part variantPart, PartVariant variant)

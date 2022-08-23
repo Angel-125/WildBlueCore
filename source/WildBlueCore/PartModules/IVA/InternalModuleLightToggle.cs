@@ -18,7 +18,7 @@ namespace WildBlueCore.PartModules.IVA
         public float dimmerLevel = 0.5f;
 
         [KSPField]
-        public string excludedProps = "WBI_Monitor;wbiDigitalPictureFrame";
+        public string excludedProps = "WBI_Monitor;wbiDigitalPictureFrame;wbiAlertLight";
         #endregion
 
         #region Housekeeping

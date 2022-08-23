@@ -25,15 +25,19 @@ namespace WildBlueCore.PartModules.IVA
 
         #region Housekeeping
         public bool isToggledOn = false;
+        public Color toggleOnColor;
+
         Material buttonFaceMaterial = null;
         Color originalEmissiveColor;
-        Color toggleOnColor;
         public FXGroup soundClip = null;
+        InternalModuleLightColorChanger colorChanger = null;
         #endregion
 
         #region Overrides
         public override void OnStart()
         {
+            colorChanger = internalProp.FindModelComponent<InternalModuleLightColorChanger>();
+
             // Get button face material
             getButtonFaceMaterial();
 
@@ -49,8 +53,8 @@ namespace WildBlueCore.PartModules.IVA
             // Toggle status
             isToggledOn = !isToggledOn;
 
-            // Change button face color
-            updateButtonColor();
+            // Update the group
+            eventGroupUpdated.Fire(this, groupId);
 
             // Play sound effect
             if (soundClip != null && soundClip.audio != null)
@@ -61,21 +65,22 @@ namespace WildBlueCore.PartModules.IVA
                 soundClip.audio.volume = GameSettings.SHIP_VOLUME;
                 soundClip.audio.Play();
             }
-
-            // Update the group
-            eventGroupUpdated.Fire(this, groupId);
         }
 
         protected override void onGroupUpdated(InternalBaseModule source)
         {
-            if (source != this && source is InternalModuleButtonToggle && groupId == source.groupId)
+            if (source is InternalModuleButtonToggle)
             {
                 InternalModuleButtonToggle buttonToggle = (InternalModuleButtonToggle)source;
-                if (buttonToggle.isToggledOn && isToggledOn)
-                {
+                if (buttonToggle != this && buttonToggle.isToggledOn && isToggledOn)
                     isToggledOn = false;
-                    updateButtonColor();
-                }
+                else if (buttonToggle.subGroupId == subGroupId)
+                    isToggledOn = buttonToggle.isToggledOn;
+
+                updateButtonColor();
+
+                if (colorChanger != null)
+                    colorChanger.ToggleColor(isToggledOn);
             }
         }
         #endregion
@@ -86,7 +91,7 @@ namespace WildBlueCore.PartModules.IVA
             Color color = isToggledOn ? toggleOnColor : originalEmissiveColor;
             if (buttonFaceMaterial != null)
             {
-                buttonFaceMaterial.SetColor("_MainTex", color);
+                buttonFaceMaterial.SetColor("_Color", color);
                 buttonFaceMaterial.SetColor("_EmissiveColor", color);
             }
         }

@@ -41,12 +41,19 @@ namespace WildBlueCore.PartModules.IVA
                 buttonRenderMaterial = renderer.material;
         }
 
-        protected override void groupUpdated(InternalBaseModule source, string sourceGroupId)
+        public void ToggleColor(bool useActiveColor)
         {
-            if (source.vessel != vessel)
+            if (colorOptions.Count < 2)
                 return;
 
-            if (source is InternalModuleLightColorChanger && groupId == sourceGroupId)
+            currentColorIndex = useActiveColor ? 1 : 0;
+            changeLightColors();
+            changeButtonMaterial();
+        }
+
+        protected override void onGroupUpdated(InternalBaseModule source)
+        {
+            if (source is InternalModuleLightColorChanger && groupId == source.groupId)
             {
                 InternalModuleLightColorChanger colorChanger = (InternalModuleLightColorChanger)source;
                 currentColorIndex = colorChanger.currentColorIndex;
@@ -79,7 +86,7 @@ namespace WildBlueCore.PartModules.IVA
         {
             if (buttonRenderMaterial != null)
             {
-                buttonRenderMaterial.SetColor("_MainTex", colorOptions[currentColorIndex]);
+                buttonRenderMaterial.SetColor("_Color", colorOptions[currentColorIndex]);
                 buttonRenderMaterial.SetColor("_EmissiveColor", colorOptions[currentColorIndex]);
             }
         }

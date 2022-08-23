@@ -99,6 +99,7 @@
     <Compile Include="PartModules\IVA\InternalBaseModule.cs" />
     <Compile Include="PartModules\IVA\InternalModuleAnimation.cs" />
     <Compile Include="PartModules\IVA\InternalModuleButtonToggle.cs" />
+    <Compile Include="PartModules\IVA\InternalModuleEmissiveFlash.cs" />
     <Compile Include="PartModules\IVA\InternalModuleLightColorChanger.cs" />
     <Compile Include="PartModules\IVA\InternalModuleLightToggle.cs" />
     <Compile Include="PartModules\IVA\InternalModuleScreenshot.cs" />
