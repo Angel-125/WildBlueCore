@@ -136,7 +136,7 @@ namespace WildBlueCore
                 }
 
                 // We also need to make sure that we don't move the attach nodes since they're already in place.
-//                updateNodePositions = false;
+                updateNodePositions = false;
             }
 
             // If originalNodePositions is empty, then it means that this is a new instance of a part (OnLoad isn't called when a new part is created in the editor), 

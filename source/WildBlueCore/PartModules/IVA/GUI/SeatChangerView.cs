@@ -14,6 +14,7 @@ namespace WildBlueCore.PartModules.IVA
     {
         #region Fields
         public Part part;
+        public Dictionary<string, string> seatAliases;
         #endregion
 
         #region Housekeeping
@@ -95,10 +96,14 @@ namespace WildBlueCore.PartModules.IVA
 
             scrollPosNewSeating = GUILayout.BeginScrollView(scrollPosNewSeating, new GUILayoutOption[] { GUILayout.Width(250) });
             count = emptySeats.Count;
+            string seatName;
             for (int index = 0; index < count; index++)
             {
+                seatName = emptySeats[index].seatTransformName;
+                if (seatAliases.ContainsKey(seatName))
+                    seatName = seatAliases[seatName];
                 isSelected = selectedNewSeatIndex == index;
-                isSelected = GUILayout.Toggle(isSelected, emptySeats[index].seatTransformName);
+                isSelected = GUILayout.Toggle(isSelected, seatName);
                 if (isSelected)
                     selectedNewSeatIndex = index;
             }

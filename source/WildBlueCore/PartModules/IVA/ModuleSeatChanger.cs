@@ -19,6 +19,7 @@ namespace WildBlueCore.PartModules.IVA
 
         #region Housekeeping
         SeatChangerView seatChangerView;
+        Dictionary<string, string> seatAliases;
         #endregion
 
         #region Overrides
@@ -28,8 +29,10 @@ namespace WildBlueCore.PartModules.IVA
             if (!HighLogic.LoadedSceneIsFlight)
                 return;
 
+            fetchSeatAliases();
             seatChangerView = new SeatChangerView();
             seatChangerView.part = part;
+            seatChangerView.seatAliases = seatAliases;
         }
         #endregion
 
@@ -47,6 +50,34 @@ namespace WildBlueCore.PartModules.IVA
         #endregion
 
         #region Helpers
+        void fetchSeatAliases()
+        {
+            seatAliases = new Dictionary<string, string>();
+
+            ConfigNode node = getPartConfigNode();
+            if (node == null || !node.HasNode("SEAT_ALIAS"))
+                return;
+            ConfigNode[] nodes = node.GetNodes("SEAT_ALIAS");
+            string seatName;
+            string displayName;
+            for (int index = 0; index < nodes.Length; index++)
+            {
+                node = nodes[index];
+                if (!node.HasValue("name") || !node.HasValue("displayName"))
+                    continue;
+
+                seatName = node.GetValue("name");
+                if (string.IsNullOrEmpty(seatName))
+                    continue;
+
+                displayName = node.GetValue("displayName");
+                if (string.IsNullOrEmpty("displayName"))
+                    continue;
+
+                if (!seatAliases.ContainsKey(seatName))
+                    seatAliases.Add(seatName, displayName);
+            }
+        }
         #endregion
     }
 }
