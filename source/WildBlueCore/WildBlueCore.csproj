@@ -94,6 +94,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="PartModules\Decals\ModuleDecal.cs" />
+    <Compile Include="PartModules\Engines\ModuleElectricEnginesFX.cs" />
     <Compile Include="PartModules\Experimental\ModuleConstructionRotationSnap.cs" />
     <Compile Include="PartModules\IVA\GUI\ScreenshotView.cs" />
     <Compile Include="PartModules\IVA\InternalBaseModule.cs" />
@@ -115,6 +116,7 @@
     <Compile Include="PartModules\KerbalGear\ModuleSuitSwitcher.cs" />
     <Compile Include="PartModules\KerbalGear\ModuleWearableItem.cs" />
     <Compile Include="PartModules\KerbalGear\ModuleWearablesController.cs" />
+    <Compile Include="PartModules\Variants\ModulePartSubvariants.cs" />
     <Compile Include="Utilities\BaseDialog\Dialog.cs" />
     <Compile Include="Utilities\BaseDialog\DialogManager.cs" />
     <Compile Include="Utilities\BaseDialog\DialogUils.cs" />
@@ -128,6 +130,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\SupportClasses\MutablePartSet.cs" />
     <Compile Include="Utilities\SupportClasses\TriggerClickWatcher.cs" />
+    <Compile Include="Utilities\SupportClasses\WBCMeshVariant.cs" />
+    <Compile Include="Utilities\SupportClasses\WBCTextureVariant.cs" />
+    <Compile Include="Utilities\SupportClasses\WBCVariant.cs" />
     <Compile Include="Wrappers\Waterfall\ModuleWaterfallFXWrapper.cs" />
     <Compile Include="Wrappers\Waterfall\WaterfallFactoryWrapper.cs" />
     <Compile Include="Wrappers\WildBlueTools\WBIOmniStorageWrapper.cs" />

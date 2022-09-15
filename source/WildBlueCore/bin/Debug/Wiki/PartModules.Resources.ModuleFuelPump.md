@@ -6,17 +6,21 @@ ModuleFuelPump will transfer resources based on a part's Flow Priority. Higher p
 ModuleFuelPump is designed to pump resources throughout the same vessel, but it can also pump resources to a nearby vessel if it is also equipped with a part that has a ModuleFuelPump.  
             
 To pump a resource throughout the same vessel, the following conditions must be met:  
-            * The fuel pump providing resources must be set to Enabled.  
+            * The fuel pump providing resources must be set to Distribute Localy.  
             * The resource must not be empty.  
             * The resource must be transferrable and unlocked.  
             * The destination parts must have space available to receive the pumped resource.  
             * The destination parts' resource storage must be unlocked.  
             
-To pump a resource to another nearby vessel, in addition to the above conditions, the following conditions must also be met:  
+To pump a resource to another nearby vessel, the following conditions must be met:  
+            * The resource must not be empty.  
+            * The resource must be transferrable and unlocked.  
+            * The destination parts must have space available to receive the pumped resource.  
+            * The destination parts' resource storage must be unlocked.  
             * All vessels must be either landed or splashed.  
             * The nearby vessels must be within the provider's pump range.  
-            * The pump providing resources must have its pump mode set to Remote.  
-            * The pumps that receive resources must be set to Enabled.  
+            * The pump providing resources must have its pump mode set to Send to remote.  
+            * The pumps that receive resources must be set to Receive from remote.  
             
             
 > #### Example
@@ -41,38 +45,26 @@ In meters, the maximum range that the fuel pump can reach when remote pumping re
 ## Methods
 
 
-### ActionFuelPumpToggle(KSPActionParam)
-Toggles the fuel pump on/off.
-> #### Parameters
-> **param:** A KSPActionParam containing the action parameters.
-
-
-### ActionFuelPumpOn(KSPActionParam)
-Turns the fuel pump on
-> #### Parameters
-> **param:** A KSPActionParam containing the action parameters.
-
-
 ### ActionFuelPumpOff(KSPActionParam)
-Turns the fuel pump off
+Turns off the fuel pump.
 > #### Parameters
 > **param:** A KSPActionParam containing the action parameters.
 
 
-### ActionFuelPumpModeToggle(KSPActionParam)
-Toggles the pump mode from local to remote and vice-versa.
+### ActionFuelPumpLocal(KSPActionParam)
+Sets pump mode to local distribution.
 > #### Parameters
 > **param:** A KSPActionParam containing the action parameters.
 
 
-### ActionFuelPumpModeLocal(KSPActionParam)
-Sets the pump mode to local.
+### ActionFuelPumpRemoteSend(KSPActionParam)
+Sets the pump mode to send to remote pumps.
 > #### Parameters
-> **param:** 
+> **param:** A KSPActionParam containing the action parameters.
 
 
-### ActionFuelPumpModeRemote(KSPActionParam)
-Sets the pump mode to remote.
+### ActionFuelPumpModeReceive(KSPActionParam)
+Sets the pump mode to receive from remote pumps.
 > #### Parameters
 > **param:** A KSPActionParam containing the action parameters.
 

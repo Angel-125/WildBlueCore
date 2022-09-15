@@ -70,6 +70,11 @@
             Changes the decal on all named transforms.
             </summary>
         </member>
+        <member name="T:WildBlueCore.PartModules.Engines.ModuleElectricEnginesFX">
+            <summary>
+            This is a class that's designed to 
+            </summary>
+        </member>
         <member name="T:WildBlueCore.PartModules.IVA.ModuleSeatRotator">
             <summary>
             This module lets users rotate a seat in a part's IVA if the seat is occupied.
@@ -152,18 +157,22 @@
             <remarks>
             To pump a resource throughout the same vessel, the following conditions must be met:  
             </remarks>
-            <li>The fuel pump providing resources must be set to Enabled.</li>
+            <li>The fuel pump providing resources must be set to Distribute Localy.</li>
             <li>The resource must not be empty.</li>
             <li>The resource must be transferrable and unlocked.</li>
             <li>The destination parts must have space available to receive the pumped resource.</li>
             <li>The destination parts' resource storage must be unlocked.</li>
             <remarks>
-            To pump a resource to another nearby vessel, in addition to the above conditions, the following conditions must also be met:  
+            To pump a resource to another nearby vessel, the following conditions must be met:  
             </remarks>
+            <li>The resource must not be empty.</li>
+            <li>The resource must be transferrable and unlocked.</li>
+            <li>The destination parts must have space available to receive the pumped resource.</li>
+            <li>The destination parts' resource storage must be unlocked.</li>
             <li>All vessels must be either landed or splashed.</li>
             <li>The nearby vessels must be within the provider's pump range.</li>
-            <li>The pump providing resources must have its pump mode set to Remote.</li>
-            <li>The pumps that receive resources must be set to Enabled.</li>
+            <li>The pump providing resources must have its pump mode set to Send to remote.</li>
+            <li>The pumps that receive resources must be set to Receive from remote.</li>
             <example>
             <code>
             MODULE
@@ -184,39 +193,27 @@
             In meters, the maximum range that the fuel pump can reach when remote pumping resources. Default is 200 meters.
             </summary>
         </member>
-        <member name="M:WildBlueCore.PartModules.Resources.ModuleFuelPump.ActionFuelPumpToggle(KSPActionParam)">
-            <summary>
-            Toggles the fuel pump on/off.
-            </summary>
-            <param name="param">A KSPActionParam containing the action parameters.</param>
-        </member>
-        <member name="M:WildBlueCore.PartModules.Resources.ModuleFuelPump.ActionFuelPumpOn(KSPActionParam)">
-            <summary>
-            Turns the fuel pump on
-            </summary>
-            <param name="param">A KSPActionParam containing the action parameters.</param>
-        </member>
         <member name="M:WildBlueCore.PartModules.Resources.ModuleFuelPump.ActionFuelPumpOff(KSPActionParam)">
             <summary>
-            Turns the fuel pump off
+            Turns off the fuel pump.
             </summary>
             <param name="param">A KSPActionParam containing the action parameters.</param>
         </member>
-        <member name="M:WildBlueCore.PartModules.Resources.ModuleFuelPump.ActionFuelPumpModeToggle(KSPActionParam)">
+        <member name="M:WildBlueCore.PartModules.Resources.ModuleFuelPump.ActionFuelPumpLocal(KSPActionParam)">
             <summary>
-            Toggles the pump mode from local to remote and vice-versa.
+            Sets pump mode to local distribution.
             </summary>
             <param name="param">A KSPActionParam containing the action parameters.</param>
         </member>
-        <member name="M:WildBlueCore.PartModules.Resources.ModuleFuelPump.ActionFuelPumpModeLocal(KSPActionParam)">
+        <member name="M:WildBlueCore.PartModules.Resources.ModuleFuelPump.ActionFuelPumpRemoteSend(KSPActionParam)">
             <summary>
-            Sets the pump mode to local.
+            Sets the pump mode to send to remote pumps.
             </summary>
-            <param name="param"></param>
+            <param name="param">A KSPActionParam containing the action parameters.</param>
         </member>
-        <member name="M:WildBlueCore.PartModules.Resources.ModuleFuelPump.ActionFuelPumpModeRemote(KSPActionParam)">
+        <member name="M:WildBlueCore.PartModules.Resources.ModuleFuelPump.ActionFuelPumpModeReceive(KSPActionParam)">
             <summary>
-            Sets the pump mode to remote.
+            Sets the pump mode to receive from remote pumps.
             </summary>
             <param name="param">A KSPActionParam containing the action parameters.</param>
         </member>
@@ -234,6 +231,164 @@
             <param name="transferAmount">A double containing how much of the resource to distrubute.</param>
             <param name="isFromRemotePump">A bool indicating whether or not the source is from a remote pump. Default is false.</param>
             <returns>True if the distribution was successful, false if not.</returns>
+        </member>
+        <member name="T:WildBlueCore.PartModules.ModulePartSubvariants">
+            <summary>
+            Helper part module to handle part mesh and texture switching. Stock ModulePartVariants doesn't cooperate with multiple ModulePartVariants in the same part, so this class
+            gets around the issue and adds a few enhancements. When you define a SWPartVariants, be sure to place its config node AFTER ModulePartVariants.  
+            When you define a ModulePartVariants, you can specify some EXTRA_INFO that SWPartVariants uses to configure itself:
+            </summary>
+            <example>
+            <code>
+            MODULE
+            {
+                name = ModulePartVariants
+                ...
+                VARIANT
+                {
+                    name = someVariantName
+                    ...
+                    EXTRA_INFO
+                    {
+                        // ModulePartSubvariants can be GUI enabled/disabled using the "enableVariantModuleIDs" and "disableVariantModuleIDs" fields, respectively.
+                        // Simply specify the SWPartVariants' moduleID. For multiple moduleIDs, separate them with a semicolon.
+                        disableVariantModuleIDs = mirroring
+                        
+                        // Similarly you can re-apply the ModulePartSubvariants' applied variant when this variant is applied.
+                        updateVariantModuleIDs = texturing
+                    }
+                }
+            }
+            </code>
+            </example>
+            <remarks>
+            To define a ModulePartSubvariants module:
+            </remarks>
+            <example>
+            <code>
+            MODULE
+            {
+                name = ModulePartSubvariants
+                moduleID = texturing
+                updateSymmetry = false
+                allowFieldUpdate = false
+                
+                VARIANT
+                {
+                    displayName = #LOC_SUNKWORKS_yachtDeck
+                    primaryColor = #caa472
+                    secondaryColor = #caa472
+                    // GAMEOBJECTS, EXTRA_INFO, etc. found in a typical ModulePartVariants are supported but omitted for brevity.
+                    
+                    // The textures will be applied to all the transforms named in the config node.
+                    TEXTURES
+                    {
+                        mainTextureURL = WildBlueIndustries/SunkWorks/Parts/Structural/BoatHulls/boatHull1Yacht
+                        bumpMapURL = WildBlueIndustries/SunkWorks/Parts/Structural/BoatHulls/boatHull1YachtNrm		
+                        transformName = cargoKeelBowFull
+                        transformName = cargoKeelBowInsert
+                        transformName = cargoKeelBowPortHalf
+                        transformName = cargoKeelBowStarboardHalf
+                        // Add as many as you like
+                        transformName = ...
+                    }
+                }
+            }
+            </code>
+            </example>
+        </member>
+        <member name="F:WildBlueCore.PartModules.ModulePartSubvariants.baseVariant">
+            <summary>
+            Name of the variant to apply if we haven't selected a variant yet.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.ModulePartSubvariants.variantIndex">
+            <summary>
+            Index for the texture variants.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.ModulePartSubvariants.updateSymmetry">
+            <summary>
+            Flag to indicate if the symmetry parts should also apply the selected variant. Default is true.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.ModulePartSubvariants.allowFieldUpdate">
+            <summary>
+            Flag to indicate whether the variant can be applied post launch. Default is false.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.ModulePartSubvariants.variantApplied">
+            <summary>
+            Field indicating whether or not we have applied the part variant.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.ModulePartSubvariants.meshSets">
+            <summary>
+            If, during a part variant update event, the meshSet field is set in EXTRA_INFO, then
+            we'll record what the meshSet's value is and apply the set IF the value is on our list.
+            If our meshSets is empty (the default), then we'll ignore any meshSet fields passed in with EXTRA_INFO.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.ModulePartSubvariants.currentMeshSet">
+            <summary>
+            The currently selected mesh set.
+            </summary>
+        </member>
+        <member name="M:WildBlueCore.PartModules.ModulePartSubvariants.OnStart(PartModule.StartState)">
+            <summary>
+            Handles the OnStart event.
+            </summary>
+            <param name="state">A StartState containing the starting state.</param>
+        </member>
+        <member name="M:WildBlueCore.PartModules.ModulePartSubvariants.OnAwake">
+            <summary>
+            Handles OnAwake event
+            </summary>
+        </member>
+        <member name="M:WildBlueCore.PartModules.ModulePartSubvariants.OnDestroy">
+            <summary>
+            Handles the OnDestroy event
+            </summary>
+        </member>
+        <member name="M:WildBlueCore.PartModules.ModulePartSubvariants.GetModuleDisplayName">
+            <summary>
+            Gets the module display name.
+            </summary>
+            <returns>A string containing the display name.</returns>
+        </member>
+        <member name="M:WildBlueCore.PartModules.ModulePartSubvariants.GetInfo">
+            <summary>
+            Gets the module description.
+            </summary>
+            <returns>A string containing the module description.</returns>
+        </member>
+        <member name="M:WildBlueCore.PartModules.ModulePartSubvariants.GetModuleCost(System.Single,ModifierStagingSituation)">
+            <summary>
+            Returns the Module cost modifier. It is added to the part's total cost.
+            </summary>
+            <param name="defaultCost">Default cost of the part</param>
+            <param name="sit">The situation in which the call is being made.</param>
+            <returns>A float containing the modified cost.</returns>
+        </member>
+        <member name="M:WildBlueCore.PartModules.ModulePartSubvariants.GetModuleCostChangeWhen">
+            <summary>
+            Describes when the part modifier changes.
+            </summary>
+            <returns>A ModifierChangeWhen indicating when the modifier is applied.</returns>
+        </member>
+        <member name="M:WildBlueCore.PartModules.ModulePartSubvariants.GetModuleMass(System.Single,ModifierStagingSituation)">
+            <summary>
+            Returns the Module cost modifier. It is added to the part's total mass.
+            </summary>
+            <param name="defaultMass">Default mass of the part</param>
+            <param name="sit">The situation in which the call is being made.</param>
+            <returns>A float containing the modified mass.</returns>
+        </member>
+        <member name="M:WildBlueCore.PartModules.ModulePartSubvariants.GetModuleMassChangeWhen">
+            <summary>
+            Describes when the part modifier changes.
+            </summary>
+            <returns>A ModifierChangeWhen indicating when the modifier is applied.</returns>
         </member>
         <!-- Badly formed XML comment ignored for member "T:WildBlueCore.KerbalGear.ModuleEVAOverrides" -->
         <member name="F:WildBlueCore.KerbalGear.ModuleEVAOverrides.buoyancyOverride">
