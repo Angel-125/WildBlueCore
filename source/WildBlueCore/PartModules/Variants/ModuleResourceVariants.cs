@@ -132,15 +132,6 @@ namespace WildBlueCore
             if (variantPart != part)
                 return;
 
-            // Handle single resource (absolute value)
-            string resourceName = variant.GetExtraInfoValue(kResourceName);
-            string amtStr = variant.GetExtraInfoValue(kAmount);
-            string maxAmtStr = variant.GetExtraInfoValue(kMaxAmount);
-            updateResource(resourceName, amtStr, maxAmtStr);
-
-            // Handle multiple resources (absolute values)
-            updateVariantResources(variant.Name);
-
             // Handle storage limit (absolute value)
             string packedVolumeLimitStr = variant.GetExtraInfoValue(kPackedVolumeLimit);
             updateStorageCapacity(packedVolumeLimitStr);
@@ -153,6 +144,15 @@ namespace WildBlueCore
                 float updatedVolume = resourceVolume * volumeMultiplier;
                 updateStorageCapacity(updatedVolume);
             }
+
+            // Handle single resource (absolute value)
+            string resourceName = variant.GetExtraInfoValue(kResourceName);
+            string amtStr = variant.GetExtraInfoValue(kAmount);
+            string maxAmtStr = variant.GetExtraInfoValue(kMaxAmount);
+            updateResource(resourceName, amtStr, maxAmtStr);
+
+            // Handle multiple resources (absolute values)
+            updateVariantResources(variant.Name);
 
             //Dirty the GUI
             MonoUtilities.RefreshContextWindows(this.part);
@@ -219,10 +219,12 @@ namespace WildBlueCore
             for (int index = 0; index < nodes.Length; index++)
             {
                 node = nodes[index];
-                if (!node.HasValue(kResourceName))
+                if (!node.HasValue(kResourceName) && !node.HasValue(kName))
                     continue;
 
                 resourceName = node.GetValue(kResourceName);
+                if (string.IsNullOrEmpty(resourceName))
+                    resourceName = node.GetValue(kName);
 
                 if (node.HasValue(kAmount))
                     amtStr = node.GetValue(kAmount);

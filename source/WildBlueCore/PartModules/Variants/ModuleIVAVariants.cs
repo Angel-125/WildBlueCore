@@ -59,6 +59,7 @@ namespace WildBlueCore
             GameEvents.onCrewTransferred.Remove(onCrewTransferred);
             GameEvents.onCommandSeatInteraction.Remove(onCommandSeatInteraction);
             GameEvents.onCommandSeatInteractionEnter.Remove(onCommandSeatInteraction);
+            GameEvents.onVesselChange.Remove(onVesselChange);
         }
 
         public override void OnAwake()
@@ -68,6 +69,7 @@ namespace WildBlueCore
             GameEvents.onCrewTransferred.Add(onCrewTransferred);
             GameEvents.onCommandSeatInteraction.Add(onCommandSeatInteraction);
             GameEvents.onCommandSeatInteractionEnter.Add(onCommandSeatInteraction);
+            GameEvents.onVesselChange.Add(onVesselChange);
         }
 
         public override void OnStart(StartState state)
@@ -195,6 +197,12 @@ namespace WildBlueCore
         private void onCommandSeatInteraction(KerbalEVA kerbal, bool isBoarding)
         {
             applyVariant();
+        }
+
+        private void onVesselChange(Vessel vesselChanged)
+        {
+            if (vesselChanged == part.vessel)
+                applyVariant();
         }
 
         private ConfigNode findNode(string name, ConfigNode[] nodes)
