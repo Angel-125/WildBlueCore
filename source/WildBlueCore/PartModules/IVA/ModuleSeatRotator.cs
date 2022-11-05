@@ -231,6 +231,10 @@ namespace WildBlueCore.PartModules.IVA
         void findSeat()
         {
             InternalSeat seat;
+            if (part.internalModel == null)
+            {
+                return;
+            }
             int count = part.internalModel.seats.Count;
 
             for (int index = 0; index < count; index++)

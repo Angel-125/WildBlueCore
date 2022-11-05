@@ -232,6 +232,181 @@
             <param name="isFromRemotePump">A bool indicating whether or not the source is from a remote pump. Default is false.</param>
             <returns>True if the distribution was successful, false if not.</returns>
         </member>
+        <member name="F:WildBlueCore.PartModules.Resources.ModuleResourceConverterExtended.startEffect">
+            <summary>
+            Name of the effect to play when the converter starts.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Resources.ModuleResourceConverterExtended.stopEffect">
+            <summary>
+            Name of the effect to play when the converter stops.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Resources.ModuleResourceConverterExtended.runningEffect">
+            <summary>
+            Name of the effect to play while the converter is running.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Resources.ModuleResourceConverterExtended.ecPerSec">
+            <summary>
+            This field describes how much ElectricCharge is consumed per second. A negative number indicates consumption.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Resources.ModuleResourceConverterExtended.minimumVesselPercentEC">
+            <summary>
+            This is a threshold value to ensure that the converter will shut off if the vessel's
+            ElectricCharge falls below the specified percentage. It is ignored if the converter doesn't
+            use ElectricCharge.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Resources.ModuleResourceConverterExtended.requiresHomeConnection">
+            <summary>
+            This flag tells the converter to check for a connection to the homeworld if set to true.
+            If no connection is present, then the converter operations are suspended. It requires
+            CommNet to be enabled.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Resources.ModuleResourceConverterExtended.minimumCrew">
+            <summary>
+            This field specifies the minimum number of crew required to operate the converter. If the part
+            lacks the minimum required crew, then operations are suspended.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Resources.ModuleResourceConverterExtended.canBeShutdown">
+            <summary>
+            This field indicates whether or not the converter can be shut down. If set to false, then the converter
+            will remove the shutdown and toggle actions and disable the shutdown button.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Resources.ModuleResourceConverterExtended.requiresSplashed">
+            <summary>
+            Flag to indicate that the converter's part must be splashed in order to function.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Resources.ModuleResourceConverterExtended.requiresOxygen">
+            <summary>
+            Flag indicating that the converter requires an oxygenated atmosphere in order to run.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Resources.ModuleResourceConverterExtended.dieRollMin">
+            <summary>
+            Minimum die roll
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Resources.ModuleResourceConverterExtended.dieRollMax">
+            <summary>
+            Maximum die roll
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Resources.ModuleResourceConverterExtended.minimumSuccess">
+            <summary>
+            On a roll of dieRollMin - dieRollMax, the minimum roll required to declare a successful resource yield. Set to 0 if you don't want to roll for success.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Resources.ModuleResourceConverterExtended.criticalSuccess">
+            <summary>
+            On a roll of dieRollMin - dieRollMax, minimum roll for a resource yield to be declared a critical success.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Resources.ModuleResourceConverterExtended.criticalFail">
+            <summary>
+            On a roll of dieRollMin - dieRollMax, the maximum roll for a resource yield to be declared a critical failure.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Resources.ModuleResourceConverterExtended.hoursPerCycle">
+            <summary>
+            How many hours to wait before producing resources defined by YIELD_RESOURCE nodes.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Resources.ModuleResourceConverterExtended.cycleStartTime">
+            <summary>
+            The time at which we started a new resource production cycle.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Resources.ModuleResourceConverterExtended.progress">
+            <summary>
+            Current progress of the production cycle
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Resources.ModuleResourceConverterExtended.timeRemainingDisplay">
+            <summary>
+            Display field to show time remaining on the production cycle.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Resources.ModuleResourceConverterExtended.lastAttempt">
+            <summary>
+            Results of the last production cycle attempt.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Resources.ModuleResourceConverterExtended.criticalSuccessMultiplier">
+            <summary>
+            If the yield check is a critical success, multiply the units produced by this number. Default is 1.0.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Resources.ModuleResourceConverterExtended.failureMultiplier">
+            <summary>
+            If the yield check is a failure, multiply the units produced by this number. Default is 1.0.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Resources.ModuleResourceConverterExtended.explodeUponCriticalFail">
+            <summary>
+            Flag to indicate whether or not the part explodes if the yield roll critically fails.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Resources.ModuleResourceConverterExtended.elapsedTime">
+            <summary>
+            The amount of time that has passed since the converter was last checked if it should produce yield resources.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Resources.ModuleResourceConverterExtended.secondsPerCycle">
+            <summary>
+            The number of seconds per yield cycle.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Resources.ModuleResourceConverterExtended.yieldsList">
+            <summary>
+            The list of resources to produce after the elapsedTime matches the secondsPerCycle.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Resources.ModuleResourceConverterExtended.missingResources">
+            <summary>
+            The converter is missing resources. If set to true then the converter's operations are suspended.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Resources.ModuleResourceConverterExtended.crewEfficiencyBonus">
+            <summary>
+            The efficieny bonus of the crew.
+            </summary>
+        </member>
+        <member name="M:WildBlueCore.PartModules.Resources.ModuleResourceConverterExtended.PerformAnalysis">
+            <summary>
+            Performs the analysis roll to determine how many yield resources to produce.
+            The roll must meet or exceed the minimumSuccess required in order to produce a nominal
+            yield (the amount specified in a YIELD_RESOURCE's Ratio entry). If the roll fails,
+            then a lower than normal yield is produced. If the roll exceeds the criticalSuccess number,
+            then a higher than normal yield is produced. If the roll falls below the criticalFailure number,
+            then no yield is produced, and the part will explode if the explodeUponCriticalFailure flag is set.
+            </summary>
+        </member>
+        <member name="M:WildBlueCore.PartModules.Resources.ModuleResourceConverterExtended.CalculateProgress">
+            <summary>
+            Calculates and updates the progress of the yield production cycle.
+            </summary>
+        </member>
+        <member name="M:WildBlueCore.PartModules.Resources.ModuleResourceConverterExtended.formatTime(System.Double,System.Boolean)">
+            <summary>
+            Formats the supplied seconds into a string.
+            </summary>
+            <param name="secondsToFormat">The number of seconds to format.</param>
+            <param name="showCompact">A flag to indicate whether or not to show the compact form.</param>
+            <returns></returns>
+        </member>
+        <member name="M:WildBlueCore.PartModules.Resources.ModuleResourceConverterExtended.GetSecondsPerDay">
+            <summary>
+            Gets the number of seconds per day on the homeworld.
+            </summary>
+            <returns>The lenght of the solar day in seconds of the homeworld.</returns>
+        </member>
         <member name="T:WildBlueCore.PartModules.ModulePartSubvariants">
             <summary>
             Helper part module to handle part mesh and texture switching. Stock ModulePartVariants doesn't cooperate with multiple ModulePartVariants in the same part, so this class
