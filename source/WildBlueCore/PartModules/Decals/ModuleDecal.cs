@@ -57,26 +57,61 @@ namespace WildBlueCore.PartModules.Decals
         public string selectDecalName = "Select Decal";
 
         /// <summary>
+        ///  GUI name for button that reverses the decal.
+        /// </summary>
+        [KSPField()]
+        public string reverseDecalName = "Reverse Decal";
+
+        /// <summary>
         /// List of transforms that will be changed by the decal. Separate names by semicolon
         /// </summary>
         [KSPField()]
         public string decalTransforms = string.Empty;
 
+        /// <summary>
+        /// Name of the transform for the normal orientation of the decal.
+        /// </summary>
+        [KSPField]
+        public string normalDecalTransformName = string.Empty;
+
+        /// <summary>
+        /// Name of the transform for the reversed orientation of the decal. This is particularly helpful for creating flags and lettering on the opposite side of the part.
+        /// </summary>
+        [KSPField]
+        public string reversedDecalTransformName = string.Empty;
+
+        /// <summary>
+        /// Flag to indicate if the decal is reversed or not.
+        /// </summary>
+        [KSPField(isPersistant = true)]
+        public bool isReversed = false;
+
         public override void OnStart(StartState state)
         {
             base.OnStart(state);
 
-            toggleDecalName = Localizer.Format("#LOC_WILDBLUECORE_toggleDecal");
-            selectDecalName = Localizer.Format("#LOC_WILDBLUECORE_changeDecal");
+            toggleDecalName = Localizer.Format(toggleDecalName);
+            selectDecalName = Localizer.Format(selectDecalName);
+            reverseDecalName = Localizer.Format(reverseDecalName);
 
             Events["ToggleDecal"].guiName = toggleDecalName;
             Events["ToggleDecal"].active = !alwaysVisible;
             Events["ToggleDecal"].guiActive = allowFieldEdit;
             Events["SelectDecal"].guiActive = allowFieldEdit;
+            Events["ReverseDecal"].guiActive = allowFieldEdit;
+
+            if (string.IsNullOrEmpty(normalDecalTransformName) && string.IsNullOrEmpty(reversedDecalTransformName))
+                Events["ReverseDecal"].guiActive = false;
 
             Events["SelectDecal"].guiName = selectDecalName;
+            Events["ToggleDecal"].guiName = toggleDecalName;
+            Events["ReverseDecal"].guiName = reverseDecalName;
 
             ChangeDecal();
+
+            // Setup normal/reversed decals
+            refreshNormalReversedDecals();
+
             GameEvents.onEditorVariantApplied.Add(this.onEditorVariantApplied);
         }
 
@@ -94,6 +129,9 @@ namespace WildBlueCore.PartModules.Decals
             isVisible = !isVisible;
             ChangeDecal();
 
+            if (isVisible)
+                refreshNormalReversedDecals();
+
             updateSymmetryParts();
         }
 
@@ -109,6 +147,43 @@ namespace WildBlueCore.PartModules.Decals
         }
 
         /// <summary>
+        /// Reverses the decal if the transform specified by reverseDecalTransformName and normalDecalTransformName both exist.
+        /// </summary>
+        [KSPEvent(guiActive = true, guiActiveEditor = true, guiName = "Reverse Decal")]
+        public void ReverseDecal()
+        {
+            // Make sure that we have the normal and reversed decals
+            if (string.IsNullOrEmpty(normalDecalTransformName) || string.IsNullOrEmpty(reversedDecalTransformName))
+            {
+                if (string.IsNullOrEmpty(normalDecalTransformName))
+                    Debug.Log("[ModuleDecal] - normalDecalTransformName is not defined");
+                if (string.IsNullOrEmpty(reversedDecalTransformName))
+                    Debug.Log("[ModuleDecal] - reverselDecalTransformName is not defined");
+                return;
+            }
+
+            Transform[] normalDecalTransforms = part.FindModelTransforms(normalDecalTransformName);
+            if (normalDecalTransforms == null || normalDecalTransforms.Length <= 0)
+            {
+                Debug.Log("[ModuleDecal] - Could not find" + normalDecalTransformName);
+                return;
+            }
+
+            Transform[] reversedDecalTransforms = part.FindModelTransforms(reversedDecalTransformName);
+            if (reversedDecalTransforms == null || reversedDecalTransforms.Length <= 0)
+            {
+                Debug.Log("[ModuleDecal] - Could not find" + reversedDecalTransformName);
+                return;
+            }
+
+            // Reverse the decals
+            isReversed = !isReversed;
+
+            toggleDecal(normalDecalTransforms, !isReversed);
+            toggleDecal(reversedDecalTransforms, isReversed);
+        }
+
+        /// <summary>
         /// Private event handler to respond to flag selection.
         /// </summary>
         /// <param name="selected">The selected texture</param>
@@ -116,6 +191,7 @@ namespace WildBlueCore.PartModules.Decals
         {
             decalURL = selected.textureInfo.name;
             ChangeDecal();
+            refreshNormalReversedDecals();
 
             updateSymmetryParts();
         }
@@ -160,7 +236,7 @@ namespace WildBlueCore.PartModules.Decals
                 if (targets == null)
                 {
                     Debug.Log("No targets found for " + transform);
-                    return;
+                    continue;
                 }
 
                 foreach (Transform target in targets)
@@ -180,5 +256,33 @@ namespace WildBlueCore.PartModules.Decals
                 }
             }
         }
+
+        #region Helpers
+        void toggleDecal(Transform[] targets, bool isDisplayed)
+        {
+            foreach (Transform target in targets)
+            {
+                target.gameObject.SetActive(isDisplayed);
+                Collider collider = target.gameObject.GetComponent<Collider>();
+                if (collider != null)
+                    collider.enabled = isDisplayed;
+            }
+        }
+
+        void refreshNormalReversedDecals()
+        {
+            if (!string.IsNullOrEmpty(normalDecalTransformName) && !string.IsNullOrEmpty(reversedDecalTransformName))
+            {
+                Transform[] normalDecalTransforms = part.FindModelTransforms(normalDecalTransformName);
+                Transform[] reversedDecalTransforms = part.FindModelTransforms(reversedDecalTransformName);
+
+                if (normalDecalTransforms != null || normalDecalTransforms.Length > 0 && reversedDecalTransforms != null && reversedDecalTransforms.Length > 0)
+                {
+                    toggleDecal(normalDecalTransforms, !isReversed);
+                    toggleDecal(reversedDecalTransforms, isReversed);
+                }
+            }
+        }
+        #endregion
     }
 }

@@ -17,8 +17,16 @@ Flag to indicate if the decal updates symmetry parts
 GUI name for button that toggles decal visibility
 ### selectDecalName
 GUI name for button that selects the decal.
+### reverseDecalName
+GUI name for button that reverses the decal.
 ### decalTransforms
 List of transforms that will be changed by the decal. Separate names by semicolon
+### normalDecalTransformName
+Name of the transform for the normal orientation of the decal.
+### reversedDecalTransformName
+Name of the transform for the reversed orientation of the decal. This is particularly helpful for creating flags and lettering on the opposite side of the part.
+### isReversed
+Flag to indicate if the decal is reversed or not.
 ## Methods
 
 
@@ -27,6 +35,9 @@ Toggles visibility of the decal.
 
 ### SelectDecal
 Changes the decal
+
+### ReverseDecal
+Reverses the decal if the transform specified by reverseDecalTransformName and normalDecalTransformName both exist.
 
 ### onFlagSelected(FlagBrowser.FlagEntry)
 Private event handler to respond to flag selection.

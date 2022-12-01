@@ -44,9 +44,29 @@
              GUI name for button that selects the decal.
             </summary>
         </member>
+        <member name="F:WildBlueCore.PartModules.Decals.ModuleDecal.reverseDecalName">
+            <summary>
+             GUI name for button that reverses the decal.
+            </summary>
+        </member>
         <member name="F:WildBlueCore.PartModules.Decals.ModuleDecal.decalTransforms">
             <summary>
             List of transforms that will be changed by the decal. Separate names by semicolon
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Decals.ModuleDecal.normalDecalTransformName">
+            <summary>
+            Name of the transform for the normal orientation of the decal.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Decals.ModuleDecal.reversedDecalTransformName">
+            <summary>
+            Name of the transform for the reversed orientation of the decal. This is particularly helpful for creating flags and lettering on the opposite side of the part.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Decals.ModuleDecal.isReversed">
+            <summary>
+            Flag to indicate if the decal is reversed or not.
             </summary>
         </member>
         <member name="M:WildBlueCore.PartModules.Decals.ModuleDecal.ToggleDecal">
@@ -57,6 +77,11 @@
         <member name="M:WildBlueCore.PartModules.Decals.ModuleDecal.SelectDecal">
             <summary>
             Changes the decal
+            </summary>
+        </member>
+        <member name="M:WildBlueCore.PartModules.Decals.ModuleDecal.ReverseDecal">
+            <summary>
+            Reverses the decal if the transform specified by reverseDecalTransformName and normalDecalTransformName both exist.
             </summary>
         </member>
         <member name="M:WildBlueCore.PartModules.Decals.ModuleDecal.onFlagSelected(FlagBrowser.FlagEntry)">
