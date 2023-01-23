@@ -11,7 +11,7 @@ namespace WildBlueCore.PartModules
 {
     /// <summary>
     /// Helper part module to handle part mesh and texture switching. Stock ModulePartVariants doesn't cooperate with multiple ModulePartVariants in the same part, so this class
-    /// gets around the issue and adds a few enhancements. When you define a SWPartVariants, be sure to place its config node AFTER ModulePartVariants.  
+    /// gets around the issue and adds a few enhancements. When you define a ModulePartVariants, be sure to place its config node AFTER ModulePartVariants.  
     /// When you define a ModulePartVariants, you can specify some EXTRA_INFO that SWPartVariants uses to configure itself:
     /// </summary>
     /// <example>

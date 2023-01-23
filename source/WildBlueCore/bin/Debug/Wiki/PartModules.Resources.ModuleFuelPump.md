@@ -41,7 +41,7 @@ To pump a resource to another nearby vessel, the following conditions must be me
 ### onPumpStateChanged
 Signals when the isActivated and/or remotePumpMode changes.
 ### maxRemotePumpRange
-In meters, the maximum range that the fuel pump can reach when remote pumping resources. Default is 200 meters.
+In meters, the maximum range that the fuel pump can reach when remote pumping resources. Default is 2000 meters.
 ## Methods
 
 
@@ -69,7 +69,7 @@ Sets the pump mode to receive from remote pumps.
 > **param:** A KSPActionParam containing the action parameters.
 
 
-### DistributeResources
+### DistributeResources(System.Single)
 This method will attempt to distribute any resources that the host part has to other parts in the vessel or to nearby vessels. The resources must be capable of being transferred, and they must be unlocked. Additionally, to remotely distribute the resources, remotePumpMode must be set to true, the nearby vessel must have at least one ModuleFuelPump, and the nearby vessel's fuel pump' isActivated must be set to true.
 
 ### DistributeResourceLocally(PartResource,System.Double,System.Boolean)

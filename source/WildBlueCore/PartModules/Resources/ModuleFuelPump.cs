@@ -66,6 +66,7 @@ namespace WildBlueCore.PartModules.Resources
     {
         #region Constants
         const double kAmountThreshold = 1e-8;
+        const float kMaxTransferTime = 216000f;
         #endregion
 
         #region Custom GameEvents
@@ -78,33 +79,34 @@ namespace WildBlueCore.PartModules.Resources
         #region Fields
         [KSPField(isPersistant = true, guiActive = true, guiActiveEditor = true, groupName = "FuelPump", groupDisplayName = "#LOC_WILDBLUECORE_fuelPumpTitle", guiName = "#LOC_WILDBLUECORE_fuelPumpTitle")]
         [UI_Toggle(enabledText = "#LOC_WILDBLUECORE_fuelPumpEnabled", disabledText = "#LOC_WILDBLUECORE_fuelPumpDisabled")]
-        bool isActivated = false;
+        public bool isActivated = false;
         
         [KSPField(guiActive = true, groupName = "FuelPump", groupDisplayName = "#LOC_WILDBLUECORE_fuelPumpTitle", guiName = "#LOC_WILDBLUECORE_fuelPumpStatus")]
-        string pumpStatus = string.Empty;
+        public string pumpStatus = string.Empty;
 
         [KSPField(isPersistant = true)]
-        PumpingMode pumpMode;
+        internal PumpingMode pumpMode;
 
         [KSPField(guiActive = true, isPersistant = true, guiActiveEditor = true, groupName = "FuelPump", groupDisplayName = "#LOC_WILDBLUECORE_fuelPumpTitle", guiName = "#LOC_WILDBLUECORE_fuelPumpRate", guiFormat = "n0", guiUnits = "%")]
         [UI_FloatRange(affectSymCounterparts = UI_Scene.All, minValue = 1f, maxValue = 20f, stepIncrement = 1f)]
-        float pumpRate = 10f;
+        public float pumpRate = 10f;
 
         /// <summary>
-        /// In meters, the maximum range that the fuel pump can reach when remote pumping resources. Default is 200 meters.
+        /// In meters, the maximum range that the fuel pump can reach when remote pumping resources. Default is 2000 meters.
         /// </summary>
         [KSPField()]
-        public float maxRemotePumpRange = 200f;
+        public float maxRemotePumpRange = 2000f;
         #endregion
 
         #region Housekeeping
-        Part hostPart = null;
-        MutablePartSet resourcePartSet = null;
-        FuelPumpState pumpState = FuelPumpState.disabled;
-        int loadedVesselsCount = -1;
-        ModuleFuelPump[] remoteFuelPumps;
-        PumpingMode prevPumpMode;
-        bool wasActivated;
+        internal Part hostPart = null;
+        internal MutablePartSet resourcePartSet = null;
+        internal FuelPumpState pumpState = FuelPumpState.disabled;
+        internal int loadedVesselsCount = -1;
+        internal ModuleFuelPump[] remoteFuelPumps;
+        internal PumpingMode prevPumpMode;
+        internal bool wasActivated;
+        bool transfersWereEnabled;
 
         string cacheStringStatusPumpOff;
         string cacheStringStatusPumping;
@@ -248,7 +250,7 @@ namespace WildBlueCore.PartModules.Resources
         #endregion
 
         #region Update Loops
-        private void FixedUpdate()
+        internal virtual void FixedUpdate()
         {
             if (!HighLogic.LoadedSceneIsFlight)
                 return;
@@ -261,6 +263,7 @@ namespace WildBlueCore.PartModules.Resources
                 return;
             }
 
+            // Check activation
             if (isActivated != wasActivated)
             {
                 wasActivated = isActivated;
@@ -300,7 +303,7 @@ namespace WildBlueCore.PartModules.Resources
         /// This method will attempt to distribute any resources that the host part has to other parts in the vessel or to nearby vessels. The resources must be capable of being transferred, and they must be unlocked.
         /// Additionally, to remotely distribute the resources, remotePumpMode must be set to true, the nearby vessel must have at least one ModuleFuelPump, and the nearby vessel's fuel pump' isActivated must be set to true.
         /// </summary>
-        public void DistributeResources()
+        public void DistributeResources(float pumpRateOverride = -1f)
         {
             if (!isActivated || pumpMode == PumpingMode.receiveFromRemote)
                 return;
@@ -332,8 +335,13 @@ namespace WildBlueCore.PartModules.Resources
                 // We know that at least one resource isn't empty.
                 localResourcesAreEmpty = false;
 
+                // Calculate pump rate
+                float adjustedPumpRate = (pumpRate / 100) * TimeWarp.fixedDeltaTime;
+                if (pumpRateOverride > 0)
+                    adjustedPumpRate = pumpRateOverride / 100f;
+
                 // Calculate transfer amount
-                transferAmount = resource.maxAmount * (pumpRate / 100f) * TimeWarp.fixedDeltaTime;
+                transferAmount = resource.maxAmount * adjustedPumpRate;
                 if (transferAmount >= resource.amount)
                 {
                     transferAmount = resource.amount;
@@ -575,7 +583,7 @@ namespace WildBlueCore.PartModules.Resources
             remoteFuelPumps = remotePumps.ToArray();
         }
 
-        private void updatePumpStatusDisplay()
+        internal void updatePumpStatusDisplay()
         {
             switch (pumpState)
             {
@@ -597,7 +605,7 @@ namespace WildBlueCore.PartModules.Resources
             }
         }
 
-        private void updatePumpModeUI()
+        internal void updatePumpModeUI()
         {
             switch (pumpMode)
             {

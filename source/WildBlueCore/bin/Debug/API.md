@@ -153,7 +153,7 @@ To pump a resource to another nearby vessel, the following conditions must be me
 ### onPumpStateChanged
 Signals when the isActivated and/or remotePumpMode changes.
 ### maxRemotePumpRange
-In meters, the maximum range that the fuel pump can reach when remote pumping resources. Default is 200 meters.
+In meters, the maximum range that the fuel pump can reach when remote pumping resources. Default is 2000 meters.
 ## Methods
 
 
@@ -181,7 +181,7 @@ Sets the pump mode to receive from remote pumps.
 > **param:** A KSPActionParam containing the action parameters.
 
 
-### DistributeResources
+### DistributeResources(System.Single)
 This method will attempt to distribute any resources that the host part has to other parts in the vessel or to nearby vessels. The resources must be capable of being transferred, and they must be unlocked. Additionally, to remotely distribute the resources, remotePumpMode must be set to true, the nearby vessel must have at least one ModuleFuelPump, and the nearby vessel's fuel pump' isActivated must be set to true.
 
 ### DistributeResourceLocally(PartResource,System.Double,System.Boolean)
@@ -196,9 +196,34 @@ Distributes the desired resource locally throughout the vessel.
 > #### Return value
 > True if the distribution was successful, false if not.
 
+# PartModules.Resources.ModuleSupplyLine
+            
+Derived from ModuleFuelPup, this part module provides periodic refills of the resources contained in the storage tank. The storage tank can be either the part that hosts this part module, or, if the host part has no resources, then the tank is the part that the supply line part is attached to. It makes the assumption that the storage tank is completely full when it arrives at the desired destination; how it gets there is up to the player. The part module allows players to specify how long, in hours, it takes between supply runs. It also can optionally charge for the cost of the resources upon delivery. When a delivery is made, the part module can play an EFFECT and/or run an animation.
+        
+## Fields
+
+### transfersEnabled
+Flag to enable periodic transfers. Every transferPeriod, the fuel pump will immediately refill the tank and distribute the contents
+### transferTime
+In hours, how long to wait before magically refilling the tank and distributing the contents.
+### lastUpdated
+Last time the pump was updated.
+### isRecordingTime
+Flag indicating that the pump is recording mission time.
+### missionStartTime
+Last time the pump was updated.
+### missionStopTime
+Last time the pump was updated.
+### missionElapsedTime
+In seconds, elapsed mission time.
+### chargeForResources
+Flag to indicate whether or not the player should be charged for resource deliveries
+### payFlatFee
+Flag to indicate whether or not the player should be charged a flat fee to deliver resources
+
 # PartModules.ModulePartSubvariants
             
-Helper part module to handle part mesh and texture switching. Stock ModulePartVariants doesn't cooperate with multiple ModulePartVariants in the same part, so this class gets around the issue and adds a few enhancements. When you define a SWPartVariants, be sure to place its config node AFTER ModulePartVariants. When you define a ModulePartVariants, you can specify some EXTRA_INFO that SWPartVariants uses to configure itself:
+Helper part module to handle part mesh and texture switching. Stock ModulePartVariants doesn't cooperate with multiple ModulePartVariants in the same part, so this class gets around the issue and adds a few enhancements. When you define a ModulePartVariants, be sure to place its config node AFTER ModulePartVariants. When you define a ModulePartVariants, you can specify some EXTRA_INFO that SWPartVariants uses to configure itself:
             
             
 > #### Example

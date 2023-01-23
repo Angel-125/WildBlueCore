@@ -117,6 +117,7 @@
     <Compile Include="PartModules\KerbalGear\ModuleWearableItem.cs" />
     <Compile Include="PartModules\KerbalGear\ModuleWearablesController.cs" />
     <Compile Include="PartModules\Resources\ModuleResourceConverterExtended.cs" />
+    <Compile Include="PartModules\Resources\ModuleSupplyLine.cs" />
     <Compile Include="PartModules\Thermal\ModuleThermalShield.cs" />
     <Compile Include="PartModules\Variants\ModulePartSubvariants.cs" />
     <Compile Include="Utilities\BaseDialog\Dialog.cs" />
