@@ -13,7 +13,7 @@ namespace WildBlueCore.PartModules.Resources
         disabled,
         pumping,
         sourceIsEmpty,
-        destinationsAreFull,
+        destinationsAreFull
     }
 
     internal enum PumpingMode
@@ -67,6 +67,7 @@ namespace WildBlueCore.PartModules.Resources
         #region Constants
         const double kAmountThreshold = 1e-8;
         const float kMaxTransferTime = 216000f;
+        const double kPauseDuration = 3.0f;
         #endregion
 
         #region Custom GameEvents
@@ -74,6 +75,8 @@ namespace WildBlueCore.PartModules.Resources
         /// Signals when the isActivated and/or remotePumpMode changes.
         /// </summary>
         public static EventData<ModuleFuelPump> onPumpStateChanged = new EventData<ModuleFuelPump>("onPumpStateChanged");
+
+        public static EventData<ModuleFuelPump> onReloadPumpVessels = new EventData<ModuleFuelPump>("onReloadPumpVessels");
         #endregion
 
         #region Fields
@@ -96,6 +99,12 @@ namespace WildBlueCore.PartModules.Resources
         /// </summary>
         [KSPField()]
         public float maxRemotePumpRange = 2000f;
+
+        /// <summary>
+        /// Flag to indicate that the part that has the ModuleFuelPump is the host part.
+        /// </summary>
+        [KSPField]
+        public bool selfIsHostPart = true;
         #endregion
 
         #region Housekeeping
@@ -106,6 +115,8 @@ namespace WildBlueCore.PartModules.Resources
         internal ModuleFuelPump[] remoteFuelPumps;
         internal PumpingMode prevPumpMode;
         internal bool wasActivated;
+        internal bool isPaused = false;
+        internal double resumeOpsTimestamp;
         bool transfersWereEnabled;
 
         string cacheStringStatusPumpOff;
@@ -163,6 +174,7 @@ namespace WildBlueCore.PartModules.Resources
             GameEvents.onPartResourceFullEmpty.Add(onPartResourceFullEmpty);
             GameEvents.onPartPriorityChanged.Add(onPartPriorityChanged);
             onPumpStateChanged.Add(pumpStateChanged);
+            onReloadPumpVessels.Add(reloadPumpVessels);
         }
 
         public override string GetInfo()
@@ -172,6 +184,17 @@ namespace WildBlueCore.PartModules.Resources
         #endregion
 
         #region Actions
+        /// <summary>
+        /// Turns off the fuel pump.
+        /// </summary>
+        /// <param name="param">A KSPActionParam containing the action parameters.</param>
+        [KSPAction("#LOC_WILDBLUECORE_fuelPumpModeOn")]
+        public void ActionFuelPumpOn(KSPActionParam param)
+        {
+            isActivated = true;
+            updatePumpActivationState();
+        }
+
         /// <summary>
         /// Turns off the fuel pump.
         /// </summary>
@@ -218,9 +241,11 @@ namespace WildBlueCore.PartModules.Resources
 
         private void updatePumpActivationState()
         {
+            loadedVesselsCount = -1;
             rebuildPartSet();
             updateLoadedVesselsCache();
             onPumpStateChanged.Fire(this);
+            onReloadPumpVessels.Fire(this);
         }
         #endregion
 
@@ -263,10 +288,22 @@ namespace WildBlueCore.PartModules.Resources
                 return;
             }
 
+            if (isPaused && Planetarium.GetUniversalTime() > resumeOpsTimestamp)
+            {
+                isPaused = false;
+                updatePumpActivationState();
+                updatePumpModeUI();
+                pumpState = FuelPumpState.pumping;
+                prevPumpMode = pumpMode;
+                onPumpStateChanged.Fire(this);
+            }
+
             // Check activation
             if (isActivated != wasActivated)
             {
                 wasActivated = isActivated;
+                if (isActivated)
+                    isPaused = false;
                 updatePumpActivationState();
                 updatePumpModeUI();
             }
@@ -373,11 +410,19 @@ namespace WildBlueCore.PartModules.Resources
             // Update the state
             // If localResourcesAreEmpty then we need to stop pumping and wait until we have more resources.
             if (localResourcesAreEmpty)
+            {
                 pumpState = FuelPumpState.sourceIsEmpty;
+                isPaused = true;
+                resumeOpsTimestamp = Planetarium.GetUniversalTime() + kPauseDuration;
+            }
 
             // If !tanksWereFilled then all the destination tanks are full and we should wait until one or more of them has room.
             else if (!tanksWereFilled)
+            {
                 pumpState = FuelPumpState.destinationsAreFull;
+                isPaused = true;
+                resumeOpsTimestamp = Planetarium.GetUniversalTime() + kPauseDuration;
+            }
         }
 
         /// <summary>
@@ -393,15 +438,16 @@ namespace WildBlueCore.PartModules.Resources
 
             // Make sure that we have the resource.
             // As a courtesy, if we are receiving from a remote pump we can skip this check.
-            if (!hostPart.Resources.Contains(resource.info.id))
+            if (!hostPart.Resources.Contains(resource.info.id) && resource.resourceName != "ElectricCharge")
             {
                 // No resource was transferred so give it back to the host tank.
                 resource.amount += Math.Abs(transferAmount);
+
                 return false;
             }
 
             // Distribute the resource and process the result.
-            double amountTransferred = resourcePartSet.RequestResource(hostPart, resource.info.id, -transferAmount, true);
+            double amountTransferred = hostPart.RequestResource(resource.info.id, -transferAmount, resource.info.resourceFlowMode, false);
 
             // If no tanks were filled and the source is a remote pump then we can try to fill our own tanks.
             if (amountTransferred == 0 && isFromRemotePump)
@@ -443,7 +489,9 @@ namespace WildBlueCore.PartModules.Resources
 
             // If we're waiting for the host part's tanks to fill up again, then we can resume pumping.
             if (pumpState == FuelPumpState.sourceIsEmpty && isActivated)
+            {
                 pumpState = FuelPumpState.pumping;
+            }
         }
 
         private void onPartResourceEmptyFull(PartResource resource)
@@ -462,7 +510,9 @@ namespace WildBlueCore.PartModules.Resources
 
             // If we're waitng for a destination part to have room then we can resume pumping.
             if (pumpState == FuelPumpState.destinationsAreFull && isActivated)
+            {
                 pumpState = FuelPumpState.pumping;
+            }
         }
 
         private void onPartResourceNonemptyEmpty(PartResource resource)
@@ -498,11 +548,27 @@ namespace WildBlueCore.PartModules.Resources
 
             rebuildPartSet();
         }
+
+        private void reloadPumpVessels(ModuleFuelPump fuelPump)
+        {
+            if (fuelPump == this)
+                return;
+
+            loadedVesselsCount = -1;
+            rebuildPartSet();
+            updateLoadedVesselsCache();
+        }
         #endregion
 
         #region Helpers
         private void findHostPart()
         {
+            if (selfIsHostPart)
+            {
+                hostPart = part;
+                return;
+            }
+
             if (part.parent != null)
                 hostPart = part.parent;
             else
@@ -637,6 +703,7 @@ namespace WildBlueCore.PartModules.Resources
             GameEvents.onPartResourceFullEmpty.Remove(onPartResourceFullEmpty);
             GameEvents.onPartPriorityChanged.Remove(onPartPriorityChanged);
             onPumpStateChanged.Remove(pumpStateChanged);
+            onReloadPumpVessels.Remove(reloadPumpVessels);
         }
 
         private void rebuildPartSet()

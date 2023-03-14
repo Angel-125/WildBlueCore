@@ -218,6 +218,17 @@
             In meters, the maximum range that the fuel pump can reach when remote pumping resources. Default is 2000 meters.
             </summary>
         </member>
+        <member name="F:WildBlueCore.PartModules.Resources.ModuleFuelPump.selfIsHostPart">
+            <summary>
+            Flag to indicate that the part that has the ModuleFuelPump is the host part.
+            </summary>
+        </member>
+        <member name="M:WildBlueCore.PartModules.Resources.ModuleFuelPump.ActionFuelPumpOn(KSPActionParam)">
+            <summary>
+            Turns off the fuel pump.
+            </summary>
+            <param name="param">A KSPActionParam containing the action parameters.</param>
+        </member>
         <member name="M:WildBlueCore.PartModules.Resources.ModuleFuelPump.ActionFuelPumpOff(KSPActionParam)">
             <summary>
             Turns off the fuel pump.

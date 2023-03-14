@@ -154,7 +154,15 @@ To pump a resource to another nearby vessel, the following conditions must be me
 Signals when the isActivated and/or remotePumpMode changes.
 ### maxRemotePumpRange
 In meters, the maximum range that the fuel pump can reach when remote pumping resources. Default is 2000 meters.
+### selfIsHostPart
+Flag to indicate that the part that has the ModuleFuelPump is the host part.
 ## Methods
+
+
+### ActionFuelPumpOn(KSPActionParam)
+Turns off the fuel pump.
+> #### Parameters
+> **param:** A KSPActionParam containing the action parameters.
 
 
 ### ActionFuelPumpOff(KSPActionParam)
