@@ -20,7 +20,9 @@ namespace WildBlueCore.PartModules.Resources
     {
         distributeLocally,
         sendToRemote,
-        receiveFromRemote
+        receiveFromRemote,
+        addToDeepStore,
+        removeFromDeepStore
     }
 
     /// <summary>

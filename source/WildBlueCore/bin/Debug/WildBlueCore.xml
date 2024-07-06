@@ -167,6 +167,21 @@
             Rotates the seat to the right.
             </summary>
         </member>
+        <member name="T:WildBlueCore.PartModules.KerbalGear.ModuleEVAResourceTransfer">
+            <summary>
+            This part module enables resource transfers between inventory parts.
+            </summary>
+        </member>
+        <member name="M:WildBlueCore.PartModules.KerbalGear.ModuleEVAResourceTransfer.OnInactive">
+            <summary>
+            Overrides OnInactive. Called when an inventory item is unequipped and the module is disabled.
+            </summary>
+        </member>
+        <member name="M:WildBlueCore.PartModules.KerbalGear.ModuleEVAResourceTransfer.OnActive">
+            <summary>
+            Overrides OnActive. Called when an inventory item is equipped and the module is enabled.
+            </summary>
+        </member>
         <member name="T:WildBlueCore.PartModules.Resources.ModuleFuelPump">
             <summary>
             This part module pumps one or more resources from the host part to other parts that have the same resource. The module can be directly added to a resource tank part or to a part that is

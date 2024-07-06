@@ -109,6 +109,19 @@ Rotates the seat to the left.
 ### RotateRight
 Rotates the seat to the right.
 
+# PartModules.KerbalGear.ModuleEVAResourceTransfer
+            
+This part module enables resource transfers between inventory parts.
+        
+## Methods
+
+
+### OnInactive
+Overrides OnInactive. Called when an inventory item is unequipped and the module is disabled.
+
+### OnActive
+Overrides OnActive. Called when an inventory item is equipped and the module is enabled.
+
 # PartModules.Resources.ModuleFuelPump
             
 This part module pumps one or more resources from the host part to other parts that have the same resource. The module can be directly added to a resource tank part or to a part that is radially attached to a resource tank part. When enabled, ModuleFuelPump will automatically pump resources until either the host part's resource is empty or when the destination parts are full. In either case, it will wait until the host part gains more resources to pump or the destination parts gain more room to store the resource.

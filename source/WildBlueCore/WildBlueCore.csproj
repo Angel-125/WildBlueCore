@@ -96,6 +96,7 @@
     <Compile Include="PartModules\Decals\ModuleDecal.cs" />
     <Compile Include="PartModules\Engines\ModuleElectricEnginesFX.cs" />
     <Compile Include="PartModules\Experimental\ModuleConstructionRotationSnap.cs" />
+    <Compile Include="PartModules\Experimental\ModuleMassTest.cs" />
     <Compile Include="PartModules\IVA\GUI\ScreenshotView.cs" />
     <Compile Include="PartModules\IVA\InternalBaseModule.cs" />
     <Compile Include="PartModules\IVA\InternalModuleAnimation.cs" />
@@ -108,6 +109,8 @@
     <Compile Include="PartModules\IVA\ModuleSeatChanger.cs" />
     <Compile Include="PartModules\IVA\ModuleSeatRotator.cs" />
     <Compile Include="PartModules\IVA\GUI\SeatChangerView.cs" />
+    <Compile Include="PartModules\KerbalGear\ModuleEVAResourceTransfer.cs" />
+    <Compile Include="PartModules\KerbalGear\WBIResourceTransferGUI.cs" />
     <Compile Include="PartModules\Resources\ModuleFuelPump.cs" />
     <Compile Include="PartModules\KerbalGear\GUI\WBIPropOffsetGUI.cs" />
     <Compile Include="PartModules\KerbalGear\GUI\WBIWardrobeGUI.cs" />
