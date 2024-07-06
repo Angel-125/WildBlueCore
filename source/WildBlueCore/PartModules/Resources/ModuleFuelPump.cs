@@ -119,7 +119,6 @@ namespace WildBlueCore.PartModules.Resources
         internal bool wasActivated;
         internal bool isPaused = false;
         internal double resumeOpsTimestamp;
-        bool transfersWereEnabled;
 
         string cacheStringStatusPumpOff;
         string cacheStringStatusPumping;

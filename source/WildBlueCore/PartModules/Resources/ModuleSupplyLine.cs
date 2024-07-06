@@ -16,7 +16,7 @@ namespace WildBlueCore.PartModules.Resources
     ///  it takes between supply runs. It also can optionally charge for the cost of the resources upon delivery.
     ///  When a delivery is made, the part module can play an EFFECT and/or run an animation.
     /// </summary>
-    public class ModuleSupplyLine: ModuleFuelPump
+    public class ModuleSupplyLine: BasePartModule
     {
         #region Constants
         const float kMaxTransferTime = 216000f;
@@ -85,6 +85,12 @@ namespace WildBlueCore.PartModules.Resources
         /// </summary>
         [KSPField(isPersistant = true)]
         public bool payFlatFee;
+
+        /// <summary>
+        /// Flag to indicate that the part that has the ModuleSupplyLine is the host part.
+        /// </summary>
+        [KSPField]
+        public bool selfIsHostPart = true;
         #endregion
 
         #region Housekeeping
@@ -92,6 +98,8 @@ namespace WildBlueCore.PartModules.Resources
         bool effectPlayed;
         bool animationPlayed;
         ModuleAnimateGeneric animationModule = null;
+        internal Part hostPart = null;
+        ModuleFuelPump fuelPump = null;
         #endregion
 
         #region Overrides
@@ -99,19 +107,15 @@ namespace WildBlueCore.PartModules.Resources
         {
             base.OnStart(state);
 
+            // Get host part
+            findHostPart();
+
+            fuelPump = part.FindModuleImplementing<ModuleFuelPump>();
+
             // Periodic Transfers
             transfersWereEnabled = transfersEnabled;
 
             // UI
-            Fields["isActivated"].guiActive = false;
-            Fields["isActivated"].guiActiveEditor = false;
-            Fields["pumpRate"].guiActive = false;
-            Fields["pumpRate"].guiActiveEditor = false;
-            Fields["pumpStatus"].group.name = "SupplyLine";
-            Fields["pumpMode"].group.name = "SupplyLine";
-            Fields["pumpRate"].group.name = "SupplyLine";
-            Fields["isActivated"].group.name = "SupplyLine";
-
             if (isRecordingTime)
             {
                 Events["RecordStartTime"].active = false;
@@ -122,9 +126,6 @@ namespace WildBlueCore.PartModules.Resources
                 Events["RecordStartTime"].active = true;
                 Events["RecordEndTime"].active = false;
             }
-
-            wasActivated = isActivated;
-            updatePumpModeUI();
 
             // Animation
             List<ModuleAnimateGeneric> animationModules = part.FindModulesImplementing<ModuleAnimateGeneric>();
@@ -173,13 +174,10 @@ namespace WildBlueCore.PartModules.Resources
         #endregion
 
         #region Update Loops
-        internal override void FixedUpdate()
+        internal void FixedUpdate()
         {
             if (!HighLogic.LoadedSceneIsFlight)
                 return;
-            isActivated = true;
-
-            base.FixedUpdate();
 
             // Check resource transfer state
             if (transfersWereEnabled != transfersEnabled)
@@ -208,12 +206,28 @@ namespace WildBlueCore.PartModules.Resources
 
 
         #region Helpers
+        private void findHostPart()
+        {
+            if (selfIsHostPart)
+            {
+                hostPart = part;
+                return;
+            }
+
+            if (part.parent != null)
+                hostPart = part.parent;
+            else
+                hostPart = part;
+        }
+
         private void performResourceTransferIfNeeded()
         {
             if (isRecordingTime || transferTime <= 0 || !transfersEnabled || hostPart == null)
                 return;
             if (lastUpdated <= 0)
                 lastUpdated = Planetarium.GetUniversalTime();
+            if (fuelPump == null)
+                return;
 
             double elapsedTime = Planetarium.GetUniversalTime() - lastUpdated;
             double transferTimeSeconds = transferTime * 3600;
@@ -232,9 +246,7 @@ namespace WildBlueCore.PartModules.Resources
                 fillTankResources();
 
                 // Distribute resources
-                isActivated = true;
-                wasActivated = isActivated;
-                DistributeResources(100f);
+                fuelPump.DistributeResources(100f);
 
                 // Update elapsedTime
                 elapsedTime -= transferTimeSeconds;

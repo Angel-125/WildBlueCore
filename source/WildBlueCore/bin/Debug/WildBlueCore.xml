@@ -513,6 +513,11 @@
             Flag to indicate whether or not the player should be charged a flat fee to deliver resources
             </summary>
         </member>
+        <member name="F:WildBlueCore.PartModules.Resources.ModuleSupplyLine.selfIsHostPart">
+            <summary>
+            Flag to indicate that the part that has the ModuleSupplyLine is the host part.
+            </summary>
+        </member>
         <member name="T:WildBlueCore.PartModules.ModulePartSubvariants">
             <summary>
             Helper part module to handle part mesh and texture switching. Stock ModulePartVariants doesn't cooperate with multiple ModulePartVariants in the same part, so this class

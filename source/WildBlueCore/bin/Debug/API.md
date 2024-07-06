@@ -241,6 +241,8 @@ In seconds, elapsed mission time.
 Flag to indicate whether or not the player should be charged for resource deliveries
 ### payFlatFee
 Flag to indicate whether or not the player should be charged a flat fee to deliver resources
+### selfIsHostPart
+Flag to indicate that the part that has the ModuleSupplyLine is the host part.
 
 # PartModules.ModulePartSubvariants
             
