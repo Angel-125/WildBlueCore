@@ -214,6 +214,8 @@ namespace WildBlueCore.PartModules.Resources
         /// The efficieny bonus of the crew.
         /// </summary>
         protected float crewEfficiencyBonus = 1.0f;
+
+        protected bool debugMode;
         #endregion
 
         #region Overrides
@@ -299,6 +301,7 @@ namespace WildBlueCore.PartModules.Resources
         public override void OnStart(StartState state)
         {
             base.OnStart(state);
+            debugMode = WildBlueCoreScenario.debugMode;
 
             //Hide action buttons if needed
             if (!canBeShutdown)

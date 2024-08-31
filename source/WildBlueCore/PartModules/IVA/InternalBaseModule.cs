@@ -31,6 +31,7 @@ namespace WildBlueCore.PartModules.IVA
         #region Housekeeping
         protected TriggerClickWatcher clickWatcher = null;
         protected ModulePropStates propStates = null;
+        public bool debugMode;
         #endregion
 
         #region Computed properties
@@ -60,6 +61,7 @@ namespace WildBlueCore.PartModules.IVA
         #region Overrides
         public void Start()
         {
+            debugMode = WildBlueCoreScenario.debugMode;
             propStates = part.FindModuleImplementing<ModulePropStates>();
 
             // Get the animation trigger

@@ -308,37 +308,20 @@ namespace WildBlueCore.KerbalGear
             {
                 decal = flags[flagIndex];
                 if ((decal.textureQuadName.Contains("EVAStorage") && (kerbalEVA.StorageTransform.gameObject.activeSelf || kerbalEVA.StorageSlimTransform.gameObject.activeSelf)) ||
-                    (decal.textureQuadName.Contains("kbEVA_flagDecals") && inventory.ContainsPart("evaJetpack"))
-                        )
+                    (decal.textureQuadName.Contains("kbEVA_flagDecals") && inventory.ContainsPart("evaJetpack")))
                 {
                     decal.flagDisplayed = false;
                     decal.UpdateDisplay();
                 }
             }
 
-            if (inventory.ContainsPart("evaJetpack"))
-            {
-                kerbalEVA.BackpackTransform.gameObject.SetActive(false);
-                kerbalEVA.BackpackStTransform.gameObject.SetActive(false);
-            }
-
-            /*
-            if (inventory.ContainsPart("evaChute"))
-            {
-                kerbalEVA.ChuteJetpackTransform.gameObject.SetActive(true);
-                kerbalEVA.ChuteStTransform.gameObject.SetActive(false);
-                kerbalEVA.ChuteContainerTransform.gameObject.SetActive(false);
-
-                ModuleEvaChute chute = part.FindModuleImplementing<ModuleEvaChute>();
-                chute.SetCanopy(kerbalEVA.ChuteJetpackTransform);
-            }
-            */
-
-            if (kerbalEVA.StorageTransform.gameObject.activeSelf || kerbalEVA.StorageSlimTransform.gameObject.activeSelf)
-            {
-                kerbalEVA.StorageTransform.gameObject.SetActive(false);
-                kerbalEVA.StorageSlimTransform.gameObject.SetActive(false);
-            }
+            kerbalEVA.BackpackTransform.gameObject.SetActive(false);
+            kerbalEVA.BackpackStTransform.gameObject.SetActive(false);
+            kerbalEVA.StorageTransform.gameObject.SetActive(false);
+            kerbalEVA.StorageSlimTransform.gameObject.SetActive(false);
+            kerbalEVA.ChuteJetpackTransform.gameObject.SetActive(false);
+            kerbalEVA.ChuteStTransform.gameObject.SetActive(false);
+            kerbalEVA.ChuteContainerTransform.gameObject.SetActive(false);
         }
 
         private void setupWearableParts()

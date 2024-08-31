@@ -36,6 +36,12 @@ namespace WildBlueCore
         [KSPField]
         public string moduleID = string.Empty;
 
+        public override void OnAwake()
+        {
+            base.OnAwake();
+            debugMode = WildBlueCoreScenario.debugMode;
+        }
+
         /// <summary>
         /// Retrieves the module's config node from the part config.
         /// </summary>

@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\..\WildBlueTools\packages\Krafs.Publicizer.2.2.1\build\Krafs.Publicizer.props" Condition="Exists('..\..\..\WildBlueTools\packages\Krafs.Publicizer.2.2.1\build\Krafs.Publicizer.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -9,11 +10,12 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>WildBlueCore</RootNamespace>
     <AssemblyName>WildBlueCore</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -119,17 +121,21 @@
     <Compile Include="PartModules\KerbalGear\ModuleSuitSwitcher.cs" />
     <Compile Include="PartModules\KerbalGear\ModuleWearableItem.cs" />
     <Compile Include="PartModules\KerbalGear\ModuleWearablesController.cs" />
+    <Compile Include="PartModules\Animation\ModuleAnimateGenericExtended.cs" />
     <Compile Include="PartModules\Resources\ModuleResourceConverterExtended.cs" />
     <Compile Include="PartModules\Resources\ModuleSupplyLine.cs" />
     <Compile Include="PartModules\Thermal\ModuleThermalShield.cs" />
+    <Compile Include="PartModules\IVA\ModuleInternalVariants.cs" />
     <Compile Include="PartModules\Variants\ModulePartSubvariants.cs" />
+    <Compile Include="SettingsAndScenario\WildBlueCoreScenario.cs" />
+    <Compile Include="SettingsAndScenario\WildBlueCoreSettings.cs" />
     <Compile Include="Utilities\BaseDialog\Dialog.cs" />
     <Compile Include="Utilities\BaseDialog\DialogManager.cs" />
     <Compile Include="Utilities\BaseDialog\DialogUils.cs" />
     <Compile Include="PartModules\BasePartModule.cs" />
     <Compile Include="PartModules\Breaking Ground\ModulePowerUnitConverter.cs" />
     <Compile Include="PartModules\Breaking Ground\ModulePowerUnitDistributor.cs" />
-    <Compile Include="PartModules\Variants\ModuleIVAVariants.cs" />
+    <Compile Include="PartModules\IVA\ModuleIVAVariants.cs" />
     <Compile Include="PartModules\Variants\ModulePartGridVariants.cs" />
     <Compile Include="PartModules\Variants\ModuleResourceVariants.cs" />
     <Compile Include="PartModules\Wheels\ModuleWheelSFX.cs" />
@@ -146,6 +152,10 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <Publicize Include="Assembly-CSharp:ModuleAnimateGeneric.FixedUpdate" />
+    <Publicize Include="Assembly-CSharp:ModuleAnimateGeneric.anim" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="MarkdownSeparator.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -154,6 +164,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="xmldoc2md.ps1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -167,4 +178,12 @@ xcopy /Y "$(TargetDir)$(TargetName).dll" "C:\KSPDev\GameData\WildBlueIndustries\
 Powershell.exe -ExecutionPolicy Unrestricted -file "$(TargetDir)xmldoc2md.ps1" -xml "$(TargetDir)$(TargetName).xml" -xsl "$(TargetDir)xmldoc2md.xsl" -output "$(TargetDir)API.md"
 $(TargetDir)MarkdownSeparator.exe $(TargetDir)API.md Wiki</PostBuildEvent>
   </PropertyGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\..\WildBlueTools\packages\Krafs.Publicizer.2.2.1\build\Krafs.Publicizer.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\WildBlueTools\packages\Krafs.Publicizer.2.2.1\build\Krafs.Publicizer.props'))" />
+    <Error Condition="!Exists('..\..\..\WildBlueTools\packages\Krafs.Publicizer.2.2.1\build\Krafs.Publicizer.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\WildBlueTools\packages\Krafs.Publicizer.2.2.1\build\Krafs.Publicizer.targets'))" />
+  </Target>
+  <Import Project="..\..\..\WildBlueTools\packages\Krafs.Publicizer.2.2.1\build\Krafs.Publicizer.targets" Condition="Exists('..\..\..\WildBlueTools\packages\Krafs.Publicizer.2.2.1\build\Krafs.Publicizer.targets')" />
 </Project>

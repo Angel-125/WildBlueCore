@@ -244,6 +244,91 @@ Flag to indicate whether or not the player should be charged a flat fee to deliv
 ### selfIsHostPart
 Flag to indicate that the part that has the ModuleSupplyLine is the host part.
 
+# PartModules.ModuleAnimateGenericExtended
+            
+This part module derives from ModuleAnimatedGeneric. It adds the ability to play sound effects while animating. It also adds several options to check before playing the animation. First, it can check the active vessel for a necessary skill and skill level. Second, it can check for and consume required resources. Those resources can be pulled from the part's vessel and/or from a remote vessel. Third, it can check for and consume parts stored in an inventory. Those parts can be pulled form the parts vessel and/or from a remote vessel. Finally, you can provide a list of part modules that will be enabled after tne animation completes, and disabled when when not complete.
+        
+## Fields
+
+### debugMode
+Debug flag
+### startEventRequiresSkillCheck
+Flag indicating whether or not to require a skill check before playing the start event animation. Default is false.
+### endEventRequiresSkillCheck
+Flag indicating whether or not to require a skill check before playing the end event animation. Default is false.
+### skillToCheck
+The skill required to unpack the part.
+### minimumSkillLevel
+The minimum skill level required to unpack the box. Default is 0.
+### startEventRequiresResources
+Flag to indicate whether or not to make a resource requirements check before playing the start event animation. Default is false.
+### endEventGivesResources
+Flag to indicate whether or not to make a resource requirements check before playing the end event animation. Default is false.
+### canUseRemoteResources
+Flag to indicate whether or not when checking resources, resources can come from other vessels. Default is true.
+### startSoundURL
+URL for the start sound played when the animation starts.
+### startSoundPitch
+Pitch level for the start sound.
+### startSoundVolume
+Volume level for the start sound.
+### loopSoundURL
+URL for the loop sound, played while the animation is playing.
+### loopSoundPitch
+Pitch level for the loop sound.
+### loopSoundVolume
+Volume level for the loop sound.
+### stopSoundURL
+URL four the stop sound, played when the animation is completed.
+### stopSoundPitch
+Pitch level for the stop sound.
+### stopSoundVolume
+Volume level for the stop sound.
+## Methods
+
+
+### Toggle
+Toggles the animation.
+
+### ToggleAction(KSPActionParam)
+Action to toggle the animation.
+> #### Parameters
+> **param:** 
+
+
+### SetProgress(System.Single)
+Sets the Progress level. Call this instead of setting deployPercent directly.
+> #### Parameters
+> **toValue:** A float between 0 and 100.
+
+
+### PlayStartSound
+Plays the start sound.
+
+### PlayEndSound
+Plays the end sound.
+
+# PartModules.Variants.ModuleInternalVariants
+            
+Use this module to change the INTERNAL model (the IVA) of a part.
+        
+## Fields
+
+### variantIndex
+Index for the internal variant.
+## Methods
+
+
+### GetModuleDisplayName
+Gets the module display name.
+> #### Return value
+> A string containing the display name.
+
+### GetInfo
+Gets the module description.
+> #### Return value
+> A string containing the module description.
+
 # PartModules.ModulePartSubvariants
             
 Helper part module to handle part mesh and texture switching. Stock ModulePartVariants doesn't cooperate with multiple ModulePartVariants in the same part, so this class gets around the issue and adds a few enhancements. When you define a ModulePartVariants, be sure to place its config node AFTER ModulePartVariants. When you define a ModulePartVariants, you can specify some EXTRA_INFO that SWPartVariants uses to configure itself:

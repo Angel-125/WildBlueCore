@@ -22,19 +22,29 @@ namespace WildBlueCore
     [KSPAddon(KSPAddon.Startup.AllGameScenes, false)]
     public class DialogManager : MonoBehaviour
     {
-
         public static DialogManager Instance;
+
+        bool showWindows = true;
         List<IManagedWindow> managedWindows = new List<IManagedWindow>();
 
         public void Awake()
         {
             Instance = this;
+
+            GameEvents.onHideUI.Add(onHideUI);
+            GameEvents.onShowUI.Add(onShowUI);
+        }
+
+        public void OnDestroy()
+        {
+            GameEvents.onHideUI.Remove(onHideUI);
+            GameEvents.onShowUI.Remove(onShowUI);
         }
 
         public void OnGUI()
         {
             int totalWindows = managedWindows.Count;
-            if (totalWindows == 0)
+            if (totalWindows == 0 || !showWindows)
                 return;
             IManagedWindow managedWindow;
 
@@ -57,5 +67,16 @@ namespace WildBlueCore
             if (managedWindows.Contains(managedWindow))
                 managedWindows.Remove(managedWindow);
         }
+
+        protected virtual void onHideUI()
+        {
+            showWindows = false;
+        }
+
+        protected virtual void onShowUI()
+        {
+            showWindows = true;
+        }
+
     }
 }
