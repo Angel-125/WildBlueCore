@@ -16,13 +16,13 @@ namespace WildBlueCore
     /// <code>
     /// MODULE
     /// {
-    ///     name = BasePartModule
+    ///     name = WBIBasePartModule
     ///     moduleId = warpEngine
     ///     debugMode = true
     /// }
     /// </code>
     /// </example>
-    public class BasePartModule: PartModule
+    public class WBIBasePartModule: PartModule
     {
         /// <summary>
         /// Flag to indicate whether or not the module is in debug mode.
@@ -87,6 +87,15 @@ namespace WildBlueCore
             }
 
             return partConfigNode;
+        }
+
+
+        protected virtual void debugLog(string message)
+        {
+            if (debugMode == false)
+                return;
+
+            Debug.Log("[" + ClassName + "] -" + message);
         }
 
         /// <summary>

@@ -39,6 +39,7 @@ namespace WildBlueCore.PartModules.IVA
         public ScreenshotView() :
         base("Select An Image", 900, 600)
         {
+            fileNames = new string[0];
             Resizable = false;
             _scrollPos = new Vector2(0, 0);
         }
@@ -51,6 +52,9 @@ namespace WildBlueCore.PartModules.IVA
 
         void fetchImages()
         {
+            if (fileNames.Length > 0)
+                return;
+
             if (string.IsNullOrEmpty(screeshotFolderPath))
                 screeshotFolderPath = KSPUtil.ApplicationRootPath.Replace("\\", "/") + "Screenshots/";
 
@@ -70,12 +74,25 @@ namespace WildBlueCore.PartModules.IVA
 
             int imageIndex = UnityEngine.Random.Range(0, imagePaths.Length - 1);
             Texture2D randomImage = new Texture2D(1, 1);
+            string filePath = "file://" + imagePaths[imageIndex];
+
+            if (System.IO.File.Exists(filePath))
+            {
+                byte[] fileData = System.IO.File.ReadAllBytes(filePath);
+                randomImage.LoadImage(fileData);
+
+                if (showImageDelegate != null)
+                    showImageDelegate(randomImage, imagePaths[imageIndex]);
+            }
+
+            /*
             WWW www = new WWW("file://" + imagePaths[imageIndex]);
 
             www.LoadImageIntoTexture(randomImage);
 
             if (showImageDelegate != null)
                 showImageDelegate(randomImage, imagePaths[imageIndex]);
+            */
         }
 
         protected override void DrawWindowContents(int windowId)
@@ -98,8 +115,6 @@ namespace WildBlueCore.PartModules.IVA
             _scrollPos = GUILayout.BeginScrollView(_scrollPos, new GUILayoutOption[] { GUILayout.Width(375) });
             if (viewOptionIndex == 0)
                 selectedIndex = GUILayout.SelectionGrid(selectedIndex, fileNames, 1);
-            //            else
-            //                drawCameraControls();
 
             GUILayout.EndScrollView();
 
@@ -107,27 +122,12 @@ namespace WildBlueCore.PartModules.IVA
 
             GUILayout.BeginVertical();
 
-            if (viewOptionIndex == 0)
-                drawScreenshotPreview();
-            //            else
-            //                drawCameraView();
+            drawScreenshotPreview();
 
             drawOkCancelButtons();
             GUILayout.EndVertical();
 
             GUILayout.EndHorizontal();
-        }
-
-        protected void drawCameraView()
-        {
-            if (previewImage != null)
-            {
-                GUILayout.BeginHorizontal();
-                GUILayout.FlexibleSpace();
-                GUILayout.Label(previewImage, new GUILayoutOption[] { GUILayout.Width(525), GUILayout.Height(400) });
-                GUILayout.FlexibleSpace();
-                GUILayout.EndHorizontal();
-            }
         }
 
         protected void drawScreenshotPreview()
@@ -156,11 +156,6 @@ namespace WildBlueCore.PartModules.IVA
                 GUILayout.EndHorizontal();
             }
 
-        }
-
-        protected void drawCameraControls()
-        {
-            GUILayout.Label("TODO: camera rotate and zoom controls here.");
         }
 
         protected void drawOkCancelButtons()

@@ -158,7 +158,7 @@ namespace WildBlueCore.KerbalGear
                 outputString.AppendLine(string.Format("rotationOffset = {0:n4}, {1:n4}, {2:n4}", offsetRollDelta, offsetPitchDelta, offsetYawDelta));
                 string offsetString = outputString.ToString();
 
-                if (kerbalEVA.ModuleInventoryPartReference.ContainsPart(ModuleWearablesController.kJetpackPartName))
+                if (kerbalEVA.ModuleInventoryPartReference.ContainsPart(WBIModuleWearablesController.kJetpackPartName))
                     offsetString = offsetString.Replace("positionOffset", "positionOffsetJetpack");
 
                 GUIUtility.systemCopyBuffer = offsetString;
@@ -203,7 +203,7 @@ namespace WildBlueCore.KerbalGear
 
         private void setInitialOffsets()
         {
-            if (kerbalEVA.ModuleInventoryPartReference.ContainsPart(ModuleWearablesController.kJetpackPartName) && wearableProp.bodyLocation == BodyLocations.backOrJetpack)
+            if (kerbalEVA.ModuleInventoryPartReference.ContainsPart(WBIModuleWearablesController.kJetpackPartName) && wearableProp.bodyLocation == BodyLocations.backOrJetpack)
             {
                 offsetXString = wearableProp.positionOffsetJetpack.x.ToString();
                 offsetYString = wearableProp.positionOffsetJetpack.y.ToString();

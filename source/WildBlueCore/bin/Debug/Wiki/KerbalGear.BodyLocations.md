@@ -1,5 +1,5 @@
             
-Various locations where an wearable item can be placed. This is primarily used for ModuleWearableItem.
+Various locations where an wearable item can be placed. This is primarily used for WBIModuleWearableItem.
         
 ## Fields
 

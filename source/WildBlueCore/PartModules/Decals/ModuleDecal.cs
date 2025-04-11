@@ -12,7 +12,7 @@ namespace WildBlueCore.PartModules.Decals
     /// <summary>
     /// This part module lets you change the decal using the stock flag selector. It does so independently of the mission flag.
     /// </summary>
-    public class ModuleDecal : BasePartModule
+    public class WBIModuleDecal : WBIBasePartModule
     {
         /// <summary>
         /// URL to the image that's displayed by the decal.
@@ -156,23 +156,23 @@ namespace WildBlueCore.PartModules.Decals
             if (string.IsNullOrEmpty(normalDecalTransformName) || string.IsNullOrEmpty(reversedDecalTransformName))
             {
                 if (string.IsNullOrEmpty(normalDecalTransformName))
-                    Debug.Log("[ModuleDecal] - normalDecalTransformName is not defined");
+                    Debug.Log("[WBIModuleDecal] - normalDecalTransformName is not defined");
                 if (string.IsNullOrEmpty(reversedDecalTransformName))
-                    Debug.Log("[ModuleDecal] - reverselDecalTransformName is not defined");
+                    Debug.Log("[WBIModuleDecal] - reverselDecalTransformName is not defined");
                 return;
             }
 
             Transform[] normalDecalTransforms = part.FindModelTransforms(normalDecalTransformName);
             if (normalDecalTransforms == null || normalDecalTransforms.Length <= 0)
             {
-                Debug.Log("[ModuleDecal] - Could not find" + normalDecalTransformName);
+                Debug.Log("[WBIModuleDecal] - Could not find" + normalDecalTransformName);
                 return;
             }
 
             Transform[] reversedDecalTransforms = part.FindModelTransforms(reversedDecalTransformName);
             if (reversedDecalTransforms == null || reversedDecalTransforms.Length <= 0)
             {
-                Debug.Log("[ModuleDecal] - Could not find" + reversedDecalTransformName);
+                Debug.Log("[WBIModuleDecal] - Could not find" + reversedDecalTransformName);
                 return;
             }
 
@@ -200,10 +200,10 @@ namespace WildBlueCore.PartModules.Decals
         {
             if (updateSymmetry)
             {
-                ModuleDecal nameTag;
+                WBIModuleDecal nameTag;
                 foreach (Part symmetryPart in this.part.symmetryCounterparts)
                 {
-                    nameTag = symmetryPart.GetComponent<ModuleDecal>();
+                    nameTag = symmetryPart.GetComponent<WBIModuleDecal>();
                     nameTag.decalURL = this.decalURL;
                     nameTag.isVisible = this.isVisible;
                     nameTag.ChangeDecal();

@@ -12,7 +12,7 @@ namespace WildBlueCore.PartModules.KerbalGear
     /// <summary>
     /// This part module enables resource transfers between inventory parts.
     /// </summary>
-    public class ModuleEVAResourceTransfer : BasePartModule
+    public class WBIModuleEVAResourceTransfer : WBIBasePartModule
     {
         #region Fields
         [KSPField]
@@ -100,12 +100,12 @@ namespace WildBlueCore.PartModules.KerbalGear
                         // List out the resources
                         if (debugMode)
                         {
-                            Debug.Log("[ModuleEVAResourceTransfer] - Gathering resources for " + storedPart.partName);
+                            Debug.Log("[WBIModuleEVAResourceTransfer] - Gathering resources for " + storedPart.partName);
 
                             for (int resourceIndex = 0; resourceIndex < count; resourceIndex++)
                             {
                                 resourceSnapshot = storedPart.snapshot.resources[resourceIndex];
-                                Debug.Log("[ModuleEVAResourceTransfer] - " + resourceSnapshot.resourceName + string.Format("{0:n2}/{1:n2}", resourceSnapshot.amount, resourceSnapshot.maxAmount));
+                                Debug.Log("[WBIModuleEVAResourceTransfer] - " + resourceSnapshot.resourceName + string.Format("{0:n2}/{1:n2}", resourceSnapshot.amount, resourceSnapshot.maxAmount));
                             }
                         }
                     }

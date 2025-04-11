@@ -12,7 +12,7 @@ namespace WildBlueCore.PartModules.Variants
     /// <summary>
     /// Use this module to change the INTERNAL model (the IVA) of a part.
     /// </summary>
-    public class ModuleInternalVariants: BasePartModule
+    public class WBIModuleInternalVariants: WBIBasePartModule
     {
         #region Fields
         /// <summary>
@@ -107,13 +107,13 @@ namespace WildBlueCore.PartModules.Variants
             ConfigNode node = getPartConfigNode();
             if (node == null)
             {
-                Debug.Log("[ModuleInternalVariants] - Part config node not found.");
+                Debug.Log("[WBIModuleInternalVariants] - Part config node not found.");
                 return;
             }
             loadVariantConfigs(node);
             if (variants.Count == 0)
             {
-                Debug.Log("[ModuleInternalVariants] - No VARIANT nodes found.");
+                Debug.Log("[WBIModuleInternalVariants] - No VARIANT nodes found.");
                 return;
             }
 
@@ -168,7 +168,7 @@ namespace WildBlueCore.PartModules.Variants
             {
                 Fields["variantIndex"].guiActiveUnfocused = false;
                 Fields["variantIndex"].guiActive = false;
-                Debug.Log("[ModuleInternalVariants] - Cannot allow IVA switch, there are crew aboard the part. Count: " + part.protoModuleCrew.Count);
+                Debug.Log("[WBIModuleInternalVariants] - Cannot allow IVA switch, there are crew aboard the part. Count: " + part.protoModuleCrew.Count);
 
                 //Dirty the GUI
                 MonoUtilities.RefreshContextWindows(part);
@@ -186,10 +186,10 @@ namespace WildBlueCore.PartModules.Variants
             if (variantSelector.variants == null)
                 setupVariants();
 
-            Debug.Log("[ModuleInternalVariants] - inConstructionMode: " + inConstructionMode);
+            Debug.Log("[WBIModuleInternalVariants] - inConstructionMode: " + inConstructionMode);
 
             if (variantSelector.variants != null)
-                Debug.Log("[ModuleInternalVariants] - variants: " + variantSelector.variants.Count);
+                Debug.Log("[WBIModuleInternalVariants] - variants: " + variantSelector.variants.Count);
         }
 
         private UI_VariantSelector getVariantSelector()

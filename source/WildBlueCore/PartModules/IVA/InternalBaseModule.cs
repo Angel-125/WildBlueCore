@@ -8,10 +8,10 @@ using WildBlueCore.Utilities;
 
 namespace WildBlueCore.PartModules.IVA
 {
-    public class InternalBaseModule: InternalModule
+    public class WBIInternalBaseModule: InternalModule
     {
         #region Events
-        public static EventData<InternalBaseModule, string> eventGroupUpdated = new EventData<InternalBaseModule, string>("eventGroupUpdated");
+        public static EventData<WBIInternalBaseModule, string> eventGroupUpdated = new EventData<WBIInternalBaseModule, string>("eventGroupUpdated");
         #endregion
 
         #region Fields
@@ -30,7 +30,7 @@ namespace WildBlueCore.PartModules.IVA
 
         #region Housekeeping
         protected TriggerClickWatcher clickWatcher = null;
-        protected ModulePropStates propStates = null;
+        protected WBIModulePropStates propStates = null;
         public bool debugMode;
         #endregion
 
@@ -62,7 +62,7 @@ namespace WildBlueCore.PartModules.IVA
         public void Start()
         {
             debugMode = WildBlueCoreScenario.debugMode;
-            propStates = part.FindModuleImplementing<ModulePropStates>();
+            propStates = part.FindModuleImplementing<WBIModulePropStates>();
 
             // Get the animation trigger
             Transform trans = internalProp.FindModelTransform(triggerName);
@@ -77,23 +77,20 @@ namespace WildBlueCore.PartModules.IVA
                         clickWatcher = goTrigger.AddComponent<TriggerClickWatcher>();
                         clickWatcher.internalBaseModule = this;
                     }
-                    TriggerClickWatcher.onTriggerClicked.Add(triggerClicked);
-                    TriggerClickWatcher.onMouseDown.Add(triggerMouseDown);
                 }
             }
+            TriggerClickWatcher.onTriggerClicked.Add(triggerClicked);
+            TriggerClickWatcher.onMouseDown.Add(triggerMouseDown);
 
             eventGroupUpdated.Add(groupUpdated);
 
             OnStart();
         }
 
-        public void OnDestroy()
+        public virtual void OnDestroy()
         {
-            if (clickWatcher != null)
-            {
-                TriggerClickWatcher.onTriggerClicked.Remove(triggerClicked);
-                TriggerClickWatcher.onMouseDown.Remove(triggerMouseDown);
-            }
+            TriggerClickWatcher.onTriggerClicked.Remove(triggerClicked);
+            TriggerClickWatcher.onMouseDown.Remove(triggerMouseDown);
 
             eventGroupUpdated.Remove(groupUpdated);
         }
@@ -112,7 +109,7 @@ namespace WildBlueCore.PartModules.IVA
 
         }
 
-        protected virtual void onGroupUpdated(InternalBaseModule source)
+        protected virtual void onGroupUpdated(WBIInternalBaseModule source)
         {
 
         }
@@ -144,19 +141,19 @@ namespace WildBlueCore.PartModules.IVA
         #endregion
 
         #region Helpers
-        protected virtual void groupUpdated(InternalBaseModule source, string sourceGroupId)
+        protected virtual void groupUpdated(WBIInternalBaseModule source, string sourceGroupId)
         {
             if ((groupId == sourceGroupId && source.part == part) || (groupId == sourceGroupId && source.vessel == vessel && allowSameVessel))
                 onGroupUpdated(source);
         }
 
-        void triggerClicked(InternalBaseModule internalBaseModule)
+        void triggerClicked(WBIInternalBaseModule internalBaseModule)
         {
             if (internalBaseModule == this)
                 onTriggerClick();
         }
 
-        void triggerMouseDown(InternalBaseModule internalBaseModule)
+        void triggerMouseDown(WBIInternalBaseModule internalBaseModule)
         {
             if (internalBaseModule == this)
                 onMouseDown();

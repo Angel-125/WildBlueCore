@@ -16,17 +16,17 @@ namespace WildBlueCore
     /// <code>
     /// MODULE
     /// {
-    ///     name = ModulePowerUnitDistributor
+    ///     name = WBIModulePowerUnitDistributor
     /// }
     /// </code>
     /// </example>
-    public class ModulePowerUnitDistributor: BasePartModule
+    public class WBIModulePowerUnitDistributor: WBIBasePartModule
     {
         #region Housekeeping
         int prevLoadedVesselCount = -1;
         ModuleGroundExpControl groundExpControl = null;
         List<ModuleGroundExpControl> groundControllers = null;
-        Dictionary<Vessel, List<ModulePowerUnitConverter>> vesselPowerConverters = null;
+        Dictionary<Vessel, List<WBIModulePowerUnitConverter>> vesselPowerConverters = null;
         int originalPowerProduced = -1;
         int originalPowerActualProduced = -1;
         int prevTotalPowerAvailable = -1;
@@ -95,9 +95,9 @@ namespace WildBlueCore
                 return;
 
             Vessel converterVessel = null;
-            List<ModulePowerUnitConverter> converters = null;
+            List<WBIModulePowerUnitConverter> converters = null;
             int converterCount;
-            ModulePowerUnitConverter converter = null;
+            WBIModulePowerUnitConverter converter = null;
             int totalPowerAvailable = originalPowerProduced;
             for (int index = 0; index < coverterVessels.Length; index++)
             {
@@ -146,10 +146,10 @@ namespace WildBlueCore
 
             // Distribute the power to each vessel
             Vessel converterVessel = null;
-            List<ModulePowerUnitConverter> converters = null;
+            List<WBIModulePowerUnitConverter> converters = null;
             int converterCount;
-            ModulePowerUnitConverter converter = null;
-            ModulePowerUnitConverter bestConverter = null;
+            WBIModulePowerUnitConverter converter = null;
+            WBIModulePowerUnitConverter bestConverter = null;
             for (int index = 0; index < coverterVessels.Length; index++)
             {
                 converterVessel = coverterVessels[index];
@@ -184,11 +184,11 @@ namespace WildBlueCore
                 return;
             prevLoadedVesselCount = count;
             groundControllers = new List<ModuleGroundExpControl>();
-            vesselPowerConverters = new Dictionary<Vessel, List<ModulePowerUnitConverter>>();
+            vesselPowerConverters = new Dictionary<Vessel, List<WBIModulePowerUnitConverter>>();
 
             Vessel loadedVessel = null;
             ModuleGroundExpControl groundControl = null;
-            List<ModulePowerUnitConverter> powerUnitConverters = null;
+            List<WBIModulePowerUnitConverter> powerUnitConverters = null;
             for (int index = 0; index < count; index++)
             {
                 loadedVessel = FlightGlobals.VesselsLoaded[index];
@@ -206,7 +206,7 @@ namespace WildBlueCore
                     groundControllers.Add(groundControl);
 
                 // If the vessel has power converters then add them to the map.
-                powerUnitConverters = loadedVessel.FindPartModulesImplementing<ModulePowerUnitConverter>();
+                powerUnitConverters = loadedVessel.FindPartModulesImplementing<WBIModulePowerUnitConverter>();
                 if (powerUnitConverters != null && powerUnitConverters.Count > 0 && !vesselPowerConverters.ContainsKey(loadedVessel))
                     vesselPowerConverters.Add(loadedVessel, powerUnitConverters);
             }

@@ -26,11 +26,11 @@ namespace WildBlueCore.PartModules
     ///         ...
     ///         EXTRA_INFO
     ///         {
-    ///             // ModulePartSubvariants can be GUI enabled/disabled using the "enableVariantModuleIDs" and "disableVariantModuleIDs" fields, respectively.
+    ///             // WBIModulePartSubvariants can be GUI enabled/disabled using the "enableVariantModuleIDs" and "disableVariantModuleIDs" fields, respectively.
     ///             // Simply specify the SWPartVariants' moduleID. For multiple moduleIDs, separate them with a semicolon.
     ///             disableVariantModuleIDs = mirroring
     ///             
-    ///             // Similarly you can re-apply the ModulePartSubvariants' applied variant when this variant is applied.
+    ///             // Similarly you can re-apply the WBIModulePartSubvariants' applied variant when this variant is applied.
     ///             updateVariantModuleIDs = texturing
     ///         }
     ///     }
@@ -38,13 +38,13 @@ namespace WildBlueCore.PartModules
     /// </code>
     /// </example>
     /// <remarks>
-    /// To define a ModulePartSubvariants module:
+    /// To define a WBIModulePartSubvariants module:
     /// </remarks>
     /// <example>
     /// <code>
     /// MODULE
     /// {
-    ///     name = ModulePartSubvariants
+    ///     name = WBIModulePartSubvariants
     ///     moduleID = texturing
     ///     updateSymmetry = false
     ///     allowFieldUpdate = false
@@ -72,7 +72,7 @@ namespace WildBlueCore.PartModules
     /// }
     /// </code>
     /// </example>
-    public class ModulePartSubvariants : BasePartModule, IPartCostModifier, IPartMassModifier
+    public class WBIModulePartSubvariants : WBIBasePartModule, IPartCostModifier, IPartMassModifier
     {
         #region Fields
         /// <summary>
@@ -122,7 +122,7 @@ namespace WildBlueCore.PartModules
         #endregion
 
         #region Housekeeping
-        public static EventData<ModulePartSubvariants, string, Dictionary<string, string>> onApplySubvariantExtraInfo = new EventData<ModulePartSubvariants, string, Dictionary<string, string>>("onApplySubvariantExtraInfo");
+        public static EventData<WBIModulePartSubvariants, string, Dictionary<string, string>> onApplySubvariantExtraInfo = new EventData<WBIModulePartSubvariants, string, Dictionary<string, string>>("onApplySubvariantExtraInfo");
 
         List<WBCVariant> variants;
         bool isInitialized = false;
@@ -221,10 +221,10 @@ namespace WildBlueCore.PartModules
             if (updateSymmetry)
             {
                 int count = part.symmetryCounterparts.Count;
-                ModulePartSubvariants partVariant;
+                WBIModulePartSubvariants partVariant;
                 for (int index = 0; index < count; index++)
                 {
-                    partVariant = part.symmetryCounterparts[index].FindModuleImplementing<ModulePartSubvariants>();
+                    partVariant = part.symmetryCounterparts[index].FindModuleImplementing<WBIModulePartSubvariants>();
                     partVariant.variantIndex = variantIndex;
                     partVariant.variantApplied = true;
                     variant = partVariant.variants[variantIndex];
@@ -380,7 +380,7 @@ namespace WildBlueCore.PartModules
             onVariantApplied(variantPart, variant);
         }
 
-        private void onApplyVariantExtraInfoHandler(ModulePartSubvariants orginator, string variantName, Dictionary<string, string> extraInfo)
+        private void onApplyVariantExtraInfoHandler(WBIModulePartSubvariants orginator, string variantName, Dictionary<string, string> extraInfo)
         {
             if (orginator.part != part || orginator == this || !isInitialized)
                 return;

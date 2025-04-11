@@ -8,10 +8,10 @@ using KSP.Localization;
 
 namespace WildBlueCore.PartModules.IVA
 {
-    public class ModuleSeatChanger: BasePartModule
+    public class WBIModuleSeatChanger: WBIBasePartModule
     {
         #region Events
-        public static EventData<ModuleSeatChanger> onSeatsReassigned = new EventData<ModuleSeatChanger>("onSeatsReassigned");
+        public static EventData<WBIModuleSeatChanger> onSeatsReassigned = new EventData<WBIModuleSeatChanger>("onSeatsReassigned");
         #endregion
 
         #region Fields

@@ -144,10 +144,10 @@ namespace WildBlueCore.PartModules.IVA
             part.vessel.CrewListSetDirty();
             respawingCrew = false;
             fetchSeats();
-            ModuleIVAVariants ivaVariants = part.FindModuleImplementing<ModuleIVAVariants>();
+            WBIModuleIVAVariants ivaVariants = part.FindModuleImplementing<WBIModuleIVAVariants>();
             if (ivaVariants != null)
                 ivaVariants.applyVariant();
-            ModuleSeatChanger.onSeatsReassigned.Fire(part.FindModuleImplementing<ModuleSeatChanger>());
+            WBIModuleSeatChanger.onSeatsReassigned.Fire(part.FindModuleImplementing<WBIModuleSeatChanger>());
         }
 
         int findSeatIndex(InternalSeat seat)

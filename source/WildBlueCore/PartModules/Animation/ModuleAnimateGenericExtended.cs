@@ -20,7 +20,7 @@ namespace WildBlueCore.PartModules
     /// Third, it can check for and consume parts stored in an inventory. Those parts can be pulled form the parts vessel and/or from a remote vessel.
     /// Finally, you can provide a list of part modules that will be enabled after tne animation completes, and disabled when when not complete.
     /// </summary>
-    public class ModuleAnimateGenericExtended: ModuleAnimateGeneric
+    public class WBIModuleAnimateGenericExtended: ModuleAnimateGeneric
     {
         #region Fields
         /// <summary>
@@ -160,7 +160,14 @@ namespace WildBlueCore.PartModules
         {
             base.OnStart(state);
             if (!HighLogic.LoadedSceneIsFlight)
+            {
+                if (HighLogic.LoadedSceneIsEditor)
+                {
+                    // Clear resources if we haven't completed the animation.
+                    updateManagedResources();
+                }
                 return;
+            }
 
             if (debugMode)
             {
@@ -175,12 +182,36 @@ namespace WildBlueCore.PartModules
             }
 
             // Disable part modules if we haven't completed the animation.
-            updateManagedModules();
+            //updateManagedModules();
+
+            // Clear resources if we haven't completed the animation.
+            //updateManagedResources();
 
             setupSounds();
 
             OnMoving.Add(onMovingAnimation);
             OnStop.Add(onStopAnimation);
+        }
+
+        /// <summary>
+        /// This gets called after all part modules in the part have been started.
+        /// Overriding this gives us the opportunity to disable all the part modules that we manage regardless of their load order.
+        /// </summary>
+        /// <param name="state">The StartState upon finishing the start process.</param>
+        public override void OnStartFinished(StartState state)
+        {
+            base.OnStartFinished(state);
+
+            if (!HighLogic.LoadedSceneIsFlight)
+            {
+                return;
+            }
+
+            // Disable part modules if we haven't completed the animation.
+            updateManagedModules();
+
+            // Clear resources if we haven't completed the animation.
+            updateManagedResources();
         }
 
         /// <summary>
@@ -191,6 +222,8 @@ namespace WildBlueCore.PartModules
             if (!HighLogic.LoadedSceneIsFlight)
             {
                 base.Toggle();
+                if (HighLogic.LoadedSceneIsEditor)
+                    updateManagedResources();
                 return;
             }
 
@@ -203,11 +236,14 @@ namespace WildBlueCore.PartModules
 
             PlayStartSound();
 
-            base.Toggle();
-
-            // Disable part modules if needed.
+            // Disable part modules and resources if needed.
             if (Events["Toggle"].guiName == endEventGUIName)
+            {
                 updateManagedModules();
+                updateManagedResources();
+            }
+
+            base.Toggle();
         }
 
         /// <summary>
@@ -231,11 +267,14 @@ namespace WildBlueCore.PartModules
 
             PlayStartSound();
 
-            base.ToggleAction(param);
-
-            // Disable part modules if needed.
+            // Disable part modules and resources if needed.
             if (Events["Toggle"].guiName == endEventGUIName)
+            {
                 updateManagedModules();
+                updateManagedResources();
+            }
+
+            base.ToggleAction(param);
         }
 
         public override string GetInfo()
@@ -314,6 +353,7 @@ namespace WildBlueCore.PartModules
             {
                 FixedUpdate();
                 updateManagedModules();
+                updateManagedResources();
             }
         }
 
@@ -526,7 +566,7 @@ namespace WildBlueCore.PartModules
                 int resCount = resHandler.outputResources.Count;
                 for (int index = 0; index < resCount; index++)
                 {
-                    part.RequestResource(resHandler.outputResources[index].resourceDef.name, -resHandler.outputResources[index].amount, ResourceFlowMode.ALL_VESSEL, false);
+                    part.RequestResource(resHandler.outputResources[index].resourceDef.name, -resHandler.outputResources[index].amount, ResourceFlowMode.STAGE_PRIORITY_FLOW, false);
                 }
                 return;
             }
@@ -544,6 +584,75 @@ namespace WildBlueCore.PartModules
             }
         }
 
+        void updateManagedResources()
+        {
+            if (debugMode && part.partInfo != null)
+                Debug.Log("[WBIModuleAnimateGenericExtended] - updateManagedResources called for " + part.partInfo.title);
+
+            ConfigNode node = getPartConfigNode();
+            if (node == null)
+            {
+                if (debugMode)
+                    Debug.Log("[WBIModuleAnimateGenericExtended] - part config node not found");
+                return;
+            }
+            bool isDeployed = Events["Toggle"].guiName == endEventGUIName;
+
+            if (!node.HasNode("MANAGED_RESOURCE"))
+            {
+                if (debugMode)
+                    Debug.Log("[WBIModuleAnimateGenericExtended] - MANAGED_RESOURCE not found");
+                return;
+            }
+
+            ConfigNode[] resourceNodes = node.GetNodes("MANAGED_RESOURCE");
+            ConfigNode resourceNode;
+            string resourceName;
+            double maxAmount;
+            for (int index = 0; index < resourceNodes.Length; index++)
+            {
+                resourceNode = resourceNodes[index];
+                if (resourceNode.HasValue("name") == false || resourceNode.HasValue("maxAmount") == false)
+                {
+                    if (debugMode)
+                        Debug.Log("[WBIModuleAnimateGenericExtended] - MANAGED_RESOURCE: name or maxAmount not found");
+                    continue;
+                }
+
+                // Remove the resource if the animation isn't deployed.
+                resourceName = resourceNode.GetValue("name");
+                if (part.Resources.Contains(resourceName) && isDeployed == false)
+                {
+                    if (debugMode)
+                        Debug.Log("[WBIModuleAnimateGenericExtended] - removing resource: " + resourceName);
+
+                    part.Resources.Remove(resourceName);
+
+                    continue;
+                }
+
+                maxAmount = 0;
+                if (double.TryParse(resourceNode.GetValue("maxAmount"), out maxAmount) == false)
+                {
+                    if (debugMode)
+                        Debug.Log("[WBIModuleAnimateGenericExtended] - cannot parse maxAmount from managed resource named " + resourceName);
+                    continue;
+                }
+
+                // Add resource if needed.
+                if (part.Resources.Contains(resourceName) == false && isDeployed)
+                {
+                    if (debugMode)
+                        Debug.Log("[WBIModuleAnimateGenericExtended] - adding resource: " + resourceName);
+
+                    part.Resources.Add(resourceName, 0, maxAmount, true, true, false, true, PartResource.FlowMode.Both);
+                }
+            }
+
+            //Dirty the GUI
+            MonoUtilities.RefreshContextWindows(part);
+        }
+
         void updateManagedModules()
         {
             ConfigNode node = getPartConfigNode();
@@ -556,8 +665,8 @@ namespace WildBlueCore.PartModules
             bool isDeployed = Events["Toggle"].guiName == endEventGUIName;
             if (debugMode)
             {
-                Debug.Log("[ModuleAnimateGenericExtended] - animTime: " + animTime);
-                Debug.Log("[ModuleAnimateGenericExtended] - isDeployed: " + isDeployed);
+                Debug.Log("[WBIModuleAnimateGenericExtended] - animTime: " + animTime);
+                Debug.Log("[WBIModuleAnimateGenericExtended] - isDeployed: " + isDeployed);
             }
 
             PartModule module;
@@ -601,23 +710,30 @@ namespace WildBlueCore.PartModules
             if (!node.HasNode("MANAGED_MODULES"))
             {
                 if (debugMode)
-                    Debug.Log("[ModuleAnimateGenericExtended] - MANAGED_MODULES not found");
+                    Debug.Log("[WBIModuleAnimateGenericExtended] - MANAGED_MODULES not found");
                 return managedModules;
             }
             ConfigNode modulesNode = node.GetNode("MANAGED_MODULES");
 
             string[] moduleNames = modulesNode.GetValues("moduleName");
-            string managedModuleName;
-            for (int nameIndex = 0; nameIndex < moduleNames.Length; nameIndex++)
-            {
-                managedModuleName = moduleNames[nameIndex];
+            StringBuilder builder = new StringBuilder();
+            for (int index = 0; index < moduleNames.Length; index++)
+                builder.Append(moduleNames[index] + ";");
+            string managedModuleNames = builder.ToString();
+            if (debugMode)
+                Debug.Log("[WBIModuleAnimateGenericExtended] - Potential modules to manage: " + managedModuleNames);
 
-                if (part.Modules.Contains(managedModuleName))
-                    managedModules.Add(part.Modules[managedModuleName]);
+            int count = part.Modules.Count;
+            PartModule partModule;
+            for (int index = 0; index < count; index++)
+            {
+                partModule = part.Modules[index];
+                if (managedModuleNames.Contains(partModule.moduleName))
+                    managedModules.Add(partModule);
             }
 
             if (debugMode)
-                Debug.Log("[ModuleAnimateGenericExtended] - found " + managedModules.Count + " modules to manage.");
+                Debug.Log("[WBIModuleAnimateGenericExtended] - found " + managedModules.Count + " modules to manage.");
             return managedModules;
         }
 
@@ -628,7 +744,7 @@ namespace WildBlueCore.PartModules
             if (part.partInfo.partConfig == null)
             {
                 if (debugMode)
-                    Debug.Log("[ModuleAnimateGenericExtended] - part.partInfo.partConfig == null");
+                    Debug.Log("[WBIModuleAnimateGenericExtended] - part.partInfo.partConfig == null");
                 return null;
             }
             ConfigNode[] nodes = this.part.partInfo.partConfig.GetNodes("MODULE");
@@ -665,7 +781,7 @@ namespace WildBlueCore.PartModules
             }
 
             if (debugMode)
-                Debug.Log("[ModuleAnimateGenericExtended] - found partConfigNode");
+                Debug.Log("[WBIModuleAnimateGenericExtended] - found partConfigNode");
             return partConfigNode;
         }
 
@@ -709,11 +825,16 @@ namespace WildBlueCore.PartModules
         void onStopAnimation(float deployedPercentage)
         {
             if (!HighLogic.LoadedSceneIsFlight)
+            {
+                if (HighLogic.LoadedSceneIsEditor)
+                    updateManagedResources();
                 return;
+            }
 
             hasStarted = false;
             PlayEndSound();
             updateManagedModules();
+            updateManagedResources();
         }
 
         string getResourceInfo(ModuleResource resource)

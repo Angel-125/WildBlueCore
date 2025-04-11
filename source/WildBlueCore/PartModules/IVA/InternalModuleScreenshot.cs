@@ -8,7 +8,7 @@ using WildBlueCore.Utilities;
 
 namespace WildBlueCore.PartModules.IVA
 {
-    public class InternalModuleScreenshot: InternalBaseModule
+    public class WBIInternalModuleScreenshot: WBIInternalBaseModule
     {
         #region Constants
         private const float kMinimumSwitchTime = 30.0f;
@@ -41,10 +41,10 @@ namespace WildBlueCore.PartModules.IVA
         ScreenshotView screenView;
         bool enableRandomImages;
         double screenSwitchTime;
-        double elapsedTime;
         Texture defaultTexture;
         Transform screenTransform = null;
         Texture textureShown = null;
+        bool ivaVisible;
         #endregion
 
         #region Overrides
@@ -69,19 +69,31 @@ namespace WildBlueCore.PartModules.IVA
             setupScreenView();
 
             // Setup events
-            InternalModuleAnimation.onAnimationPlayed.Add(onAnimationPlayed);
-            InternalModuleAnimation.onAnimationFinished.Add(onAnimationFinished);
+            WBIInternalModuleAnimation.onAnimationPlayed.Add(onAnimationPlayed);
+            WBIInternalModuleAnimation.onAnimationFinished.Add(onAnimationFinished);
         }
 
-        public void OnDestroy()
+        public override void OnDestroy()
         {
-            InternalModuleAnimation.onAnimationPlayed.Remove(onAnimationPlayed);
+            base.OnDestroy();
+            screenView.SetVisible(false);
+            screenView = null;
+            textureShown = null;
+            rendererMaterial = null;
+            WBIInternalModuleAnimation.onAnimationPlayed.Remove(onAnimationPlayed);
+            WBIInternalModuleAnimation.onAnimationFinished.Remove(onAnimationFinished);
         }
 
         public void FixedUpdate()
         {
-            if (enableRandomImages == false)
+            ivaVisible = ivaIsVisible;
+
+            if (enableRandomImages == false || ivaVisible == false || TimeWarp.CurrentRateIndex > 0)
+            {
+                screenSwitchTime = Planetarium.GetUniversalTime() + screenSwitchDuration;
                 return;
+            }
+
             if (screenSwitchDuration <= 0)
                 screenSwitchDuration = kMinimumSwitchTime;
             if (screenSwitchTime <= 0)
@@ -102,7 +114,7 @@ namespace WildBlueCore.PartModules.IVA
             if (!HighLogic.LoadedSceneIsFlight || rendererMaterial == null)
                 return;
 
-            if (rendererMaterial.enabled != screenIsVisible && ivaIsVisible)
+            if (rendererMaterial.enabled != screenIsVisible && ivaVisible)
                 SetScreenVisible(screenIsVisible);
         }
         #endregion

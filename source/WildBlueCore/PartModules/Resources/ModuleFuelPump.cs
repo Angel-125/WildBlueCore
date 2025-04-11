@@ -27,14 +27,14 @@ namespace WildBlueCore.PartModules.Resources
 
     /// <summary>
     /// This part module pumps one or more resources from the host part to other parts that have the same resource. The module can be directly added to a resource tank part or to a part that is
-    /// radially attached to a resource tank part. When enabled, ModuleFuelPump will automatically pump resources until either the host part's resource is empty or when the destination parts are full. In either case,
+    /// radially attached to a resource tank part. When enabled, WBIModuleFuelPump will automatically pump resources until either the host part's resource is empty or when the destination parts are full. In either case,
     /// it will wait until the host part gains more resources to pump or the destination parts gain more room to store the resource.
     /// </summary>
     /// <remarks>
-    /// ModuleFuelPump will transfer resources based on a part's Flow Priority. Higher priority parts will receive resources before lower priority parts.  
+    /// WBIModuleFuelPump will transfer resources based on a part's Flow Priority. Higher priority parts will receive resources before lower priority parts.  
     /// </remarks>
     /// <remarks>
-    /// ModuleFuelPump is designed to pump resources throughout the same vessel, but it can also pump resources to a nearby vessel if it is also equipped with a part that has a ModuleFuelPump.  
+    /// WBIModuleFuelPump is designed to pump resources throughout the same vessel, but it can also pump resources to a nearby vessel if it is also equipped with a part that has a WBIModuleFuelPump.  
     /// </remarks>
     /// <remarks>
     /// To pump a resource throughout the same vessel, the following conditions must be met:  
@@ -59,12 +59,12 @@ namespace WildBlueCore.PartModules.Resources
     /// <code>
     /// MODULE
     /// {
-    ///     name = ModuleFuelPump
+    ///     name = WBIModuleFuelPump
     ///     maxRemotePumpRange = 200
     /// }
     /// </code>
     /// </example>
-    public class ModuleFuelPump: BasePartModule
+    public class WBIModuleFuelPump: WBIBasePartModule
     {
         #region Constants
         const double kAmountThreshold = 1e-8;
@@ -76,9 +76,9 @@ namespace WildBlueCore.PartModules.Resources
         /// <summary>
         /// Signals when the isActivated and/or remotePumpMode changes.
         /// </summary>
-        public static EventData<ModuleFuelPump> onPumpStateChanged = new EventData<ModuleFuelPump>("onPumpStateChanged");
+        public static EventData<WBIModuleFuelPump> onPumpStateChanged = new EventData<WBIModuleFuelPump>("onPumpStateChanged");
 
-        public static EventData<ModuleFuelPump> onReloadPumpVessels = new EventData<ModuleFuelPump>("onReloadPumpVessels");
+        public static EventData<WBIModuleFuelPump> onReloadPumpVessels = new EventData<WBIModuleFuelPump>("onReloadPumpVessels");
         #endregion
 
         #region Fields
@@ -103,7 +103,7 @@ namespace WildBlueCore.PartModules.Resources
         public float maxRemotePumpRange = 2000f;
 
         /// <summary>
-        /// Flag to indicate that the part that has the ModuleFuelPump is the host part.
+        /// Flag to indicate that the part that has the WBIModuleFuelPump is the host part.
         /// </summary>
         [KSPField]
         public bool selfIsHostPart = true;
@@ -114,7 +114,7 @@ namespace WildBlueCore.PartModules.Resources
         internal MutablePartSet resourcePartSet = null;
         internal FuelPumpState pumpState = FuelPumpState.disabled;
         internal int loadedVesselsCount = -1;
-        internal ModuleFuelPump[] remoteFuelPumps;
+        internal WBIModuleFuelPump[] remoteFuelPumps;
         internal PumpingMode prevPumpMode;
         internal bool wasActivated;
         internal bool isPaused = false;
@@ -339,7 +339,7 @@ namespace WildBlueCore.PartModules.Resources
         #region API
         /// <summary>
         /// This method will attempt to distribute any resources that the host part has to other parts in the vessel or to nearby vessels. The resources must be capable of being transferred, and they must be unlocked.
-        /// Additionally, to remotely distribute the resources, remotePumpMode must be set to true, the nearby vessel must have at least one ModuleFuelPump, and the nearby vessel's fuel pump' isActivated must be set to true.
+        /// Additionally, to remotely distribute the resources, remotePumpMode must be set to true, the nearby vessel must have at least one WBIModuleFuelPump, and the nearby vessel's fuel pump' isActivated must be set to true.
         /// </summary>
         public void DistributeResources(float pumpRateOverride = -1f)
         {
@@ -542,7 +542,7 @@ namespace WildBlueCore.PartModules.Resources
                 rebuildPartSet();
         }
 
-        private void pumpStateChanged(ModuleFuelPump fuelPump)
+        private void pumpStateChanged(WBIModuleFuelPump fuelPump)
         {
             if (fuelPump.hostPart.vessel != hostPart.vessel || fuelPump == this)
                 return;
@@ -550,7 +550,7 @@ namespace WildBlueCore.PartModules.Resources
             rebuildPartSet();
         }
 
-        private void reloadPumpVessels(ModuleFuelPump fuelPump)
+        private void reloadPumpVessels(WBIModuleFuelPump fuelPump)
         {
             if (fuelPump == this)
                 return;
@@ -583,8 +583,8 @@ namespace WildBlueCore.PartModules.Resources
                 return false;
 
             // First, locate the pumps that are active, in range, and landed or splashed.
-            List<ModuleFuelPump> activePumps = new List<ModuleFuelPump>();
-            ModuleFuelPump remotePump;
+            List<WBIModuleFuelPump> activePumps = new List<WBIModuleFuelPump>();
+            WBIModuleFuelPump remotePump;
             for (int index = 0; index < remoteFuelPumps.Length; index++)
             {
                 remotePump = remoteFuelPumps[index];
@@ -631,8 +631,8 @@ namespace WildBlueCore.PartModules.Resources
                 return;
             loadedVesselsCount = count;
 
-            List<ModuleFuelPump> remotePumps = new List<ModuleFuelPump>();
-            List<ModuleFuelPump> fuelPumps = null;
+            List<WBIModuleFuelPump> remotePumps = new List<WBIModuleFuelPump>();
+            List<WBIModuleFuelPump> fuelPumps = null;
 
             Vessel loadedVessel;
             for (int index = 0; index < count; index++)
@@ -642,7 +642,7 @@ namespace WildBlueCore.PartModules.Resources
                     continue;
 
                 // We're looking for loaded vessels with fuel pumps.
-                fuelPumps = loadedVessel.FindPartModulesImplementing<ModuleFuelPump>();
+                fuelPumps = loadedVessel.FindPartModulesImplementing<WBIModuleFuelPump>();
                 if (fuelPumps != null && fuelPumps.Count > 0)
                     remotePumps.AddRange(fuelPumps);
             }
@@ -713,8 +713,8 @@ namespace WildBlueCore.PartModules.Resources
             resourcePartSet.BuildLists(hostPart);
             resourcePartSet.RemovePartFromLists(hostPart);
 
-            List<ModuleFuelPump> fuelPumps = hostPart.vessel.FindPartModulesImplementing<ModuleFuelPump>();
-            ModuleFuelPump fuelPump;
+            List<WBIModuleFuelPump> fuelPumps = hostPart.vessel.FindPartModulesImplementing<WBIModuleFuelPump>();
+            WBIModuleFuelPump fuelPump;
             int count = fuelPumps.Count;
             for (int index = 0; index < count; index++)
             {

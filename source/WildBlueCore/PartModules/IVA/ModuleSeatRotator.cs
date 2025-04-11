@@ -15,7 +15,7 @@ namespace WildBlueCore.PartModules.IVA
     /// <code>
     /// MODULE
     /// {
-    ///     name = ModuleSeatRotator
+    ///     name = WBIModuleSeatRotator
     ///     
     ///     // Name of the seat transform to rotate. This needs to be the same name as in the IVA's 3D model and in the IVA's config file.
     ///     seatName = Seat001
@@ -31,7 +31,7 @@ namespace WildBlueCore.PartModules.IVA
     /// }
     /// </code>
     /// </example>
-    public class ModuleSeatRotator: BasePartModule
+    public class WBIModuleSeatRotator: WBIBasePartModule
     {
         #region Fields
         /// <summary>
@@ -166,12 +166,12 @@ namespace WildBlueCore.PartModules.IVA
             Actions["ActionRotateLeft"].guiName = seatName + rotateLeftString;
             Actions["ActionRotateRight"].guiName = seatName + rotateRightString;
 
-            ModuleSeatChanger.onSeatsReassigned.Add(onSeatsReassigned);
+            WBIModuleSeatChanger.onSeatsReassigned.Add(onSeatsReassigned);
         }
 
         public void OnDestroy()
         {
-            ModuleSeatChanger.onSeatsReassigned.Remove(onSeatsReassigned);
+            WBIModuleSeatChanger.onSeatsReassigned.Remove(onSeatsReassigned);
         }
         #endregion
 
@@ -308,7 +308,7 @@ namespace WildBlueCore.PartModules.IVA
             }
         }
 
-        void onSeatsReassigned(ModuleSeatChanger seatChanger)
+        void onSeatsReassigned(WBIModuleSeatChanger seatChanger)
         {
             if (seatChanger.part != part)
                 return;

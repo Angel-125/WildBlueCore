@@ -8,7 +8,7 @@ using KSP.Localization;
 
 namespace WildBlueCore.PartModules.Resources
 {
-    public class ModuleResourceConverterExtended: ModuleResourceConverter
+    public class WBIModuleResourceConverterExtended: ModuleResourceConverter
     {
         #region constants
         private const float kminimumSuccess = 80f;

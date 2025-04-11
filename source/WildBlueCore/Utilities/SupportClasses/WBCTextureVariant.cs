@@ -8,7 +8,7 @@ using KSP.Localization;
 
 namespace WildBlueCore.Utilities
 {
-    #region SWVariant class
+    #region WBCTextureVariant class
     internal class WBCTextureVariant
     {
         public string mainTextureURL = string.Empty;

@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace WildBlueCore.PartModules.IVA
 {
-    public class InternalModuleButtonToggle: InternalBaseModule
+    public class WBIInternalModuleButtonToggle: WBIInternalBaseModule
     {
         #region Fields
         [KSPField]
@@ -30,13 +30,13 @@ namespace WildBlueCore.PartModules.IVA
         Material buttonFaceMaterial = null;
         Color originalEmissiveColor;
         public FXGroup soundClip = null;
-        InternalModuleLightColorChanger colorChanger = null;
+        WBIInternalModuleLightColorChanger colorChanger = null;
         #endregion
 
         #region Overrides
         public override void OnStart()
         {
-            colorChanger = internalProp.FindModelComponent<InternalModuleLightColorChanger>();
+            colorChanger = internalProp.FindModelComponent<WBIInternalModuleLightColorChanger>();
 
             // Get button face material
             getButtonFaceMaterial();
@@ -67,11 +67,11 @@ namespace WildBlueCore.PartModules.IVA
             }
         }
 
-        protected override void onGroupUpdated(InternalBaseModule source)
+        protected override void onGroupUpdated(WBIInternalBaseModule source)
         {
-            if (source is InternalModuleButtonToggle)
+            if (source is WBIInternalModuleButtonToggle)
             {
-                InternalModuleButtonToggle buttonToggle = (InternalModuleButtonToggle)source;
+                WBIInternalModuleButtonToggle buttonToggle = (WBIInternalModuleButtonToggle)source;
                 if (buttonToggle != this && buttonToggle.isToggledOn && isToggledOn)
                     isToggledOn = false;
                 else if (buttonToggle.subGroupId == subGroupId)

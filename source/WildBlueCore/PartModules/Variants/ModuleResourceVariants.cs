@@ -10,12 +10,12 @@ namespace WildBlueCore
 {
     /// <summary>
     /// A small helper class to update a part's resources when a part variant is applied. ModulePartVariants defines one or more VARIANT config nodes, and each node
-    /// can have a EXTRA_INFO within its config. EXTRA_INFO uses key/value pairs to define its data. ModuleResourceVariants can also define its own VARIANT nodes.
-    /// When ModulePartVariants fires its onVariantApplied event, and the name of the event matches one of ModuleResourceVariants's VARIANT nodes, then ModuleResourceVariants's
-    /// variant will be applied. Currently ModuleResourceVariants only supports RESOURCE nodes in its VARIANT node.
+    /// can have a EXTRA_INFO within its config. EXTRA_INFO uses key/value pairs to define its data. WBIModuleResourceVariants can also define its own VARIANT nodes.
+    /// When ModulePartVariants fires its onVariantApplied event, and the name of the event matches one of WBIModuleResourceVariants's VARIANT nodes, then WBIModuleResourceVariants's
+    /// variant will be applied. Currently WBIModuleResourceVariants only supports RESOURCE nodes in its VARIANT node.
     /// </summary>
     /// <remarks>
-    /// ModulePartVariants can define EXTRA_INFO as part of its VARIANT node, and ModuleResourceVariants can read some of the values defined in the EXTRA_INFO. here's an example:
+    /// ModulePartVariants can define EXTRA_INFO as part of its VARIANT node, and WBIModuleResourceVariants can read some of the values defined in the EXTRA_INFO. here's an example:
     /// </remarks>
     /// <example>
     /// <code>
@@ -50,13 +50,13 @@ namespace WildBlueCore
     /// </code>
     /// </example>
     /// <remarks>
-    /// To define ModuleResourceVariants:
+    /// To define WBIModuleResourceVariants:
     /// </remarks>
     /// <example>
     /// <code>
     /// MODULE
     /// {
-    ///     name = ModuleResourceVariants
+    ///     name = WBIModuleResourceVariants
     ///     resourceVolume = 6000
     ///     // You can specify resource variants for the part that will be applied when you change the part's variant.
     ///     VARIANT
@@ -79,7 +79,7 @@ namespace WildBlueCore
     /// }
     /// </code>
     /// </example>
-    public class ModuleResourceVariants : BasePartModule
+    public class WBIModuleResourceVariants : WBIBasePartModule
     {
         #region Constants
         const string kResourceName = "resourceName";
@@ -132,11 +132,13 @@ namespace WildBlueCore
             if (variantPart != part)
                 return;
 
+            debugLog("onVariantApplied called for " + part.partInfo.title);
+
             // Handle storage limit (absolute value)
             string packedVolumeLimitStr = variant.GetExtraInfoValue(kPackedVolumeLimit);
             updateStorageCapacity(packedVolumeLimitStr);
 
-            // Handle storage limit (relative unit volumes). ModulePartGridVariants sends this.
+            // Handle storage limit (relative unit volumes). WBIModulePartGridVariants sends this.
             string volumeMultiplierStr = variant.GetExtraInfoValue(kVolumeMultiplier);
             float volumeMultiplier = 0;
             if (resourceVolume > 0 && !string.IsNullOrEmpty(volumeMultiplierStr) && float.TryParse(volumeMultiplierStr, out volumeMultiplier))
@@ -240,19 +242,33 @@ namespace WildBlueCore
         {
             double amount = 0;
             double maxAmount = 0;
+            bool overrideAmount = false;
 
-            if (string.IsNullOrEmpty(resourceName) || !part.Resources.Contains(resourceName))
+            if (!HighLogic.LoadedSceneIsEditor && !HighLogic.LoadedSceneIsFlight)
                 return;
 
+            if (string.IsNullOrEmpty(resourceName) || !part.Resources.Contains(resourceName))
+            {
+                debugLog(resourceName + " does not exist on part named " + part.partInfo.title);
+            }
+
             if (HighLogic.LoadedSceneIsEditor && !string.IsNullOrEmpty(amtStr) & double.TryParse(amtStr, out amount))
+            {
+                overrideAmount = true;
                 part.Resources[resourceName].amount = amount;
+            }
 
             if (!string.IsNullOrEmpty(maxAmtStr) & double.TryParse(maxAmtStr, out maxAmount))
             {
                 part.Resources[resourceName].maxAmount = maxAmount;
 
+                // Make sure that the amount doesn't exceed max amount
                 if ((part.Resources[resourceName].amount > part.Resources[resourceName].maxAmount) || HighLogic.LoadedSceneIsEditor)
                     part.Resources[resourceName].amount = part.Resources[resourceName].maxAmount;
+
+                // Override the amount in the editor only.
+                if (HighLogic.LoadedSceneIsEditor && overrideAmount)
+                    part.Resources[resourceName].amount = amount;
             }
 
             MonoUtilities.RefreshContextWindows(part);

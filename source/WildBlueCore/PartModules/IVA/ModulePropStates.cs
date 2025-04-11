@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace WildBlueCore.PartModules.IVA
 {
-    public class ModulePropStates : BasePartModule
+    public class WBIModulePropStates : WBIBasePartModule
     {
         protected Dictionary<string, string> propModuleProperties = new Dictionary<string, string>();
 
@@ -23,7 +23,7 @@ namespace WildBlueCore.PartModules.IVA
 
             foreach (string key in propModuleProperties.Keys)
             {
-                saveNode = ConfigNode.CreateConfigFromObject(this);
+                saveNode = new ConfigNode();
                 saveNode.name = "PROPVALUE";
                 saveNode.AddValue("name", key);
                 saveNode.AddValue("value", propModuleProperties[key]);

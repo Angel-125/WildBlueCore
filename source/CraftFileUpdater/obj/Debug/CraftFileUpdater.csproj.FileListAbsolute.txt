@@ -1,0 +1,11 @@
+C:\Projects\KSP\WildBlueIndustries\WildBlueCore\source\CraftFileUpdater\obj\Debug\CraftFileUpdater.Properties.Resources.resources
+C:\Projects\KSP\WildBlueIndustries\WildBlueCore\source\CraftFileUpdater\obj\Debug\CraftFileUpdater.csproj.GenerateResource.cache
+C:\Projects\KSP\WildBlueIndustries\WildBlueCore\source\CraftFileUpdater\obj\Debug\CraftFileUpdater.csproj.CoreCompileInputs.cache
+C:\Projects\KSP\WildBlueIndustries\WildBlueCore\source\CraftFileUpdater\bin\Debug\CraftFileUpdater.exe.config
+C:\Projects\KSP\WildBlueIndustries\WildBlueCore\source\CraftFileUpdater\bin\Debug\CraftFileUpdater.exe
+C:\Projects\KSP\WildBlueIndustries\WildBlueCore\source\CraftFileUpdater\bin\Debug\CraftFileUpdater.pdb
+C:\Projects\KSP\WildBlueIndustries\WildBlueCore\source\CraftFileUpdater\obj\Debug\CraftFileUpdater.exe
+C:\Projects\KSP\WildBlueIndustries\WildBlueCore\source\CraftFileUpdater\obj\Debug\CraftFileUpdater.pdb
+C:\Projects\KSP\WildBlueIndustries\WildBlueCore\source\CraftFileUpdater\bin\Debug\ModuleReplacements.txt
+C:\Projects\KSP\WildBlueIndustries\WildBlueCore\source\CraftFileUpdater\obj\Debug\CraftReplacerGUI.Form1.resources
+C:\Projects\KSP\WildBlueIndustries\WildBlueCore\source\CraftFileUpdater\obj\Debug\CraftFileUpdater.csproj.AssemblyReference.cache

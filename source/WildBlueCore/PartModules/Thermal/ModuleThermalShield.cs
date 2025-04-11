@@ -7,7 +7,7 @@ using WildBlueCore.Utilities;
 
 namespace WildBlueCore.PartModules.Thermal
 {
-    public class ModuleThermalShield: BasePartModule
+    public class WBIModuleThermalShield: WBIBasePartModule
     {
         public override void OnStart(StartState state)
         {

@@ -17,7 +17,7 @@ namespace WildBlueCore
     /// <code>
     /// MODULE
     /// {
-    ///     name = ModulePartGridVariants
+    ///     name = WBIModulePartGridVariants
     ///     totalRows = 6
     ///     totalColumns = 6
     ///     elementTransformName = yardFrameAngled37-30
@@ -27,7 +27,7 @@ namespace WildBlueCore
     /// }
     /// </code>
     /// </example>
-    public class ModulePartGridVariants : BasePartModule, IPartCostModifier, IPartMassModifier, IModuleInfo
+    public class WBIModulePartGridVariants : WBIBasePartModule, IPartCostModifier, IPartMassModifier, IModuleInfo
     {
         #region Constants
         const float previewOpacity = 0.3f;
@@ -168,7 +168,7 @@ namespace WildBlueCore
             if (!HighLogic.LoadedSceneIsEditor && !HighLogic.LoadedSceneIsFlight)
                 return;
 
-            ModulePartGridVariants copyGrid = (ModulePartGridVariants)copyPartModule;
+            WBIModulePartGridVariants copyGrid = (WBIModulePartGridVariants)copyPartModule;
             copyGrid.copyOriginalNodes(originalNodes);
         }
 

@@ -1,7 +1,7 @@
 ﻿# WildBlueCore
 
 
-# PartModules.Decals.ModuleDecal
+# PartModules.Decals.WBIModuleDecal
             
 This part module lets you change the decal using the stock flag selector. It does so independently of the mission flag.
         
@@ -52,12 +52,7 @@ Private event handler to respond to flag selection.
 ### ChangeDecal
 Changes the decal on all named transforms.
 
-# PartModules.Engines.ModuleElectricEnginesFX
-            
-This is a class that's designed to
-        
-
-# PartModules.IVA.ModuleSeatRotator
+# PartModules.IVA.WBIModuleSeatRotator
             
 This module lets users rotate a seat in a part's IVA if the seat is occupied.
             
@@ -67,7 +62,7 @@ This module lets users rotate a seat in a part's IVA if the seat is occupied.
 
             MODULE
             {
-                name = ModuleSeatRotator
+                name = WBIModuleSeatRotator
                 
                 // Name of the seat transform to rotate. This needs to be the same name as in the IVA's 3D model and in the IVA's config file.
                 seatName = Seat001
@@ -109,7 +104,7 @@ Rotates the seat to the left.
 ### RotateRight
 Rotates the seat to the right.
 
-# PartModules.KerbalGear.ModuleEVAResourceTransfer
+# PartModules.KerbalGear.WBIModuleEVAResourceTransfer
             
 This part module enables resource transfers between inventory parts.
         
@@ -122,13 +117,13 @@ Overrides OnInactive. Called when an inventory item is unequipped and the module
 ### OnActive
 Overrides OnActive. Called when an inventory item is equipped and the module is enabled.
 
-# PartModules.Resources.ModuleFuelPump
+# PartModules.Resources.WBIModuleFuelPump
             
-This part module pumps one or more resources from the host part to other parts that have the same resource. The module can be directly added to a resource tank part or to a part that is radially attached to a resource tank part. When enabled, ModuleFuelPump will automatically pump resources until either the host part's resource is empty or when the destination parts are full. In either case, it will wait until the host part gains more resources to pump or the destination parts gain more room to store the resource.
+This part module pumps one or more resources from the host part to other parts that have the same resource. The module can be directly added to a resource tank part or to a part that is radially attached to a resource tank part. When enabled, WBIModuleFuelPump will automatically pump resources until either the host part's resource is empty or when the destination parts are full. In either case, it will wait until the host part gains more resources to pump or the destination parts gain more room to store the resource.
             
-ModuleFuelPump will transfer resources based on a part's Flow Priority. Higher priority parts will receive resources before lower priority parts.  
+WBIModuleFuelPump will transfer resources based on a part's Flow Priority. Higher priority parts will receive resources before lower priority parts.  
             
-ModuleFuelPump is designed to pump resources throughout the same vessel, but it can also pump resources to a nearby vessel if it is also equipped with a part that has a ModuleFuelPump.  
+WBIModuleFuelPump is designed to pump resources throughout the same vessel, but it can also pump resources to a nearby vessel if it is also equipped with a part that has a WBIModuleFuelPump.  
             
 To pump a resource throughout the same vessel, the following conditions must be met:  
             * The fuel pump providing resources must be set to Distribute Localy.  
@@ -153,7 +148,7 @@ To pump a resource to another nearby vessel, the following conditions must be me
 
             MODULE
             {
-                name = ModuleFuelPump
+                name = WBIModuleFuelPump
                 maxRemotePumpRange = 200
             }
             
@@ -168,7 +163,7 @@ Signals when the isActivated and/or remotePumpMode changes.
 ### maxRemotePumpRange
 In meters, the maximum range that the fuel pump can reach when remote pumping resources. Default is 2000 meters.
 ### selfIsHostPart
-Flag to indicate that the part that has the ModuleFuelPump is the host part.
+Flag to indicate that the part that has the WBIModuleFuelPump is the host part.
 ## Methods
 
 
@@ -203,7 +198,7 @@ Sets the pump mode to receive from remote pumps.
 
 
 ### DistributeResources(System.Single)
-This method will attempt to distribute any resources that the host part has to other parts in the vessel or to nearby vessels. The resources must be capable of being transferred, and they must be unlocked. Additionally, to remotely distribute the resources, remotePumpMode must be set to true, the nearby vessel must have at least one ModuleFuelPump, and the nearby vessel's fuel pump' isActivated must be set to true.
+This method will attempt to distribute any resources that the host part has to other parts in the vessel or to nearby vessels. The resources must be capable of being transferred, and they must be unlocked. Additionally, to remotely distribute the resources, remotePumpMode must be set to true, the nearby vessel must have at least one WBIModuleFuelPump, and the nearby vessel's fuel pump' isActivated must be set to true.
 
 ### DistributeResourceLocally(PartResource,System.Double,System.Boolean)
 Distributes the desired resource locally throughout the vessel.
@@ -217,7 +212,7 @@ Distributes the desired resource locally throughout the vessel.
 > #### Return value
 > True if the distribution was successful, false if not.
 
-# PartModules.Resources.ModuleSupplyLine
+# PartModules.Resources.WBIModuleSupplyLine
             
 Derived from ModuleFuelPup, this part module provides periodic refills of the resources contained in the storage tank. The storage tank can be either the part that hosts this part module, or, if the host part has no resources, then the tank is the part that the supply line part is attached to. It makes the assumption that the storage tank is completely full when it arrives at the desired destination; how it gets there is up to the player. The part module allows players to specify how long, in hours, it takes between supply runs. It also can optionally charge for the cost of the resources upon delivery. When a delivery is made, the part module can play an EFFECT and/or run an animation.
         
@@ -242,9 +237,9 @@ Flag to indicate whether or not the player should be charged for resource delive
 ### payFlatFee
 Flag to indicate whether or not the player should be charged a flat fee to deliver resources
 ### selfIsHostPart
-Flag to indicate that the part that has the ModuleSupplyLine is the host part.
+Flag to indicate that the part that has the WBIModuleSupplyLine is the host part.
 
-# PartModules.ModuleAnimateGenericExtended
+# PartModules.WBIModuleAnimateGenericExtended
             
 This part module derives from ModuleAnimatedGeneric. It adds the ability to play sound effects while animating. It also adds several options to check before playing the animation. First, it can check the active vessel for a necessary skill and skill level. Second, it can check for and consume required resources. Those resources can be pulled from the part's vessel and/or from a remote vessel. Third, it can check for and consume parts stored in an inventory. Those parts can be pulled form the parts vessel and/or from a remote vessel. Finally, you can provide a list of part modules that will be enabled after tne animation completes, and disabled when when not complete.
         
@@ -287,6 +282,12 @@ Volume level for the stop sound.
 ## Methods
 
 
+### OnStartFinished(PartModule.StartState)
+This gets called after all part modules in the part have been started. Overriding this gives us the opportunity to disable all the part modules that we manage regardless of their load order.
+> #### Parameters
+> **state:** The StartState upon finishing the start process.
+
+
 ### Toggle
 Toggles the animation.
 
@@ -308,7 +309,7 @@ Plays the start sound.
 ### PlayEndSound
 Plays the end sound.
 
-# PartModules.Variants.ModuleInternalVariants
+# PartModules.Variants.WBIModuleInternalVariants
             
 Use this module to change the INTERNAL model (the IVA) of a part.
         
@@ -329,7 +330,7 @@ Gets the module description.
 > #### Return value
 > A string containing the module description.
 
-# PartModules.ModulePartSubvariants
+# PartModules.WBIModulePartSubvariants
             
 Helper part module to handle part mesh and texture switching. Stock ModulePartVariants doesn't cooperate with multiple ModulePartVariants in the same part, so this class gets around the issue and adds a few enhancements. When you define a ModulePartVariants, be sure to place its config node AFTER ModulePartVariants. When you define a ModulePartVariants, you can specify some EXTRA_INFO that SWPartVariants uses to configure itself:
             
@@ -347,11 +348,11 @@ Helper part module to handle part mesh and texture switching. Stock ModulePartVa
                     ...
                     EXTRA_INFO
                     {
-                        // ModulePartSubvariants can be GUI enabled/disabled using the "enableVariantModuleIDs" and "disableVariantModuleIDs" fields, respectively.
+                        // WBIModulePartSubvariants can be GUI enabled/disabled using the "enableVariantModuleIDs" and "disableVariantModuleIDs" fields, respectively.
                         // Simply specify the SWPartVariants' moduleID. For multiple moduleIDs, separate them with a semicolon.
                         disableVariantModuleIDs = mirroring
                         
-                        // Similarly you can re-apply the ModulePartSubvariants' applied variant when this variant is applied.
+                        // Similarly you can re-apply the WBIModulePartSubvariants' applied variant when this variant is applied.
                         updateVariantModuleIDs = texturing
                     }
                 }
@@ -361,7 +362,7 @@ Helper part module to handle part mesh and texture switching. Stock ModulePartVa
 
             
             
-To define a ModulePartSubvariants module:  
+To define a WBIModulePartSubvariants module:  
             
             
 > #### Example
@@ -369,7 +370,7 @@ To define a ModulePartSubvariants module:
 
             MODULE
             {
-                name = ModulePartSubvariants
+                name = WBIModulePartSubvariants
                 moduleID = texturing
                 updateSymmetry = false
                 allowFieldUpdate = false
@@ -471,9 +472,9 @@ Describes when the part modifier changes.
 > #### Return value
 > A ModifierChangeWhen indicating when the modifier is applied.
 
-# KerbalGear.ModuleKerbalEVAModules
+# KerbalGear.WBIModuleKerbalEVAModules
             
-Special thanks to Vali for figuring out this issue! :) The Vintage, Standard, and Future suits are all defined in separate part modules that are combined when KSP starts. The problem is that when Module Manager is used to add part modules to the kerbal, you'll get duplicates. One solution is to disable or outright remove the duplicate part module, but we have several part modules to manage. So to get around that problem, the ModuleKerbalEVAModules adds a custom LoadingSystem that adds any part modules defined by a KERBAL_EVA_MODULES node to the kerbals. Simply define a KERBAL_EVA_MODULES config node with one or more standard MODULE config nodes, and they'll be added to the kerbals.
+Special thanks to Vali for figuring out this issue! :) The Vintage, Standard, and Future suits are all defined in separate part modules that are combined when KSP starts. The problem is that when Module Manager is used to add part modules to the kerbal, you'll get duplicates. One solution is to disable or outright remove the duplicate part module, but we have several part modules to manage. So to get around that problem, the WBIModuleKerbalEVAModules adds a custom LoadingSystem that adds any part modules defined by a KERBAL_EVA_MODULES node to the kerbals. Simply define a KERBAL_EVA_MODULES config node with one or more standard MODULE config nodes, and they'll be added to the kerbals.
             
             
 > #### Example
@@ -483,13 +484,13 @@ Special thanks to Vali for figuring out this issue! :) The Vintage, Standard, an
             {
                 MODULE
                 {
-                    name = ModuleWearablesController
+                    name = WBIModuleWearablesController
                     debugMode = false
                 }
                 
                 MODULE
                 {
-                    name = ModuleEVAOverrides
+                    name = WBIModuleEVAOverrides
                 }
             }
             
@@ -498,12 +499,12 @@ Special thanks to Vali for figuring out this issue! :) The Vintage, Standard, an
             
         
 
-# KerbalGear.ModuleKerbalEVAModules.EVAModulesLoader
+# KerbalGear.WBIModuleKerbalEVAModules.EVAModulesLoader
             
 An internal helper class that reads KERVAL_EVA_MODULES for MODULE nodes to add to a kerbal.
         
 
-# KerbalGear.ModuleSuitSwitcher
+# KerbalGear.WBIModuleSuitSwitcher
             
 This part module allows kerbals to change their outfits after the vessel leaves the VAB/SPH.
             
@@ -513,7 +514,7 @@ This part module allows kerbals to change their outfits after the vessel leaves 
 
             MODULE
             {
-                name = ModuleSuitSwitcher
+                name = WBIModuleSuitSwitcher
             }
             
 ```
@@ -528,7 +529,7 @@ Opens the wardrobe GUI.
 
 # KerbalGear.BodyLocations
             
-Various locations where an wearable item can be placed. This is primarily used for ModuleWearableItem.
+Various locations where an wearable item can be placed. This is primarily used for WBIModuleWearableItem.
         
 ## Fields
 
@@ -545,9 +546,9 @@ The left bicep of the kerbal.
 ### rightBicep
 The right bicep of the kerbal.
 
-# KerbalGear.ModuleWearableItem
+# KerbalGear.WBIModuleWearableItem
             
-This module represents an equippable cargo item that appears as a 3D model on the kerbal. When equipping the item, this part module can also activate one or more part modules on the kerbal that provide various abilities. For example, an item can activate the ModuleEVAOverrides to improve the kerbal's swim speed. The activated part modules are defined in KERBAL_EVA_MODULES config nodes. You can have more than one ModuleWearableItem part module per cargo part.
+This module represents an equippable cargo item that appears as a 3D model on the kerbal. When equipping the item, this part module can also activate one or more part modules on the kerbal that provide various abilities. For example, an item can activate the WBIModuleEVAOverrides to improve the kerbal's swim speed. The activated part modules are defined in KERBAL_EVA_MODULES config nodes. You can have more than one WBIModuleWearableItem part module per cargo part.
             
             
 > #### Example
@@ -555,7 +556,7 @@ This module represents an equippable cargo item that appears as a 3D model on th
 
                MODULE
                {
-                    name = ModuleWearableItem
+                    name = WBIModuleWearableItem
                     moduleID = SCUBA Tank
                     bodyLocation = back
                     anchorTransform = scubaTank
@@ -563,7 +564,7 @@ This module represents an equippable cargo item that appears as a 3D model on th
                     positionOffset = 0.0000, 0.0200, 0.0900
                     positionOffsetJetpack = 0,0,0
                     rotationOffset = -70.0000, 0.0000, 0.0000
-                    evaModules = ModuleEVADiveComputer
+                    evaModules = WBIModuleEVADiveComputer
                }
             
 ```
@@ -591,7 +592,7 @@ Name of the part modules to enable on the kerbal when you equip the wearable ite
 
 # KerbalGear.SWearableProp
             
-Represents an instance of a wearable prop. One SWearableProp corresponds to a part's ModuleWearableItem part module. Since ModuleWearableItem is created in relation to the part prefab, we use SWearableProp per kerbal on EVA.
+Represents an instance of a wearable prop. One SWearableProp corresponds to a part's WBIModuleWearableItem part module. Since WBIModuleWearableItem is created in relation to the part prefab, we use SWearableProp per kerbal on EVA.
         
 ## Fields
 
@@ -612,7 +613,7 @@ Position offset of the prop if the kerbal has a jetpack and bodyLocation is back
 ### rotationOffset
 Rotation offset of the prop.
 
-# KerbalGear.ModuleWearablesController
+# KerbalGear.WBIModuleWearablesController
             
 A utility class to handle wearable items and the part modules associated with them. This part module is added to a kerbal via a KERBAL_EVA_MODULES config node, NOT a standard KSP part.
             
@@ -624,7 +625,7 @@ A utility class to handle wearable items and the part modules associated with th
             {
                 MODULE
                 {
-                    name = ModuleWearablesController
+                    name = WBIModuleWearablesController
                     debugMode = false
                 }
             }
@@ -643,7 +644,7 @@ Flag to turn on/off debug mode.
 ### ShowPropOffsetView
 Debug button that shows the prop offset view.
 
-# BasePartModule
+# WBIBasePartModule
             
 This is a simple base class that defines common functionality. Part modules should derive from it; it's not intended to be used directly in a part config.
             
@@ -653,7 +654,7 @@ This is a simple base class that defines common functionality. Part modules shou
 
             MODULE
             {
-                name = BasePartModule
+                name = WBIBasePartModule
                 moduleId = warpEngine
                 debugMode = true
             }
@@ -689,7 +690,7 @@ Loads the desired FloatCurve from the desired config node.
 > **defaultCurve:** An optional default curve to use in case the curve's node doesn't exist in the part module's config.
 
 
-# ModulePowerUnitConverter
+# WBIModulePowerUnitConverter
             
 This module converts Power Units from Breaking Ground Science to Electric Charge and vice-versa.
             
@@ -699,7 +700,7 @@ This module converts Power Units from Breaking Ground Science to Electric Charge
 
             MODULE
             {
-                name = ModulePowerUnitConverter
+                name = WBIModulePowerUnitConverter
                 isActive = true
                 isConsuming = false
                 ecPerPowerUnit = 0.25
@@ -749,7 +750,7 @@ Asks the converter to convert the supplied available power into Electric Charge 
 > **availablePower:** An int containing the total Power Units to distribute.
 
 
-# ModulePowerUnitDistributor
+# WBIModulePowerUnitDistributor
             
 Manages power unit to electric charge distribution. Add this module to parts with a ModuleGroundExpControl (Probodobodyne Experiment Control Station is one example)
             
@@ -759,7 +760,7 @@ Manages power unit to electric charge distribution. Add this module to parts wit
 
             MODULE
             {
-                name = ModulePowerUnitDistributor
+                name = WBIModulePowerUnitDistributor
             }
             
 ```
@@ -767,9 +768,9 @@ Manages power unit to electric charge distribution. Add this module to parts wit
             
         
 
-# ModuleIVAVariants
+# WBIModuleIVAVariants
             
-This class works in conjunction with the stock ModulePartVariants. When the event onVariantApplied is received from the same part that has ModuleIVAVariants, and the name of the new variant matches the name of one of ModuleIVAVariants' VARIANT nodes, then the GAMEOBJECTS in the node will be enabled/disabled accordingly. The meshes must appear in the IVA meshes or in the depth mask. The format of the IVA's VARIANT node follows the same format of ModulePartVariants.
+This class works in conjunction with the stock ModulePartVariants. When the event onVariantApplied is received from the same part that has WBIModuleIVAVariants, and the name of the new variant matches the name of one of WBIModuleIVAVariants' VARIANT nodes, then the GAMEOBJECTS in the node will be enabled/disabled accordingly. The meshes must appear in the IVA meshes or in the depth mask. The format of the IVA's VARIANT node follows the same format of ModulePartVariants.
             
             
 > #### Example
@@ -777,7 +778,7 @@ This class works in conjunction with the stock ModulePartVariants. When the even
 
             MODULE
             {
-                name = ModuleIVAVariants
+                name = WBIModuleIVAVariants
                 VARIANT
                 {
                     name = Rover
@@ -800,7 +801,7 @@ This class works in conjunction with the stock ModulePartVariants. When the even
 ### selectedVariant
 The currently selected IVA Variant.
 
-# ModulePartGridVariants
+# WBIModulePartGridVariants
             
 This is a specialized class that creates a two-dimensional grid of meshes from a collection of meshes provided by the model. While it is possible to duplicate multiple copies of a single transform, research shows that the part's radial attachment system gets messed up when you do that. So for now, we have a grid that is limited by the total number of meshes in the model.
             
@@ -810,7 +811,7 @@ This is a specialized class that creates a two-dimensional grid of meshes from a
 
             MODULE
             {
-                name = ModulePartGridVariants
+                name = WBIModulePartGridVariants
                 totalRows = 6
                 totalColumns = 6
                 elementTransformName = yardFrameAngled37-30
@@ -850,11 +851,11 @@ Called when the part was copied in the editor.
 > **copyNodes:** The list of AttachNode objects to copy into our originalNodes field.
 
 
-# ModuleResourceVariants
+# WBIModuleResourceVariants
             
-A small helper class to update a part's resources when a part variant is applied. ModulePartVariants defines one or more VARIANT config nodes, and each node can have a EXTRA_INFO within its config. EXTRA_INFO uses key/value pairs to define its data. ModuleResourceVariants can also define its own VARIANT nodes. When ModulePartVariants fires its onVariantApplied event, and the name of the event matches one of ModuleResourceVariants's VARIANT nodes, then ModuleResourceVariants's variant will be applied. Currently ModuleResourceVariants only supports RESOURCE nodes in its VARIANT node.
+A small helper class to update a part's resources when a part variant is applied. ModulePartVariants defines one or more VARIANT config nodes, and each node can have a EXTRA_INFO within its config. EXTRA_INFO uses key/value pairs to define its data. WBIModuleResourceVariants can also define its own VARIANT nodes. When ModulePartVariants fires its onVariantApplied event, and the name of the event matches one of WBIModuleResourceVariants's VARIANT nodes, then WBIModuleResourceVariants's variant will be applied. Currently WBIModuleResourceVariants only supports RESOURCE nodes in its VARIANT node.
             
-ModulePartVariants can define EXTRA_INFO as part of its VARIANT node, and ModuleResourceVariants can read some of the values defined in the EXTRA_INFO. here's an example:  
+ModulePartVariants can define EXTRA_INFO as part of its VARIANT node, and WBIModuleResourceVariants can read some of the values defined in the EXTRA_INFO. here's an example:  
             
             
 > #### Example
@@ -893,7 +894,7 @@ ModulePartVariants can define EXTRA_INFO as part of its VARIANT node, and Module
 
             
             
-To define ModuleResourceVariants:  
+To define WBIModuleResourceVariants:  
             
             
 > #### Example
@@ -901,7 +902,7 @@ To define ModuleResourceVariants:
 
             MODULE
             {
-                name = ModuleResourceVariants
+                name = WBIModuleResourceVariants
                 resourceVolume = 6000
                 // You can specify resource variants for the part that will be applied when you change the part's variant.
                 VARIANT
@@ -932,7 +933,7 @@ To define ModuleResourceVariants:
 ### resourceVolume
 Resource volume size, in liters, per unit of volume. When the extra info in onPartVariantApplied contains volumeMultiplier, resource and inventory part modules will be updated to reflect the change. In such a case, the new storage volume will be resourceVolume * volumeMultiplier.
 
-# ModuleWheelSFX
+# WBIModuleWheelSFX
             
 This part module adds sound effects to wheels when their motors are engaged. Effects are defined via the standard EFFECT config node.
             
@@ -942,7 +943,7 @@ This part module adds sound effects to wheels when their motors are engaged. Eff
 
             MODULE
             {
-                name = ModuleWheelSFX
+                name = WBIModuleWheelSFX
                 runningEffect = running
                 revTime = 0.05
             }

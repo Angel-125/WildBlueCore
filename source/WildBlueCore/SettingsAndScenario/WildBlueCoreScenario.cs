@@ -29,6 +29,12 @@ namespace WildBlueCore
             GameEvents.OnGameSettingsApplied.Add(onGameSettingsApplied);
             onGameSettingsApplied();
         }
+
+        public void OnDestroy()
+        {
+            GameEvents.OnGameSettingsApplied.Remove(onGameSettingsApplied);
+        }
+
         #endregion
 
         #region Helpers

@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\..\..\WildBlueTools\packages\Krafs.Publicizer.2.2.1\build\Krafs.Publicizer.props" Condition="Exists('..\..\..\WildBlueTools\packages\Krafs.Publicizer.2.2.1\build\Krafs.Publicizer.props')" />
+  <Import Project="..\..\..\WildBlueTools\packages\Krafs.Publicizer.2.3.0\build\Krafs.Publicizer.props" Condition="Exists('..\..\..\WildBlueTools\packages\Krafs.Publicizer.2.3.0\build\Krafs.Publicizer.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -96,9 +96,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="PartModules\Decals\ModuleDecal.cs" />
-    <Compile Include="PartModules\Engines\ModuleElectricEnginesFX.cs" />
-    <Compile Include="PartModules\Experimental\ModuleConstructionRotationSnap.cs" />
-    <Compile Include="PartModules\Experimental\ModuleMassTest.cs" />
     <Compile Include="PartModules\IVA\GUI\ScreenshotView.cs" />
     <Compile Include="PartModules\IVA\InternalBaseModule.cs" />
     <Compile Include="PartModules\IVA\InternalModuleAnimation.cs" />
@@ -112,15 +109,15 @@
     <Compile Include="PartModules\IVA\ModuleSeatRotator.cs" />
     <Compile Include="PartModules\IVA\GUI\SeatChangerView.cs" />
     <Compile Include="PartModules\KerbalGear\ModuleEVAResourceTransfer.cs" />
-    <Compile Include="PartModules\KerbalGear\WBIResourceTransferGUI.cs" />
+    <Compile Include="PartModules\KerbalGear\GUI\WBIResourceTransferGUI.cs" />
     <Compile Include="PartModules\Resources\ModuleFuelPump.cs" />
     <Compile Include="PartModules\KerbalGear\GUI\WBIPropOffsetGUI.cs" />
     <Compile Include="PartModules\KerbalGear\GUI\WBIWardrobeGUI.cs" />
-    <Compile Include="PartModules\KerbalGear\ModuleEVAOverrides.cs" />
-    <Compile Include="PartModules\KerbalGear\ModuleKerbalEVAModules.cs" />
-    <Compile Include="PartModules\KerbalGear\ModuleSuitSwitcher.cs" />
-    <Compile Include="PartModules\KerbalGear\ModuleWearableItem.cs" />
-    <Compile Include="PartModules\KerbalGear\ModuleWearablesController.cs" />
+    <Compile Include="PartModules\KerbalGear\Wearables\ModuleEVAOverrides.cs" />
+    <Compile Include="PartModules\KerbalGear\Wearables\ModuleKerbalEVAModules.cs" />
+    <Compile Include="PartModules\KerbalGear\Suits\ModuleSuitSwitcher.cs" />
+    <Compile Include="PartModules\KerbalGear\Wearables\ModuleWearableItem.cs" />
+    <Compile Include="PartModules\KerbalGear\Wearables\ModuleWearablesController.cs" />
     <Compile Include="PartModules\Animation\ModuleAnimateGenericExtended.cs" />
     <Compile Include="PartModules\Resources\ModuleResourceConverterExtended.cs" />
     <Compile Include="PartModules\Resources\ModuleSupplyLine.cs" />
@@ -150,10 +147,19 @@
     <Compile Include="Wrappers\WildBlueTools\WBIOmniStorageWrapper.cs" />
     <Compile Include="Wrappers\WildBlueTools\WBTWrapper.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="PartModules\Experimental\" />
+  </ItemGroup>
+  <PropertyGroup>
+    <PublicizerClearCacheOnClean>true</PublicizerClearCacheOnClean>
+  </PropertyGroup>
   <ItemGroup>
     <Publicize Include="Assembly-CSharp:ModuleAnimateGeneric.FixedUpdate" />
     <Publicize Include="Assembly-CSharp:ModuleAnimateGeneric.anim" />
+    <Publicize Include="Assembly-CSharp:KerbalEVA.SetNewTextures" />
+    <Publicize Include="Assembly-CSharp:KerbalEVA.SetDefaultTextures" />
+    <Publicize Include="Assembly-CSharp:n2.CrewListItem.OpenHelmetSuitPickerWindow" />
+    <Publicize Include="Assembly-CSharp:n2.BaseCrewAssignmentDialog.AddAvailItem" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="MarkdownSeparator.exe">
@@ -182,8 +188,8 @@ $(TargetDir)MarkdownSeparator.exe $(TargetDir)API.md Wiki</PostBuildEvent>
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\..\..\WildBlueTools\packages\Krafs.Publicizer.2.2.1\build\Krafs.Publicizer.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\WildBlueTools\packages\Krafs.Publicizer.2.2.1\build\Krafs.Publicizer.props'))" />
-    <Error Condition="!Exists('..\..\..\WildBlueTools\packages\Krafs.Publicizer.2.2.1\build\Krafs.Publicizer.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\WildBlueTools\packages\Krafs.Publicizer.2.2.1\build\Krafs.Publicizer.targets'))" />
+    <Error Condition="!Exists('..\..\..\WildBlueTools\packages\Krafs.Publicizer.2.3.0\build\Krafs.Publicizer.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\WildBlueTools\packages\Krafs.Publicizer.2.3.0\build\Krafs.Publicizer.props'))" />
+    <Error Condition="!Exists('..\..\..\WildBlueTools\packages\Krafs.Publicizer.2.3.0\build\Krafs.Publicizer.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\WildBlueTools\packages\Krafs.Publicizer.2.3.0\build\Krafs.Publicizer.targets'))" />
   </Target>
-  <Import Project="..\..\..\WildBlueTools\packages\Krafs.Publicizer.2.2.1\build\Krafs.Publicizer.targets" Condition="Exists('..\..\..\WildBlueTools\packages\Krafs.Publicizer.2.2.1\build\Krafs.Publicizer.targets')" />
+  <Import Project="..\..\..\WildBlueTools\packages\Krafs.Publicizer.2.3.0\build\Krafs.Publicizer.targets" Condition="Exists('..\..\..\WildBlueTools\packages\Krafs.Publicizer.2.3.0\build\Krafs.Publicizer.targets')" />
 </Project>

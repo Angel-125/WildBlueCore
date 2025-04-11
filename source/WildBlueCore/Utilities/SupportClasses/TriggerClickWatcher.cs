@@ -14,16 +14,16 @@ namespace WildBlueCore.Utilities
         /// <summary>
         /// Tells listeners the trigger was clicked.
         /// </summary>
-        public static EventData<InternalBaseModule> onTriggerClicked = new EventData<InternalBaseModule>("onTriggerClicked");
+        public static EventData<WBIInternalBaseModule> onTriggerClicked = new EventData<WBIInternalBaseModule>("onTriggerClicked");
 
         /// <summary>
         /// Tells listeners the trigger was clicked.
         /// </summary>
-        public static EventData<InternalBaseModule> onMouseDown = new EventData<InternalBaseModule>("onMouseDown");
+        public static EventData<WBIInternalBaseModule> onMouseDown = new EventData<WBIInternalBaseModule>("onMouseDown");
         #endregion
 
         #region Fields
-        public InternalBaseModule internalBaseModule = null;
+        public WBIInternalBaseModule internalBaseModule = null;
         #endregion
 
         #region Housekeeping

@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace WildBlueCore.PartModules.IVA
 {
-    public class InternalModuleEmissiveFlash: InternalBaseModule
+    public class WBIInternalModuleEmissiveFlash: WBIInternalBaseModule
     {
         #region Fields
         [KSPField]
@@ -53,11 +53,11 @@ namespace WildBlueCore.PartModules.IVA
             }
         }
 
-        protected override void onGroupUpdated(InternalBaseModule source)
+        protected override void onGroupUpdated(WBIInternalBaseModule source)
         {
-            if (source is InternalModuleButtonToggle)
+            if (source is WBIInternalModuleButtonToggle)
             {
-                InternalModuleButtonToggle buttonToggle = (InternalModuleButtonToggle)source;
+                WBIInternalModuleButtonToggle buttonToggle = (WBIInternalModuleButtonToggle)source;
 
                 isFlashing = buttonToggle.isToggledOn;
                 if (isFlashing)

@@ -1,5 +1,5 @@
             
-Represents an instance of a wearable prop. One SWearableProp corresponds to a part's ModuleWearableItem part module. Since ModuleWearableItem is created in relation to the part prefab, we use SWearableProp per kerbal on EVA.
+Represents an instance of a wearable prop. One SWearableProp corresponds to a part's WBIModuleWearableItem part module. Since WBIModuleWearableItem is created in relation to the part prefab, we use SWearableProp per kerbal on EVA.
         
 ## Fields
 

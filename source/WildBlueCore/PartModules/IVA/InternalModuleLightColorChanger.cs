@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace WildBlueCore.PartModules.IVA
 {
-    public class InternalModuleLightColorChanger : InternalBaseModule
+    public class WBIInternalModuleLightColorChanger : WBIInternalBaseModule
     {
         #region Fields
         [KSPField]
@@ -51,11 +51,11 @@ namespace WildBlueCore.PartModules.IVA
             changeButtonMaterial();
         }
 
-        protected override void onGroupUpdated(InternalBaseModule source)
+        protected override void onGroupUpdated(WBIInternalBaseModule source)
         {
-            if (source is InternalModuleLightColorChanger && groupId == source.groupId)
+            if (source is WBIInternalModuleLightColorChanger && groupId == source.groupId)
             {
-                InternalModuleLightColorChanger colorChanger = (InternalModuleLightColorChanger)source;
+                WBIInternalModuleLightColorChanger colorChanger = (WBIInternalModuleLightColorChanger)source;
                 currentColorIndex = colorChanger.currentColorIndex;
                 changeLightColors();
                 changeButtonMaterial();

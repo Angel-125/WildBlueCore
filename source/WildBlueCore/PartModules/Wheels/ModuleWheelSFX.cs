@@ -15,13 +15,13 @@ namespace WildBlueCore
     /// <code>
     /// MODULE
     /// {
-    ///     name = ModuleWheelSFX
+    ///     name = WBIModuleWheelSFX
     ///     runningEffect = running
     ///     revTime = 0.05
     /// }
     /// </code>
     /// </example>
-    public class ModuleWheelSFX: BasePartModule
+    public class WBIModuleWheelSFX: WBIBasePartModule
     {
         #region Fields
         /// <summary>

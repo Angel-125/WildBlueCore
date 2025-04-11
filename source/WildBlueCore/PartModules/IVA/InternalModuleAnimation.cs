@@ -8,7 +8,7 @@ using WildBlueCore.Utilities;
 
 namespace WildBlueCore.PartModules.IVA
 {
-    public class InternalModuleAnimation: InternalBaseModule
+    public class WBIInternalModuleAnimation: WBIInternalBaseModule
     {
         #region Game Events
         public static EventData<InternalProp, bool> onAnimationPlayed = new EventData<InternalProp, bool>("onAnimationPlayed");
@@ -43,7 +43,7 @@ namespace WildBlueCore.PartModules.IVA
             Animation[] animations = internalProp.FindModelAnimators(animationName);
             if (animations == null || animations.Length <= 0)
             {
-                Debug.Log("[InternalModuleAnimation] - Could not find " + animationName);
+                Debug.Log("[WBIInternalModuleAnimation] - Could not find " + animationName);
                 return;
             }
 

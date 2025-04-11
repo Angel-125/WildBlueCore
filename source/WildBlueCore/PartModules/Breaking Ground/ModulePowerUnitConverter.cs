@@ -16,7 +16,7 @@ namespace WildBlueCore
     /// <code>
     /// MODULE
     /// {
-    ///     name = ModulePowerUnitConverter
+    ///     name = WBIModulePowerUnitConverter
     ///     isActive = true
     ///     isConsuming = false
     ///     ecPerPowerUnit = 0.25
@@ -24,7 +24,7 @@ namespace WildBlueCore
     /// }
     /// </code>
     /// </example>
-    public class ModulePowerUnitConverter: BasePartModule
+    public class WBIModulePowerUnitConverter: WBIBasePartModule
     {
         #region Constants
         private const double secondsPerCycle = 1800;
@@ -107,7 +107,7 @@ namespace WildBlueCore
                 return;
 
             // Get numb of converters that are distributing.
-            List<ModulePowerUnitConverter> vesselConverters = part.vessel.FindPartModulesImplementing<ModulePowerUnitConverter>();
+            List<WBIModulePowerUnitConverter> vesselConverters = part.vessel.FindPartModulesImplementing<WBIModulePowerUnitConverter>();
             totalDistributors = 0;
             for (int index = 0; index < vesselConverters.Count; index++)
             {

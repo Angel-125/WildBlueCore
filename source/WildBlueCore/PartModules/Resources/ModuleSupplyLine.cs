@@ -16,7 +16,7 @@ namespace WildBlueCore.PartModules.Resources
     ///  it takes between supply runs. It also can optionally charge for the cost of the resources upon delivery.
     ///  When a delivery is made, the part module can play an EFFECT and/or run an animation.
     /// </summary>
-    public class ModuleSupplyLine: BasePartModule
+    public class WBIModuleSupplyLine: WBIBasePartModule
     {
         #region Constants
         const float kMaxTransferTime = 216000f;
@@ -87,7 +87,7 @@ namespace WildBlueCore.PartModules.Resources
         public bool payFlatFee;
 
         /// <summary>
-        /// Flag to indicate that the part that has the ModuleSupplyLine is the host part.
+        /// Flag to indicate that the part that has the WBIModuleSupplyLine is the host part.
         /// </summary>
         [KSPField]
         public bool selfIsHostPart = true;
@@ -99,7 +99,7 @@ namespace WildBlueCore.PartModules.Resources
         bool animationPlayed;
         ModuleAnimateGeneric animationModule = null;
         internal Part hostPart = null;
-        ModuleFuelPump fuelPump = null;
+        WBIModuleFuelPump fuelPump = null;
         #endregion
 
         #region Overrides
@@ -110,7 +110,7 @@ namespace WildBlueCore.PartModules.Resources
             // Get host part
             findHostPart();
 
-            fuelPump = part.FindModuleImplementing<ModuleFuelPump>();
+            fuelPump = part.FindModuleImplementing<WBIModuleFuelPump>();
 
             // Periodic Transfers
             transfersWereEnabled = transfersEnabled;

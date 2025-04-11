@@ -32,6 +32,7 @@ namespace WildBlueCore.KerbalGear
         SuitCombo[] defaultSuits;
         SuitCombo[] vintageSuits;
         SuitCombo[] futureSuits;
+        SuitCombo[] slimSuits;
         SuitCombo selectedCombo = null;
         List<ProtoCrewMember> crewList = null;
         ProtoCrewMember selectedCrew = null;
@@ -42,13 +43,14 @@ namespace WildBlueCore.KerbalGear
         GUILayoutOption[] suitPreviewPanelWidth = new GUILayoutOption[] { GUILayout.Width(300) };
         Texture2D suitSprite = null;
         Dictionary<string, string> wardrobeIcons = null;
+        int selectedCrewIndex;
         #endregion
 
         #region Constructors
         public WBIWardrobeGUI() :
         base("Suit Switcher", 700, 400)
         {
-            WindowTitle = Localizer.Format("#LOC_SUNKWORKS_suitSwitcherTitle");
+            WindowTitle = Localizer.Format("#LOC_WILDBLUECORE_suitSwitcherTitle");
             Resizable = false;
         }
         #endregion
@@ -65,12 +67,18 @@ namespace WildBlueCore.KerbalGear
                 List<SuitCombo> maleSuits = new List<SuitCombo>();
                 List<SuitCombo> femaleSuits = new List<SuitCombo>();
 
+                if (suitCombos.helmetSuitPickerWindow != null)
+                {
+                    Debug.Log("[WBIWardrobeGUI] - suitCombos.helmetSuitPickerWindow is not null");
+                }
+
                 // Get stock suits
                 SuitCombo suitCombo;
                 int count = suitCombos.StockCombos.Count;
                 for (int index = 0; index < count; index++)
                 {
                     suitCombo = suitCombos.StockCombos[index];
+
                     if (suitCombo.gender.ToLower() == "male")
                         maleSuits.Add(suitCombo);
                     else
@@ -93,11 +101,13 @@ namespace WildBlueCore.KerbalGear
                 // Get wardrobe icons
                 getWardrobeIcons();
 
+                Debug.Log("[WBIWardrobeGUI] - Male suits found: " + maleSuitCombos.Length);
                 for (int index = 0; index < maleSuitCombos.Length; index++)
-                    Debug.Log("[WBIWardrobeGUI] - " + maleSuitCombos[index].name + " " + Localizer.Format(maleSuitCombos[index].displayName));
+                    Debug.Log("[WBIWardrobeGUI] - " + maleSuitCombos[index].name + " | " + Localizer.Format(maleSuitCombos[index].displayName));
 
+                Debug.Log("[WBIWardrobeGUI] - Female suits found: " + femaleSuitCombos.Length);
                 for (int index = 0; index < femaleSuitCombos.Length; index++)
-                    Debug.Log("[WBIWardrobeGUI] - " + femaleSuitCombos[index].name + " " + Localizer.Format(femaleSuitCombos[index].displayName));
+                    Debug.Log("[WBIWardrobeGUI] - " + femaleSuitCombos[index].name + " | " + Localizer.Format(femaleSuitCombos[index].displayName));
 
                 // Get crew list
                 crewList = part.protoModuleCrew;
@@ -106,6 +116,7 @@ namespace WildBlueCore.KerbalGear
                     selectedCrew = crewList[0];
                     selectedCombo = suitCombos.GetCombo(selectedCrew.ComboId);
                     updateSuitCombos();
+                    updateSuitSprite();
                 }
             }
         }
@@ -148,6 +159,10 @@ namespace WildBlueCore.KerbalGear
                         suitType = ProtoCrewMember.KerbalSuit.Future;
                         suitTypeString = Localizer.Format("#autoLOC_8012023");
                         break;
+                    case "slim":
+                        suitType = ProtoCrewMember.KerbalSuit.Slim;
+                        suitTypeString = Localizer.Format("#autoLOC_6011176");
+                        break;
                     default:
                         suitType = ProtoCrewMember.KerbalSuit.Default;
                         suitTypeString = Localizer.Format("#autoLOC_8012021");
@@ -162,29 +177,22 @@ namespace WildBlueCore.KerbalGear
 
             GUILayout.EndScrollView();
 
-            if (GUILayout.Button(Localizer.Format("#LOC_SUNKWORKS_suitSwitcherSelectSuit")) && selectedCrew != null && selectedCombo != null)
+            if (GUILayout.Button(Localizer.Format("#LOC_WILDBLUECORE_suitSwitcherSelectSuit")) && selectedCrew != null && selectedCombo != null)
             {
                 selectedCrew.ComboId = selectedCombo.name;
-                if (!string.IsNullOrEmpty(selectedCombo.suitTexture))
-                    selectedCrew.SuitTexturePath = selectedCombo.suitTexture;
-                if (!string.IsNullOrEmpty(selectedCombo.normalTexture))
-                    selectedCrew.NormalTexturePath = selectedCombo.normalTexture;
-
+                selectedCrew.SuitTexturePath = selectedCombo.suitTexture;
+                selectedCrew.NormalTexturePath = selectedCombo.normalTexture;
                 selectedCrew.suit = suitType;
-                switch (selectedCombo.suitType.ToLower())
-                {
-                    case "vintage":
-                        selectedCrew.suit = ProtoCrewMember.KerbalSuit.Vintage;
-                        break;
-                    case "future":
-                        selectedCrew.suit = ProtoCrewMember.KerbalSuit.Future;
-                        break;
-                    default:
-                        selectedCrew.suit = ProtoCrewMember.KerbalSuit.Default;
-                        break;
-                }
-
                 selectedCrew.UseStockTexture = suitCombos.StockCombos.Contains(selectedCombo);
+
+                part.protoModuleCrew[selectedCrewIndex] = selectedCrew;
+
+                Debug.Log("[WBIWardrobeGUI] - Changing wardrobe for: " + selectedCrew.name);
+                Debug.Log("[WBIWardrobeGUI] - selectedCrew.ComboId: " + selectedCrew.ComboId);
+                Debug.Log("[WBIWardrobeGUI] - selectedCrew.SuitTexturePath: " + selectedCrew.SuitTexturePath);
+                Debug.Log("[WBIWardrobeGUI] - selectedCrew.NormalTexturePath: " + selectedCrew.NormalTexturePath);
+                Debug.Log("[WBIWardrobeGUI] - selectedCrew.suit: " + selectedCrew.suit.ToString());
+                Debug.Log("[WBIWardrobeGUI] - selectedCrew.UseStockTexture: " + selectedCrew.UseStockTexture.ToString());
             }
 
             GUILayout.EndVertical();
@@ -195,7 +203,12 @@ namespace WildBlueCore.KerbalGear
             GUILayout.BeginVertical();
 
             if (selectedCrew != null)
+            {
                 GUILayout.Label("<color=white>" + selectedCrew.name + " - " + selectedCrew.trait + "</color>");
+                string suitName = Localizer.Format(suitCombos.GetCombo(selectedCrew.ComboId).displayName);
+                GUILayout.Label("<color=white><b>Currently Wearing</b></color>");
+                GUILayout.Label("<color=white>" + suitName + "</color>");
+            }
 
             suitListScrollPos = GUILayout.BeginScrollView(suitListScrollPos, suitPanelWidth);
 
@@ -237,6 +250,18 @@ namespace WildBlueCore.KerbalGear
                 }
             }
 
+            // Slim
+            GUILayout.Label("<color=white><b>" + Localizer.Format("#autoLOC_6011176") + "</b></color>");
+            for (int index = 0; index < slimSuits.Length; index++)
+            {
+                suitCombo = slimSuits[index];
+                if (GUILayout.Button(Localizer.Format(suitCombo.displayName)))
+                {
+                    selectedCombo = suitCombo;
+                    updateSuitSprite();
+                }
+            }
+
             GUILayout.EndScrollView();
 
             GUILayout.EndVertical();
@@ -260,8 +285,10 @@ namespace WildBlueCore.KerbalGear
                 if (GUILayout.Button(crewList[index].name))
                 {
                     selectedCrew = crewList[index];
+                    selectedCrewIndex = index;
                     selectedCombo = suitCombos.GetCombo(selectedCrew.ComboId);
                     updateSuitCombos();
+                    updateSuitSprite();
                 }
             }
 
@@ -292,6 +319,7 @@ namespace WildBlueCore.KerbalGear
             List<SuitCombo> defaultCombos = new List<SuitCombo>();
             List<SuitCombo> vintageCombos = new List<SuitCombo>();
             List<SuitCombo> futureCombos = new List<SuitCombo>();
+            List<SuitCombo> slimCombos = new List<SuitCombo>();
             SuitCombo[] combos = selectedCrew.gender == ProtoCrewMember.Gender.Male ? maleSuitCombos : femaleSuitCombos;
             SuitCombo combo;
 
@@ -309,6 +337,10 @@ namespace WildBlueCore.KerbalGear
                         futureCombos.Add(combo);
                         break;
 
+                    case "slim":
+                        slimCombos.Add(combo);
+                        break;
+
                     default:
                         defaultCombos.Add(combo);
                         break;
@@ -318,6 +350,7 @@ namespace WildBlueCore.KerbalGear
             defaultSuits = defaultCombos.ToArray();
             vintageSuits = vintageCombos.ToArray();
             futureSuits = futureCombos.ToArray();
+            slimSuits = slimCombos.ToArray();
         }
 
         void updateSuitSprite()

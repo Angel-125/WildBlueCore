@@ -8,7 +8,7 @@ using WildBlueCore.Utilities;
 
 namespace WildBlueCore.PartModules.IVA
 {
-    public class InternalModuleLightToggle: InternalBaseModule
+    public class InternalModuleLightToggle: WBIInternalBaseModule
     {
         #region Fields
         [KSPField]
@@ -29,7 +29,7 @@ namespace WildBlueCore.PartModules.IVA
         List<Color> lightColors;
         List<Color> emissiveColors;
         List<Material> emissiveMaterials;
-        InternalModuleScreenshot screenshotModule;
+        WBIInternalModuleScreenshot screenshotModule;
         ModuleColorChanger colorChanger = null;
         #endregion
 
@@ -50,7 +50,7 @@ namespace WildBlueCore.PartModules.IVA
             colorChanger = part.FindModuleImplementing<ModuleColorChanger>();
         }
 
-        protected override void onGroupUpdated(InternalBaseModule source)
+        protected override void onGroupUpdated(WBIInternalBaseModule source)
         {
             if (source is InternalModuleLightToggle)
             {
@@ -122,7 +122,7 @@ namespace WildBlueCore.PartModules.IVA
             int count = internalModel.props.Count;
             InternalProp prop;
             InternalModuleLightToggle lightToggle;
-            InternalModuleButtonToggle buttonToggle;
+            WBIInternalModuleButtonToggle buttonToggle;
             List<Material> excludedMaterials = new List<Material>();
             Renderer[] renderers;
             Renderer renderer;
@@ -130,7 +130,7 @@ namespace WildBlueCore.PartModules.IVA
             for (int index = 0; index < count; index++)
             {
                 prop = internalModel.props[index];
-                buttonToggle = prop.FindModelComponent<InternalModuleButtonToggle>();
+                buttonToggle = prop.FindModelComponent<WBIInternalModuleButtonToggle>();
                 if (buttonToggle != null)
                 {
                     renderer = prop.FindModelComponent<Renderer>(buttonToggle.buttonTransformName);
@@ -153,7 +153,7 @@ namespace WildBlueCore.PartModules.IVA
             }
 
             // Exclude materials in any IVA Variants that are hidden
-            ModuleIVAVariants iVAVariants = part.FindModuleImplementing<ModuleIVAVariants>();
+            WBIModuleIVAVariants iVAVariants = part.FindModuleImplementing<WBIModuleIVAVariants>();
             if (iVAVariants != null)
                 excludedMaterials.AddRange(iVAVariants.FetchHiddenMaterials());
 
@@ -177,9 +177,9 @@ namespace WildBlueCore.PartModules.IVA
             int count = internalProp.internalModules.Count;
             for (int index = 0; index < count; index++)
             {
-                if (internalProp.internalModules[index] is InternalModuleScreenshot)
+                if (internalProp.internalModules[index] is WBIInternalModuleScreenshot)
                 {
-                    screenshotModule = (InternalModuleScreenshot)internalProp.internalModules[index];
+                    screenshotModule = (WBIInternalModuleScreenshot)internalProp.internalModules[index];
                     break;
                 }
             }
