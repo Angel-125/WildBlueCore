@@ -17,6 +17,8 @@ The minimum skill level required to unpack the box. Default is 0.
 Flag to indicate whether or not to make a resource requirements check before playing the start event animation. Default is false.
 ### endEventGivesResources
 Flag to indicate whether or not to make a resource requirements check before playing the end event animation. Default is false.
+### allowLoopingStop
+Flag to indicate whether or not looped animations are allowed to be stopped.
 ### canUseRemoteResources
 Flag to indicate whether or not when checking resources, resources can come from other vessels. Default is true.
 ### startSoundURL
@@ -54,6 +56,9 @@ Action to toggle the animation.
 > #### Parameters
 > **param:** 
 
+
+### StopLoop
+Stops the looping animation
 
 ### SetProgress(System.Single)
 Sets the Progress level. Call this instead of setting deployPercent directly.

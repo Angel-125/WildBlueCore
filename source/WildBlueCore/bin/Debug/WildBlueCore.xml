@@ -558,6 +558,11 @@
             Flag to indicate whether or not to make a resource requirements check before playing the end event animation. Default is false.
             </summary>
         </member>
+        <member name="F:WildBlueCore.PartModules.WBIModuleAnimateGenericExtended.allowLoopingStop">
+            <summary>
+            Flag to indicate whether or not looped animations are allowed to be stopped.
+            </summary>
+        </member>
         <member name="F:WildBlueCore.PartModules.WBIModuleAnimateGenericExtended.canUseRemoteResources">
             <summary>
             Flag to indicate whether or not when checking resources,
@@ -627,6 +632,11 @@
             Action to toggle the animation.
             </summary>
             <param name="param"></param>
+        </member>
+        <member name="M:WildBlueCore.PartModules.WBIModuleAnimateGenericExtended.StopLoop">
+            <summary>
+            Stops the looping animation
+            </summary>
         </member>
         <member name="M:WildBlueCore.PartModules.WBIModuleAnimateGenericExtended.SetProgress(System.Single)">
             <summary>

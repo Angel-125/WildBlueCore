@@ -71,6 +71,12 @@ namespace WildBlueCore.PartModules
         public bool endEventGivesResources = false;
 
         /// <summary>
+        /// Flag to indicate whether or not looped animations are allowed to be stopped.
+        /// </summary>
+        [KSPField()]
+        public bool allowLoopingStop = false;
+
+        /// <summary>
         /// Flag to indicate whether or not when checking resources,
         /// resources can come from other vessels.
         /// Default is true.
@@ -143,6 +149,7 @@ namespace WildBlueCore.PartModules
         AudioSource loopSound = null;
         AudioSource startSound = null;
         AudioSource stopSound = null;
+        Animation animation = null;
         #endregion
 
         #region Overrides
@@ -212,6 +219,8 @@ namespace WildBlueCore.PartModules
 
             // Clear resources if we haven't completed the animation.
             updateManagedResources();
+
+            animation = GetAnimation();
         }
 
         /// <summary>
@@ -244,6 +253,12 @@ namespace WildBlueCore.PartModules
             }
 
             base.Toggle();
+
+            if (allowLoopingStop)
+            {
+                Events["StopLoop"].guiName = endEventGUIName;
+                Events["StopLoop"].guiActive = true;
+            }
         }
 
         /// <summary>
@@ -334,6 +349,19 @@ namespace WildBlueCore.PartModules
         #endregion
 
         #region API
+        /// <summary>
+        /// Stops the looping animation
+        /// </summary>
+        [KSPEvent(guiName = "Stop Animation")]
+        public void StopLoop()
+        {
+            Toggle();
+            animation.Stop();
+            animation.Rewind();
+            deployPercent = 0;
+            Events["StopLoop"].guiActive = false;
+        }
+
         /// <summary>
         /// Sets the Progress level. Call this instead of setting deployPercent directly.
         /// </summary>
@@ -601,7 +629,7 @@ namespace WildBlueCore.PartModules
             if (!node.HasNode("MANAGED_RESOURCE"))
             {
                 if (debugMode)
-                    Debug.Log("[WBIModuleAnimateGenericExtended] - MANAGED_RESOURCE not found");
+                    Debug.Log("[WBIModuleAnimateGenericExtended] - There is no MANAGED_RESOURCE node to manage. Exiting.");
                 return;
             }
 
@@ -815,7 +843,7 @@ namespace WildBlueCore.PartModules
 
         void onMovingAnimation(float time, float speed)
         {
-            if (hasStarted)
+            if (!hasStarted)
             {
                 hasStarted = true;
                 PlayStartSound();

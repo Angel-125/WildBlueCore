@@ -59,7 +59,7 @@ namespace WildBlueCore.KerbalGear
         #region Overrides
         public void OnDestroy()
         {
-            if (wardrobeView.IsVisible())
+            if (wardrobeView != null && wardrobeView.IsVisible())
                 wardrobeView.SetVisible(false);
 
             GameEvents.onVesselChange.Remove(onVesselChange);
