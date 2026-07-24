@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.35325.158
+# Visual Studio Version 18
+VisualStudioVersion = 18.7.11911.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WildBlueCore", "WildBlueCore.csproj", "{7D8D783F-DDA6-4C96-BF65-8905FAB07CB5}"
 EndProject
@@ -39,7 +39,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WildBlueTools", "..\..\..\W
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pathfinder", "..\..\..\Pathfinder\Pathfinder.csproj", "{AD41263E-2A61-4916-9D63-7101EA917811}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DecalUtils", "..\..\..\Decals\DecalUtils\DecalUtils.csproj", "{239E2B25-187D-4ACB-8A53-5506DF37B807}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KerbalDataCenters", "..\..\..\KerbalDataCenters\source\KerbalDataCenters\KerbalDataCenters.csproj", "{2F775A17-66BB-433E-A190-8D9DFB26FAF8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -119,10 +119,10 @@ Global
 		{AD41263E-2A61-4916-9D63-7101EA917811}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AD41263E-2A61-4916-9D63-7101EA917811}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AD41263E-2A61-4916-9D63-7101EA917811}.Release|Any CPU.Build.0 = Release|Any CPU
-		{239E2B25-187D-4ACB-8A53-5506DF37B807}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{239E2B25-187D-4ACB-8A53-5506DF37B807}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{239E2B25-187D-4ACB-8A53-5506DF37B807}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{239E2B25-187D-4ACB-8A53-5506DF37B807}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F775A17-66BB-433E-A190-8D9DFB26FAF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F775A17-66BB-433E-A190-8D9DFB26FAF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F775A17-66BB-433E-A190-8D9DFB26FAF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F775A17-66BB-433E-A190-8D9DFB26FAF8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

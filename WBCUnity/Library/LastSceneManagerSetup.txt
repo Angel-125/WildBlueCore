@@ -1,0 +1,4 @@
+sceneSetups:
+- path: Assets/Aero/mk18Parachute.unity
+  isLoaded: 1
+  isActive: 1
