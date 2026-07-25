@@ -72,8 +72,8 @@ namespace WildBlueCore.PartModules.Aero
         public float debugLogInterval = 0.25f;
 
         /// <summary>
-        /// Time, in seconds, to ramp the control surface from zero to its configured range
-        /// after the parafoil takes control from ModuleParachute.
+        /// Time, in seconds, to ramp the control surface and passive stabilizers
+        /// from zero to their configured authority after the parafoil takes control.
         /// </summary>
         [KSPField]
         public float controlAuthorityRampTime = 1f;
@@ -91,6 +91,8 @@ namespace WildBlueCore.PartModules.Aero
 
         ModuleLiftingSurface liftingSurface;
         ModuleControlSurface controlSurface;
+        List<ModuleParafoilStabilizer> stabilizerSurfaces;
+        List<float> deployedStabilizerLiftCoefficients;
         float originalMaximumDrag;
         float maximumControlSurfaceRange;
         bool originalIgnorePitch;
@@ -114,10 +116,16 @@ namespace WildBlueCore.PartModules.Aero
             originalMaximumDrag = part.maximum_drag;
 
             // ModuleControlSurface derives from ModuleLiftingSurface, so explicitly
-            // exclude it when locating the parafoil's primary lifting surface.
+            // exclude it and the stabilizers when locating the primary lifting surface.
             liftingSurface = part.FindModulesImplementing<ModuleLiftingSurface>()
-                .FirstOrDefault(module => !(module is ModuleControlSurface));
+                .FirstOrDefault(module =>
+                    !(module is ModuleControlSurface) &&
+                    !(module is ModuleParafoilStabilizer));
             controlSurface = part.FindModuleImplementing<ModuleControlSurface>();
+            stabilizerSurfaces = part.FindModulesImplementing<ModuleParafoilStabilizer>();
+            deployedStabilizerLiftCoefficients = stabilizerSurfaces
+                .Select(module => module.deflectionLiftCoeff)
+                .ToList();
 
             if (controlSurface != null)
             {
@@ -189,7 +197,9 @@ namespace WildBlueCore.PartModules.Aero
             if (parafoilFlightActive)
                 RestoreCanopyRotation();
 
-            if (liftingSurface != null || controlSurface != null)
+            if (liftingSurface != null ||
+                controlSurface != null ||
+                (stabilizerSurfaces != null && stabilizerSurfaces.Count > 0))
             {
                 float deploymentCurveTime = Mathf.Clamp01(Mathf.Pow(animTime, deploymentCurve));
 
@@ -199,6 +209,7 @@ namespace WildBlueCore.PartModules.Aero
                         SetLiftCoefficient(Mathf.Lerp(retractedDeflectionLiftCoeff, semiDeployedDeflectionLiftCoeff, deploymentCurveTime));
 
                         SetControlSurfaceCoefficient(enableControlInSemiDeploy ? Mathf.Lerp(retractedCtlSfcDeflectionLiftCoeff, semiDeployedCtlSfcDeflectionLiftCoeff, deploymentCurveTime) : retractedCtlSfcDeflectionLiftCoeff);
+                        SetStabilizerAuthority(0f);
                         DisableControlSurface();
                         break;
 
@@ -210,9 +221,15 @@ namespace WildBlueCore.PartModules.Aero
                         SetControlSurfaceCoefficient(Mathf.Lerp(deployedStartControlCoeff, deployedCtlSfcDeflectionLiftCoeff, deploymentCurveTime));
 
                         if (parafoilFlightActive)
+                        {
                             UpdateControlAuthority();
+                            UpdateStabilizerAuthority();
+                        }
                         else
+                        {
+                            SetStabilizerAuthority(0f);
                             DisableControlSurface();
+                        }
                         break;
 
                     case deploymentStates.STOWED:
@@ -325,6 +342,23 @@ namespace WildBlueCore.PartModules.Aero
                 message.Append(" controlCoeff=<null>");
             }
 
+            int stabilizerCount = stabilizerSurfaces != null ? stabilizerSurfaces.Count : 0;
+            message.Append(" stabilizer.count=").Append(stabilizerCount);
+            for (int index = 0; index < stabilizerCount; index++)
+            {
+                ModuleParafoilStabilizer stabilizer = stabilizerSurfaces[index];
+                message.Append(" stabilizer[").Append(index).Append("].transformName=")
+                    .Append(string.IsNullOrEmpty(stabilizer.transformName) ? "<part-root>" : stabilizer.transformName);
+                message.Append(" stabilizer[").Append(index).Append("].targetCoeff=")
+                    .Append(deployedStabilizerLiftCoefficients[index].ToString("F4"));
+                message.Append(" stabilizer[").Append(index).Append("].coeff=")
+                    .Append(stabilizer.deflectionLiftCoeff.ToString("F4"));
+                message.Append(" stabilizer[").Append(index).Append("].liftScalar=")
+                    .Append(stabilizer.liftScalar.ToString("F4"));
+                message.Append(" stabilizer[").Append(index).Append("].dragScalar=")
+                    .Append(stabilizer.dragScalar.ToString("F4"));
+            }
+
             Debug.Log(message.ToString());
         }
 
@@ -418,6 +452,7 @@ namespace WildBlueCore.PartModules.Aero
         {
             SetLiftCoefficient(0f);
             SetControlSurfaceCoefficient(0f);
+            SetStabilizerAuthority(0f);
             DisableControlSurface();
         }
 
@@ -446,6 +481,27 @@ namespace WildBlueCore.PartModules.Aero
                 disabledControlSurfaceRange,
                 maximumControlSurfaceRange,
                 rampProgress);
+        }
+
+        private void UpdateStabilizerAuthority()
+        {
+            float rampProgress = controlAuthorityRampTime <= 0f
+                ? 1f
+                : Mathf.Clamp01((float)((Planetarium.GetUniversalTime() - controlAuthorityRampStartTime) / controlAuthorityRampTime));
+
+            SetStabilizerAuthority(rampProgress);
+        }
+
+        private void SetStabilizerAuthority(float authority)
+        {
+            if (stabilizerSurfaces == null || deployedStabilizerLiftCoefficients == null)
+                return;
+
+            float clampedAuthority = Mathf.Clamp01(authority);
+            int stabilizerCount = Mathf.Min(stabilizerSurfaces.Count, deployedStabilizerLiftCoefficients.Count);
+            for (int index = 0; index < stabilizerCount; index++)
+                stabilizerSurfaces[index].deflectionLiftCoeff =
+                    deployedStabilizerLiftCoefficients[index] * clampedAuthority;
         }
 
         private void SetLiftCoefficient(float liftCoefficient)

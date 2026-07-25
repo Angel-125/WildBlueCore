@@ -112,6 +112,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="PartModules\Aero\ModuleParafoil.cs" />
+    <Compile Include="PartModules\Aero\ModuleParafoilStabilizer.cs" />
     <Compile Include="PartModules\Decals\ModuleDecal.cs" />
     <Compile Include="PartModules\IVA\GUI\ScreenshotView.cs" />
     <Compile Include="PartModules\IVA\InternalModules\InternalBaseModule.cs" />

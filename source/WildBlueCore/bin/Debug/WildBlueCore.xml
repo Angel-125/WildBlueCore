@@ -58,8 +58,8 @@
         </member>
         <member name="F:WildBlueCore.PartModules.Aero.ModuleParafoil.controlAuthorityRampTime">
             <summary>
-            Time, in seconds, to ramp the control surface from zero to its configured range
-            after the parafoil takes control from ModuleParachute.
+            Time, in seconds, to ramp the control surface and passive stabilizers
+            from zero to their configured authority after the parafoil takes control.
             </summary>
         </member>
         <member name="F:WildBlueCore.PartModules.Aero.ModuleParafoil.diagnosticsOnly">
@@ -78,6 +78,13 @@
             <summary>
             Lets ModuleParachute control deployment, then hands fully deployed flight
             to the parafoil lifting and control surfaces.
+            </summary>
+        </member>
+        <member name="T:WildBlueCore.PartModules.Aero.ModuleParafoilStabilizer">
+            <summary>
+            Identifies a ModuleLiftingSurface as a passive parafoil stabilizer.
+            ModuleParafoil keeps the surface disabled until the parafoil is fully
+            deployed, then ramps it to its configured deflectionLiftCoeff.
             </summary>
         </member>
         <member name="T:WildBlueCore.PartModules.Decals.WBIModuleDecal">

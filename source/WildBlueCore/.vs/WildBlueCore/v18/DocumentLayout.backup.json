@@ -5,23 +5,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{7D8D783F-DDA6-4C96-BF65-8905FAB07CB5}|WildBlueCore.csproj|c:\\projects\\ksp\\wildblueindustries\\wildbluecore\\source\\wildbluecore\\partmodules\\aero\\moduleparafoil.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{7D8D783F-DDA6-4C96-BF65-8905FAB07CB5}|WildBlueCore.csproj|solutionrelative:partmodules\\aero\\moduleparafoil.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{74BD7D76-7EAB-42B8-90AD-58486C5D12C0}|..\\..\\..\\Blueshift\\Source\\Blueshift\\Blueshift.csproj|c:\\projects\\ksp\\wildblueindustries\\blueshift\\source\\blueshift\\jumptech\\wbijumpgate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7D8D783F-DDA6-4C96-BF65-8905FAB07CB5}|WildBlueCore.csproj|C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\partmodules\\breaking ground\\modulepowerunitconverter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7D8D783F-DDA6-4C96-BF65-8905FAB07CB5}|WildBlueCore.csproj|solutionrelative:partmodules\\breaking ground\\modulepowerunitconverter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7D8D783F-DDA6-4C96-BF65-8905FAB07CB5}|WildBlueCore.csproj|C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\partmodules\\animation\\moduleanimategenericextended.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7D8D783F-DDA6-4C96-BF65-8905FAB07CB5}|WildBlueCore.csproj|solutionrelative:partmodules\\animation\\moduleanimategenericextended.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9E6C131F-3161-486A-84F3-9F16768B4D4B}|..\\..\\..\\WBIResources\\Source\\WBIResources.csproj|c:\\projects\\ksp\\wildblueindustries\\wbiresources\\source\\goldstrike\\supportclasses\\wbilodeiconhelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{00000000-0000-0000-0000-000000000000}|\u003CSolution\u003E|WildBlueCore||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|"
     }
   ],
   "DocumentGroupContainers": [
@@ -31,45 +14,8 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 0,
           "Children": [
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "ModulePowerUnitConverter.cs",
-              "DocumentMoniker": "C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\PartModules\\Breaking Ground\\ModulePowerUnitConverter.cs",
-              "RelativeDocumentMoniker": "PartModules\\Breaking Ground\\ModulePowerUnitConverter.cs",
-              "ToolTip": "C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\PartModules\\Breaking Ground\\ModulePowerUnitConverter.cs",
-              "RelativeToolTip": "PartModules\\Breaking Ground\\ModulePowerUnitConverter.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-06-21T19:06:08.479Z",
-              "IsPinned": true
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "WBIJumpGate.cs",
-              "DocumentMoniker": "C:\\Projects\\KSP\\WildBlueIndustries\\Blueshift\\Source\\Blueshift\\JumpTech\\WBIJumpGate.cs",
-              "RelativeDocumentMoniker": "..\\..\\..\\Blueshift\\Source\\Blueshift\\JumpTech\\WBIJumpGate.cs",
-              "ToolTip": "C:\\Projects\\KSP\\WildBlueIndustries\\Blueshift\\Source\\Blueshift\\JumpTech\\WBIJumpGate.cs",
-              "RelativeToolTip": "..\\..\\..\\Blueshift\\Source\\Blueshift\\JumpTech\\WBIJumpGate.cs",
-              "ViewState": "AgIAACgBAAAAAAAAAAAowIIBAAANAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-20T02:30:29.114Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "ModuleAnimateGenericExtended.cs",
-              "DocumentMoniker": "C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\PartModules\\Animation\\ModuleAnimateGenericExtended.cs",
-              "RelativeDocumentMoniker": "PartModules\\Animation\\ModuleAnimateGenericExtended.cs",
-              "ToolTip": "C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\PartModules\\Animation\\ModuleAnimateGenericExtended.cs",
-              "RelativeToolTip": "PartModules\\Animation\\ModuleAnimateGenericExtended.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-09T04:10:17.795Z"
-            },
             {
               "$type": "Document",
               "DocumentIndex": 0,
@@ -78,33 +24,10 @@
               "RelativeDocumentMoniker": "PartModules\\Aero\\ModuleParafoil.cs",
               "ToolTip": "C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\PartModules\\Aero\\ModuleParafoil.cs",
               "RelativeToolTip": "PartModules\\Aero\\ModuleParafoil.cs",
-              "ViewState": "AgIAALQAAAAAAAAAAAAowNgAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAGsAAAAIAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-07-09T04:10:06.545Z",
               "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "WBILodeIconHelper.cs",
-              "DocumentMoniker": "C:\\Projects\\KSP\\WildBlueIndustries\\WBIResources\\Source\\GoldStrike\\SupportClasses\\WBILodeIconHelper.cs",
-              "RelativeDocumentMoniker": "..\\..\\..\\WBIResources\\Source\\GoldStrike\\SupportClasses\\WBILodeIconHelper.cs",
-              "ToolTip": "C:\\Projects\\KSP\\WildBlueIndustries\\WBIResources\\Source\\GoldStrike\\SupportClasses\\WBILodeIconHelper.cs",
-              "RelativeToolTip": "..\\..\\..\\WBIResources\\Source\\GoldStrike\\SupportClasses\\WBILodeIconHelper.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABkAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-05T18:15:56.871Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "WildBlueCore",
-              "DocumentMoniker": "C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\WildBlueCore.csproj",
-              "RelativeDocumentMoniker": "WildBlueCore.csproj",
-              "ToolTip": "C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\WildBlueCore.csproj",
-              "RelativeToolTip": "WildBlueCore.csproj",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2026-06-22T04:13:27.655Z"
             }
           ]
         }

@@ -22,7 +22,7 @@ Enables FixedUpdate diagnostics in KSP.log.
 ### debugLogInterval
 Minimum time, in seconds, between groups of FixedUpdate diagnostic messages. Set to 0 to log every physics update.
 ### controlAuthorityRampTime
-Time, in seconds, to ramp the control surface from zero to its configured range after the parafoil takes control from ModuleParachute.
+Time, in seconds, to ramp the control surface and passive stabilizers from zero to their configured authority after the parafoil takes control.
 ### diagnosticsOnly
 When enabled, ModuleParafoil only emits diagnostics and leaves all parachute, drag, rotation, lift, and control behavior to the base module.
 ## Methods
