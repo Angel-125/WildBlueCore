@@ -29,12 +29,6 @@ namespace WildBlueCore.PartModules.Aero
         public float semiDeployedDeflectionLiftCoeff = 8;
 
         /// <summary>
-        /// Lift coefficient when the chute is deployed (fully open)
-        /// </summary>
-        [KSPField]
-        public float deployedDeflectionLiftCoeff = 28;
-
-        /// <summary>
         /// Control surface's lift coefficient when the chute is fully retracted
         /// </summary>
         [KSPField]
@@ -45,12 +39,6 @@ namespace WildBlueCore.PartModules.Aero
         /// </summary>
         [KSPField]
         public float semiDeployedCtlSfcDeflectionLiftCoeff = 0.25f;
-
-        /// <summary>
-        /// Control surface lift coefficient when the chute is deployed (fully open)
-        /// </summary>
-        [KSPField]
-        public float deployedCtlSfcDeflectionLiftCoeff = 1.25f;
 
         /// <summary>
         /// Flag indicating whether or not the parafoil can be steered when in the semi-deployed state.
@@ -93,6 +81,8 @@ namespace WildBlueCore.PartModules.Aero
         ModuleControlSurface controlSurface;
         List<ModuleParafoilStabilizer> stabilizerSurfaces;
         List<float> deployedStabilizerLiftCoefficients;
+        float deployedLiftCoefficient;
+        float deployedControlSurfaceLiftCoefficient;
         float originalMaximumDrag;
         float maximumControlSurfaceRange;
         bool originalIgnorePitch;
@@ -127,8 +117,12 @@ namespace WildBlueCore.PartModules.Aero
                 .Select(module => module.deflectionLiftCoeff)
                 .ToList();
 
+            if (liftingSurface != null)
+                deployedLiftCoefficient = liftingSurface.deflectionLiftCoeff;
+
             if (controlSurface != null)
             {
+                deployedControlSurfaceLiftCoefficient = controlSurface.deflectionLiftCoeff;
                 maximumControlSurfaceRange = controlSurface.ctrlSurfaceRange;
                 originalIgnorePitch = controlSurface.ignorePitch;
                 originalIgnoreRoll = controlSurface.ignoreRoll;
@@ -216,9 +210,9 @@ namespace WildBlueCore.PartModules.Aero
                     case deploymentStates.DEPLOYED:
                         float deployedStartControlCoeff = enableControlInSemiDeploy ? semiDeployedCtlSfcDeflectionLiftCoeff : retractedCtlSfcDeflectionLiftCoeff;
 
-                        SetLiftCoefficient(Mathf.Lerp(semiDeployedDeflectionLiftCoeff, deployedDeflectionLiftCoeff, deploymentCurveTime));
+                        SetLiftCoefficient(Mathf.Lerp(semiDeployedDeflectionLiftCoeff, deployedLiftCoefficient, deploymentCurveTime));
 
-                        SetControlSurfaceCoefficient(Mathf.Lerp(deployedStartControlCoeff, deployedCtlSfcDeflectionLiftCoeff, deploymentCurveTime));
+                        SetControlSurfaceCoefficient(Mathf.Lerp(deployedStartControlCoeff, deployedControlSurfaceLiftCoefficient, deploymentCurveTime));
 
                         if (parafoilFlightActive)
                         {
@@ -314,6 +308,7 @@ namespace WildBlueCore.PartModules.Aero
             if (liftingSurface != null)
             {
                 message.Append(" liftingSurface.found=True");
+                message.Append(" liftingSurface.targetCoeff=").Append(deployedLiftCoefficient.ToString("F4"));
                 message.Append(" liftCoeff=").Append(liftingSurface.deflectionLiftCoeff.ToString("F4"));
                 message.Append(" liftingSurface.liftScalar=").Append(liftingSurface.liftScalar.ToString("F4"));
                 message.Append(" liftingSurface.dragScalar=").Append(liftingSurface.dragScalar.ToString("F4"));
@@ -327,6 +322,7 @@ namespace WildBlueCore.PartModules.Aero
             if (controlSurface != null)
             {
                 message.Append(" controlSurface.found=True");
+                message.Append(" controlSurface.targetCoeff=").Append(deployedControlSurfaceLiftCoefficient.ToString("F4"));
                 message.Append(" controlCoeff=").Append(controlSurface.deflectionLiftCoeff.ToString("F4"));
                 message.Append(" controlSurface.liftScalar=").Append(controlSurface.liftScalar.ToString("F4"));
                 message.Append(" controlSurface.dragScalar=").Append(controlSurface.dragScalar.ToString("F4"));
