@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
-using KSP.IO;
-using KSP.UI.Screens;
-using KSP.Localization;
 
 namespace WildBlueCore.PartModules.Aero
 {
@@ -16,36 +13,6 @@ namespace WildBlueCore.PartModules.Aero
     public class ModuleParafoil: ModuleParachute
     {
         #region Fields
-        /// <summary>
-        /// Lift coefficient when the chute is fully retracted
-        /// </summary>
-        [KSPField]
-        public float retractedDeflectionLiftCoeff = 0;
-
-        /// <summary>
-        /// Lift coefficient when the chute is semi-deployed (not fully open)
-        /// </summary>
-        [KSPField]
-        public float semiDeployedDeflectionLiftCoeff = 8;
-
-        /// <summary>
-        /// Control surface's lift coefficient when the chute is fully retracted
-        /// </summary>
-        [KSPField]
-        public float retractedCtlSfcDeflectionLiftCoeff = 0;
-
-        /// <summary>
-        /// Control surface lift coefficient when the chute is semi-deployed (not fully open)
-        /// </summary>
-        [KSPField]
-        public float semiDeployedCtlSfcDeflectionLiftCoeff = 0.25f;
-
-        /// <summary>
-        /// Flag indicating whether or not the parafoil can be steered when in the semi-deployed state.
-        /// </summary>
-        [KSPField]
-        public bool enableControlInSemiDeploy = false;
-
         /// <summary>
         /// Enables FixedUpdate diagnostics in KSP.log.
         /// </summary>
@@ -60,18 +27,36 @@ namespace WildBlueCore.PartModules.Aero
         public float debugLogInterval = 0.25f;
 
         /// <summary>
-        /// Time, in seconds, to ramp the control surface and passive stabilizers
-        /// from zero to their configured authority after the parafoil takes control.
-        /// </summary>
-        [KSPField]
-        public float controlAuthorityRampTime = 1f;
-
-        /// <summary>
         /// When enabled, ModuleParafoil only emits diagnostics and leaves all
         /// parachute, drag, rotation, lift, and control behavior to the base module.
         /// </summary>
         [KSPField]
         public bool diagnosticsOnly = false;
+
+        /// <summary>
+        /// Lift coefficient when the chute is semi-deployed (not fully open)
+        /// </summary>
+        [KSPField]
+        public float semiDeployedDeflectionLiftCoeff = 8;
+
+        /// <summary>
+        /// Control surface lift coefficient when the chute is semi-deployed (not fully open)
+        /// </summary>
+        [KSPField]
+        public float semiDeployedCtlSfcDeflectionLiftCoeff = 0.25f;
+
+        /// <summary>
+        /// Flag indicating whether or not the parafoil can be steered when in the semi-deployed state.
+        /// </summary>
+        [KSPField]
+        public bool enableControlInSemiDeploy = false;
+
+        /// <summary>
+        /// Time, in seconds, to ramp the control surface and passive stabilizers
+        /// from zero to their configured authority after the parafoil takes control.
+        /// </summary>
+        [KSPField]
+        public float controlAuthorityRampTime = 1f;
         #endregion
 
         #region Housekeeping
@@ -200,18 +185,16 @@ namespace WildBlueCore.PartModules.Aero
                 switch (deploymentState)
                 {
                     case deploymentStates.SEMIDEPLOYED:
-                        SetLiftCoefficient(Mathf.Lerp(retractedDeflectionLiftCoeff, semiDeployedDeflectionLiftCoeff, deploymentCurveTime));
-
-                        SetControlSurfaceCoefficient(enableControlInSemiDeploy ? Mathf.Lerp(retractedCtlSfcDeflectionLiftCoeff, semiDeployedCtlSfcDeflectionLiftCoeff, deploymentCurveTime) : retractedCtlSfcDeflectionLiftCoeff);
+                        SetLiftCoefficient(Mathf.Lerp(0f, semiDeployedDeflectionLiftCoeff, deploymentCurveTime));
+                        SetControlSurfaceCoefficient(enableControlInSemiDeploy ? Mathf.Lerp(0f, semiDeployedCtlSfcDeflectionLiftCoeff, deploymentCurveTime) : 0f);
                         SetStabilizerAuthority(0f);
                         DisableControlSurface();
                         break;
 
                     case deploymentStates.DEPLOYED:
-                        float deployedStartControlCoeff = enableControlInSemiDeploy ? semiDeployedCtlSfcDeflectionLiftCoeff : retractedCtlSfcDeflectionLiftCoeff;
+                        float deployedStartControlCoeff = enableControlInSemiDeploy ? semiDeployedCtlSfcDeflectionLiftCoeff : 0f;
 
                         SetLiftCoefficient(Mathf.Lerp(semiDeployedDeflectionLiftCoeff, deployedLiftCoefficient, deploymentCurveTime));
-
                         SetControlSurfaceCoefficient(Mathf.Lerp(deployedStartControlCoeff, deployedControlSurfaceLiftCoefficient, deploymentCurveTime));
 
                         if (parafoilFlightActive)
@@ -383,7 +366,7 @@ namespace WildBlueCore.PartModules.Aero
             parafoilFlightActive = true;
             controlAuthorityRampStartTime = Planetarium.GetUniversalTime();
 
-            // ModuleLiftingSurface and ModuleControlSurface replace the deployed
+            // ModuleLiftingSurface, ModuleParafoilStabilizer, and ModuleControlSurface replace the deployed
             // parachute aerodynamics after the deployment animation completes.
             part.maximum_drag = originalMaximumDrag;
             part.DragCubes.SetCubeWeight("PACKED", 0f);
@@ -429,7 +412,7 @@ namespace WildBlueCore.PartModules.Aero
             }
 
             // Preserve stock landing/splash auto-cut, vacuum cut, and canopy
-            // thermal failure while bypassing ModuleParachute's rotation updates.
+            // thermal failure while bypassing ModuleParachute's rotation and velocity updates.
             UpdateCut();
         }
 

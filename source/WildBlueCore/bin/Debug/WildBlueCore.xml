@@ -10,41 +10,6 @@
             As the parachute deploys, it gains lift and flight control- if the above part modules are found.
             </summary>
         </member>
-        <member name="F:WildBlueCore.PartModules.Aero.ModuleParafoil.retractedDeflectionLiftCoeff">
-            <summary>
-            Lift coefficient when the chute is fully retracted
-            </summary>
-        </member>
-        <member name="F:WildBlueCore.PartModules.Aero.ModuleParafoil.semiDeployedDeflectionLiftCoeff">
-            <summary>
-            Lift coefficient when the chute is semi-deployed (not fully open)
-            </summary>
-        </member>
-        <member name="F:WildBlueCore.PartModules.Aero.ModuleParafoil.deployedDeflectionLiftCoeff">
-            <summary>
-            Lift coefficient when the chute is deployed (fully open)
-            </summary>
-        </member>
-        <member name="F:WildBlueCore.PartModules.Aero.ModuleParafoil.retractedCtlSfcDeflectionLiftCoeff">
-            <summary>
-            Control surface's lift coefficient when the chute is fully retracted
-            </summary>
-        </member>
-        <member name="F:WildBlueCore.PartModules.Aero.ModuleParafoil.semiDeployedCtlSfcDeflectionLiftCoeff">
-            <summary>
-            Control surface lift coefficient when the chute is semi-deployed (not fully open)
-            </summary>
-        </member>
-        <member name="F:WildBlueCore.PartModules.Aero.ModuleParafoil.deployedCtlSfcDeflectionLiftCoeff">
-            <summary>
-            Control surface lift coefficient when the chute is deployed (fully open)
-            </summary>
-        </member>
-        <member name="F:WildBlueCore.PartModules.Aero.ModuleParafoil.enableControlInSemiDeploy">
-            <summary>
-            Flag indicating whether or not the parafoil can be steered when in the semi-deployed state.
-            </summary>
-        </member>
         <member name="F:WildBlueCore.PartModules.Aero.ModuleParafoil.debugMode">
             <summary>
             Enables FixedUpdate diagnostics in KSP.log.
@@ -56,16 +21,31 @@
             Set to 0 to log every physics update.
             </summary>
         </member>
-        <member name="F:WildBlueCore.PartModules.Aero.ModuleParafoil.controlAuthorityRampTime">
-            <summary>
-            Time, in seconds, to ramp the control surface and passive stabilizers
-            from zero to their configured authority after the parafoil takes control.
-            </summary>
-        </member>
         <member name="F:WildBlueCore.PartModules.Aero.ModuleParafoil.diagnosticsOnly">
             <summary>
             When enabled, ModuleParafoil only emits diagnostics and leaves all
             parachute, drag, rotation, lift, and control behavior to the base module.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Aero.ModuleParafoil.semiDeployedDeflectionLiftCoeff">
+            <summary>
+            Lift coefficient when the chute is semi-deployed (not fully open)
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Aero.ModuleParafoil.semiDeployedCtlSfcDeflectionLiftCoeff">
+            <summary>
+            Control surface lift coefficient when the chute is semi-deployed (not fully open)
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Aero.ModuleParafoil.enableControlInSemiDeploy">
+            <summary>
+            Flag indicating whether or not the parafoil can be steered when in the semi-deployed state.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Aero.ModuleParafoil.controlAuthorityRampTime">
+            <summary>
+            Time, in seconds, to ramp the control surface and passive stabilizers
+            from zero to their configured authority after the parafoil takes control.
             </summary>
         </member>
         <member name="M:WildBlueCore.PartModules.Aero.ModuleParafoil.OnStart(PartModule.StartState)">
