@@ -3,7 +3,7 @@
   "WorkspaceRootPath": "C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{7D8D783F-DDA6-4C96-BF65-8905FAB07CB5}|WildBlueCore.csproj|C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\partmodules\\aero\\moduleparafoil.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{7D8D783F-DDA6-4C96-BF65-8905FAB07CB5}|WildBlueCore.csproj|c:\\projects\\ksp\\wildblueindustries\\wildbluecore\\source\\wildbluecore\\partmodules\\aero\\moduleparafoil.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{7D8D783F-DDA6-4C96-BF65-8905FAB07CB5}|WildBlueCore.csproj|solutionrelative:partmodules\\aero\\moduleparafoil.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
@@ -56,8 +56,7 @@
               "RelativeToolTip": "..\\..\\..\\Blueshift\\Source\\Blueshift\\JumpTech\\WBIJumpGate.cs",
               "ViewState": "AgIAACgBAAAAAAAAAAAowIIBAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-20T02:30:29.114Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-07-20T02:30:29.114Z"
             },
             {
               "$type": "Document",
@@ -79,7 +78,7 @@
               "RelativeDocumentMoniker": "PartModules\\Aero\\ModuleParafoil.cs",
               "ToolTip": "C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\PartModules\\Aero\\ModuleParafoil.cs",
               "RelativeToolTip": "PartModules\\Aero\\ModuleParafoil.cs",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAAADQAAAA9AAAAAAAAAA==",
+              "ViewState": "AgIAALQAAAAAAAAAAAAowNgAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-07-09T04:10:06.545Z",
               "EditorCaption": ""

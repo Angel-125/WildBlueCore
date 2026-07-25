@@ -1,39 +1,46 @@
 fileFormatVersion: 2
 guid: b22cd3791cee082418e69c4f267e8b53
-timeCreated: 1784865636
+timeCreated: 1784957331
 licenseType: Free
 ModelImporter:
   serializedVersion: 21
   fileIDToRecycleName:
     100000: base
     100002: canopy
-    100004: cap
-    100006: //RootNode
-    100008: canopyMesh
-    100010: ControlSurface
+    100004: canopyMesh
+    100006: cap
+    100008: ControlSurface
+    100010: LeftStabilizer
+    100012: //RootNode
+    100014: RightStabilizer
     400000: base
     400002: canopy
-    400004: cap
-    400006: //RootNode
-    400008: canopyMesh
-    400010: ControlSurface
+    400004: canopyMesh
+    400006: cap
+    400008: ControlSurface
+    400010: LeftStabilizer
+    400012: //RootNode
+    400014: RightStabilizer
     2300000: base
-    2300002: canopy
+    2300002: canopyMesh
     2300004: cap
-    2300006: canopyMesh
-    2300008: ControlSurface
+    2300006: ControlSurface
+    2300008: LeftStabilizer
+    2300010: RightStabilizer
     3300000: base
-    3300002: canopy
+    3300002: canopyMesh
     3300004: cap
-    3300006: canopyMesh
-    3300008: ControlSurface
+    3300006: ControlSurface
+    3300008: LeftStabilizer
+    3300010: RightStabilizer
     4300000: base
     4300002: cap
-    4300004: canopy
-    4300006: ControlSurface
-    4300008: canopyMesh
-    7400000: semiDeploy
-    7400002: fullyDeploy
+    4300004: ControlSurface
+    4300006: canopyMesh
+    4300008: LeftStabilizer
+    4300010: RightStabilizer
+    7400000: fullyDeploy
+    7400002: semiDeploy
     9500000: //RootNode
     11100000: //RootNode
   materials:
@@ -61,10 +68,10 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: semiDeploy
+      name: fullyDeploy
       takeName: Take 001
-      firstFrame: 0
-      lastFrame: 30
+      firstFrame: 30
+      lastFrame: 60
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -89,10 +96,10 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: fullyDeploy
+      name: semiDeploy
       takeName: Take 001
-      firstFrame: 31
-      lastFrame: 60
+      firstFrame: 0
+      lastFrame: 120
       wrapMode: 0
       orientationOffsetY: 0
       level: 0

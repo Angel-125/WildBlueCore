@@ -21,11 +21,25 @@ Control surface lift coefficient when the chute is semi-deployed (not fully open
 Control surface lift coefficient when the chute is deployed (fully open)
 ### enableControlInSemiDeploy
 Flag indicating whether or not the parafoil can be steered when in the semi-deployed state.
+### debugMode
+Enables FixedUpdate diagnostics in KSP.log.
+### debugLogInterval
+Minimum time, in seconds, between groups of FixedUpdate diagnostic messages. Set to 0 to log every physics update.
+### controlAuthorityRampTime
+Time, in seconds, to ramp the control surface from zero to its configured range after the parafoil takes control from ModuleParachute.
+### diagnosticsOnly
+When enabled, ModuleParafoil only emits diagnostics and leaves all parachute, drag, rotation, lift, and control behavior to the base module.
 ## Methods
 
 
+### OnStart(PartModule.StartState)
+Overrides base OnStart to provide custom functionality.
+> #### Parameters
+> **state:** 
+
+
 ### FixedUpdate
-After the base FixedUpdate is called, handle updates to the liftingSurface and controlSurface.
+Lets ModuleParachute control deployment, then hands fully deployed flight to the parafoil lifting and control surfaces.
 
 # PartModules.Decals.WBIModuleDecal
             

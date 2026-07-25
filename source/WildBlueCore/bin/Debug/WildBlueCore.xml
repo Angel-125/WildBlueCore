@@ -45,9 +45,39 @@
             Flag indicating whether or not the parafoil can be steered when in the semi-deployed state.
             </summary>
         </member>
+        <member name="F:WildBlueCore.PartModules.Aero.ModuleParafoil.debugMode">
+            <summary>
+            Enables FixedUpdate diagnostics in KSP.log.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Aero.ModuleParafoil.debugLogInterval">
+            <summary>
+            Minimum time, in seconds, between groups of FixedUpdate diagnostic messages.
+            Set to 0 to log every physics update.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Aero.ModuleParafoil.controlAuthorityRampTime">
+            <summary>
+            Time, in seconds, to ramp the control surface from zero to its configured range
+            after the parafoil takes control from ModuleParachute.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.PartModules.Aero.ModuleParafoil.diagnosticsOnly">
+            <summary>
+            When enabled, ModuleParafoil only emits diagnostics and leaves all
+            parachute, drag, rotation, lift, and control behavior to the base module.
+            </summary>
+        </member>
+        <member name="M:WildBlueCore.PartModules.Aero.ModuleParafoil.OnStart(PartModule.StartState)">
+            <summary>
+            Overrides base OnStart to provide custom functionality.
+            </summary>
+            <param name="state"></param>
+        </member>
         <member name="M:WildBlueCore.PartModules.Aero.ModuleParafoil.FixedUpdate">
             <summary>
-            After the base FixedUpdate is called, handle updates to the liftingSurface and controlSurface.
+            Lets ModuleParachute control deployment, then hands fully deployed flight
+            to the parafoil lifting and control surfaces.
             </summary>
         </member>
         <member name="T:WildBlueCore.PartModules.Decals.WBIModuleDecal">
