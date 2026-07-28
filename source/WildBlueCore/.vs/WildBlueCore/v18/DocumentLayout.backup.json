@@ -3,7 +3,19 @@
   "WorkspaceRootPath": "C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{7D8D783F-DDA6-4C96-BF65-8905FAB07CB5}|WildBlueCore.csproj|c:\\projects\\ksp\\wildblueindustries\\wildbluecore\\source\\wildbluecore\\partmodules\\aero\\moduleparafoil.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{6E7577B1-A073-4A6F-8171-0797EEF9044E}|..\\..\\..\\Sandcastle\\source\\Sandcastle\\Sandcastle.csproj|c:\\projects\\ksp\\wildblueindustries\\sandcastle\\source\\sandcastle\\partmodules\\printshop\\wbiprintshop.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6E7577B1-A073-4A6F-8171-0797EEF9044E}|..\\..\\..\\Sandcastle\\source\\Sandcastle\\Sandcastle.csproj|C:\\Projects\\KSP\\WildBlueIndustries\\sandcastle\\source\\sandcastle\\partmodules\\printshop\\wbibaseprinter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6E7577B1-A073-4A6F-8171-0797EEF9044E}|..\\..\\..\\Sandcastle\\source\\Sandcastle\\Sandcastle.csproj|c:\\projects\\ksp\\wildblueindustries\\sandcastle\\source\\sandcastle\\partmodules\\printshop\\wbishipwright.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6E7577B1-A073-4A6F-8171-0797EEF9044E}|..\\..\\..\\Sandcastle\\source\\Sandcastle\\Sandcastle.csproj|C:\\Projects\\KSP\\WildBlueIndustries\\sandcastle\\source\\sandcastle\\partmodules\\printshop\\gui\\printshopui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7D8D783F-DDA6-4C96-BF65-8905FAB07CB5}|WildBlueCore.csproj|C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\partmodules\\aero\\moduleparafoil.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{7D8D783F-DDA6-4C96-BF65-8905FAB07CB5}|WildBlueCore.csproj|solutionrelative:partmodules\\aero\\moduleparafoil.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
@@ -19,6 +31,55 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "WBIPrintShop.cs",
+              "DocumentMoniker": "C:\\Projects\\KSP\\WildBlueIndustries\\Sandcastle\\source\\Sandcastle\\PartModules\\PrintShop\\WBIPrintShop.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\Sandcastle\\source\\Sandcastle\\PartModules\\PrintShop\\WBIPrintShop.cs",
+              "ToolTip": "C:\\Projects\\KSP\\WildBlueIndustries\\Sandcastle\\source\\Sandcastle\\PartModules\\PrintShop\\WBIPrintShop.cs",
+              "RelativeToolTip": "..\\..\\..\\Sandcastle\\source\\Sandcastle\\PartModules\\PrintShop\\WBIPrintShop.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACgBAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-27T05:19:59.846Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "WBIShipwright.cs",
+              "DocumentMoniker": "C:\\Projects\\KSP\\WildBlueIndustries\\Sandcastle\\source\\Sandcastle\\PartModules\\PrintShop\\WBIShipwright.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\Sandcastle\\source\\Sandcastle\\PartModules\\PrintShop\\WBIShipwright.cs",
+              "ToolTip": "C:\\Projects\\KSP\\WildBlueIndustries\\Sandcastle\\source\\Sandcastle\\PartModules\\PrintShop\\WBIShipwright.cs",
+              "RelativeToolTip": "..\\..\\..\\Sandcastle\\source\\Sandcastle\\PartModules\\PrintShop\\WBIShipwright.cs",
+              "ViewState": "AgIAAJUDAAAAAAAAAAAAwJsDAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-26T01:01:32.497Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "WBIBasePrinter.cs",
+              "DocumentMoniker": "C:\\Projects\\KSP\\WildBlueIndustries\\Sandcastle\\source\\Sandcastle\\PartModules\\PrintShop\\WBIBasePrinter.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\Sandcastle\\source\\Sandcastle\\PartModules\\PrintShop\\WBIBasePrinter.cs",
+              "ToolTip": "C:\\Projects\\KSP\\WildBlueIndustries\\Sandcastle\\source\\Sandcastle\\PartModules\\PrintShop\\WBIBasePrinter.cs",
+              "RelativeToolTip": "..\\..\\..\\Sandcastle\\source\\Sandcastle\\PartModules\\PrintShop\\WBIBasePrinter.cs",
+              "ViewState": "AgIAAH8AAAAAAAAAAAAAwMgAAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-26T00:10:37.101Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "PrintShopUI.cs",
+              "DocumentMoniker": "C:\\Projects\\KSP\\WildBlueIndustries\\Sandcastle\\source\\Sandcastle\\PartModules\\PrintShop\\GUI\\PrintShopUI.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\Sandcastle\\source\\Sandcastle\\PartModules\\PrintShop\\GUI\\PrintShopUI.cs",
+              "ToolTip": "C:\\Projects\\KSP\\WildBlueIndustries\\Sandcastle\\source\\Sandcastle\\PartModules\\PrintShop\\GUI\\PrintShopUI.cs",
+              "RelativeToolTip": "..\\..\\..\\Sandcastle\\source\\Sandcastle\\PartModules\\PrintShop\\GUI\\PrintShopUI.cs",
+              "ViewState": "AgIAAOoAAAAAAAAAAAAAwAcBAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-25T23:48:34.73Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
               "Title": "ModuleParafoil.cs",
               "DocumentMoniker": "C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\PartModules\\Aero\\ModuleParafoil.cs",
               "RelativeDocumentMoniker": "PartModules\\Aero\\ModuleParafoil.cs",
@@ -26,8 +87,7 @@
               "RelativeToolTip": "PartModules\\Aero\\ModuleParafoil.cs",
               "ViewState": "AgIAAMQBAAAAAAAAAAAqwJ4BAABXAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-09T04:10:06.545Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-07-09T04:10:06.545Z"
             }
           ]
         }
