@@ -15,6 +15,8 @@ namespace WildBlueCore.KerbalGear
     {
         #region Constants
         const string kGeneratedThrustTransformPrefix = "wbiEVAThrustTransform";
+        const string kPAWGroupName = "EVAMotor";
+        const string kPAWGroupDisplayName = "#LOC_WILDBLUECORE_evaMotor";
         const float kStoppedThreshold = 0.002f;
         const float kThrottleChangeRate = 0.5f;
         #endregion
@@ -45,6 +47,14 @@ namespace WildBlueCore.KerbalGear
         /// </summary>
         [KSPField]
         public double propellantResourceRate = 0.1666667;
+
+        /// <summary>
+        /// Multiplies atmospheric mass flow and thrust based on static pressure in atmospheres.
+        /// Aquatic operation is not affected by this curve. If no keys are configured, atmospheric
+        /// flow remains at full strength for backward compatibility.
+        /// </summary>
+        [KSPField]
+        public FloatCurve atmosphericFlowCurve = new FloatCurve();
 
         /// <summary>
         /// Displays the currently selected propulsion environment.
@@ -289,6 +299,12 @@ namespace WildBlueCore.KerbalGear
         {
             createThrustTransform();
             base.OnStart(state);
+            setupPAWGroup();
+
+            if (atmosphericFlowCurve == null)
+                atmosphericFlowCurve = new FloatCurve();
+            if (atmosphericFlowCurve.Curve.length == 0)
+                atmosphericFlowCurve.Add(0f, 1f);
 
             // OnLoad cannot see the runtime-created transform, so repair the stock multiplier list.
             thrustTransforms.Clear();
@@ -445,6 +461,26 @@ namespace WildBlueCore.KerbalGear
                 UnFlameout(true);
             return requestRatio;
         }
+
+        /// <summary>
+        /// Scales atmospheric mass flow and thrust with the configured pressure curve while leaving
+        /// underwater operation at full strength.
+        /// </summary>
+        /// <returns>Environmental flow available to the stock engine simulation.</returns>
+        protected override float ModifyFlow()
+        {
+            if (currentEnvironment == PropulsionEnvironment.Aquatic)
+                return 1f;
+            if (currentEnvironment != PropulsionEnvironment.Atmosphere || part == null ||
+                atmosphericFlowCurve == null)
+                return 0f;
+
+            float pressure = Mathf.Max(0f, (float)part.staticPressureAtm);
+            float availableFlow = atmosphericFlowCurve.Evaluate(pressure);
+            if (float.IsNaN(availableFlow) || float.IsInfinity(availableFlow))
+                return 0f;
+            return Mathf.Clamp01(availableFlow);
+        }
         #endregion
 
         #region Unity lifecycle
@@ -479,6 +515,23 @@ namespace WildBlueCore.KerbalGear
         #endregion
 
         #region Environment helpers
+        /// <summary>
+        /// Places this module's fields and events, including the PAW entries inherited from
+        /// ModuleEngines, in a single EVA Motor group.
+        /// </summary>
+        void setupPAWGroup()
+        {
+            foreach (BaseField field in Fields)
+            {
+                field.group = new BasePAWGroup(kPAWGroupName, kPAWGroupDisplayName, false);
+            }
+
+            foreach (BaseEvent moduleEvent in Events)
+            {
+                moduleEvent.group = new BasePAWGroup(kPAWGroupName, kPAWGroupDisplayName, false);
+            }
+        }
+
         /// <summary>
         /// Applies the standard throttle-up, throttle-down, full-throttle, and cutoff bindings to
         /// the active EVA vessel.

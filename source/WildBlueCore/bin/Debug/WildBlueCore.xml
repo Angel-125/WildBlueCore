@@ -921,6 +921,13 @@
             Resource amount consumed per second at full throttle.
             </summary>
         </member>
+        <member name="F:WildBlueCore.KerbalGear.WBIModuleEVAMotor.atmosphericFlowCurve">
+            <summary>
+            Multiplies atmospheric mass flow and thrust based on static pressure in atmospheres.
+            Aquatic operation is not affected by this curve. If no keys are configured, atmospheric
+            flow remains at full strength for backward compatibility.
+            </summary>
+        </member>
         <member name="F:WildBlueCore.KerbalGear.WBIModuleEVAMotor.environmentDisplay">
             <summary>
             Displays the currently selected propulsion environment.
@@ -1096,10 +1103,23 @@
             <param name="mass">Propellant mass requested by ModuleEngines for this physics tick.</param>
             <returns>Fraction of the request that ElectricCharge can support.</returns>
         </member>
+        <member name="M:WildBlueCore.KerbalGear.WBIModuleEVAMotor.ModifyFlow">
+            <summary>
+            Scales atmospheric mass flow and thrust with the configured pressure curve while leaving
+            underwater operation at full strength.
+            </summary>
+            <returns>Environmental flow available to the stock engine simulation.</returns>
+        </member>
         <member name="M:WildBlueCore.KerbalGear.WBIModuleEVAMotor.FixedUpdate">
             <summary>
             Updates environmental availability and the center-of-mass transform before running the
             stock engine simulation, then updates the integrated propeller animation.
+            </summary>
+        </member>
+        <member name="M:WildBlueCore.KerbalGear.WBIModuleEVAMotor.setupPAWGroup">
+            <summary>
+            Places this module's fields and events, including the PAW entries inherited from
+            ModuleEngines, in a single EVA Motor group.
             </summary>
         </member>
         <member name="M:WildBlueCore.KerbalGear.WBIModuleEVAMotor.updateEVAThrottle">

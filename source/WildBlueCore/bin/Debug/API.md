@@ -519,6 +519,8 @@ Resource definition used as the working fluid while underwater. An empty value d
 Resource consumed to power the motor.
 ### propellantResourceRate
 Resource amount consumed per second at full throttle.
+### atmosphericFlowCurve
+Multiplies atmospheric mass flow and thrust based on static pressure in atmospheres. Aquatic operation is not affected by this curve. If no keys are configured, atmospheric flow remains at full strength for backward compatibility.
 ### environmentDisplay
 Displays the currently selected propulsion environment.
 ### evaThrottle
@@ -615,8 +617,16 @@ Supplies the virtual environmental propellant and consumes ElectricCharge in pro
 > #### Return value
 > Fraction of the request that ElectricCharge can support.
 
+### ModifyFlow
+Scales atmospheric mass flow and thrust with the configured pressure curve while leaving underwater operation at full strength.
+> #### Return value
+> Environmental flow available to the stock engine simulation.
+
 ### FixedUpdate
 Updates environmental availability and the center-of-mass transform before running the stock engine simulation, then updates the integrated propeller animation.
+
+### setupPAWGroup
+Places this module's fields and events, including the PAW entries inherited from ModuleEngines, in a single EVA Motor group.
 
 ### updateEVAThrottle
 Applies the standard throttle-up, throttle-down, full-throttle, and cutoff bindings to the active EVA vessel.
