@@ -52,7 +52,7 @@ namespace WildBlueCore.KerbalGear
     /// }
     /// </code>
     /// </example>
-    public class WBIModuleEVAOverrides : WBIBasePartModule
+    public class WBIModuleEVAOverrides : WBIBasePartModule, IKerbalGearInventoryListener
     {
         #region Fields
         /// <summary>
@@ -95,26 +95,11 @@ namespace WildBlueCore.KerbalGear
             originalBuoyancy = part.buoyancy;
             originalMaxPressure = part.maxPressure;
 
-            // Load EVA overrides for carried cargo parts
-            if (kerbalEVA.ModuleInventoryPartReference != null && kerbalEVA.ModuleInventoryPartReference.storedParts.Count > 0)
-            {
-                ModuleInventoryPart inventory = kerbalEVA.ModuleInventoryPartReference;
-                int[] keys = inventory.storedParts.Keys.ToArray();
-
-                for (int index = 0; index < keys.Length; index++)
-                    updatePartOverrides(inventory.storedParts[keys[index]].partName);
-            }
+            refreshInventoryOverrides(kerbalEVA.ModuleInventoryPartReference);
 
             // Set initial values if needed.
             if (setInitialValues)
-            {
-                if (swimSpeedMultiplier > 0)
-                    kerbalEVA.swimSpeed = originalSwimSpeed * swimSpeedMultiplier;
-                if (buoyancyOverride > 0)
-                    part.buoyancy = buoyancyOverride;
-                if (maxPressureOverride > 0)
-                    part.maxPressure = maxPressureOverride;
-            }
+                applyActiveOverrides();
         }
 
         /// <summary>
@@ -138,12 +123,74 @@ namespace WildBlueCore.KerbalGear
         public override void OnActive()
         {
             base.OnActive();
-            part.buoyancy = buoyancyOverride;
             setInitialValues = true;
+
+            if (kerbalEVA != null)
+            {
+                refreshInventoryOverrides(kerbalEVA.ModuleInventoryPartReference);
+                applyActiveOverrides();
+            }
+        }
+
+        /// <summary>
+        /// Recalculates active EVA overrides without cycling this retained KerbalGear module.
+        /// </summary>
+        /// <param name="changedInventory">The EVA inventory whose contents changed.</param>
+        public void OnKerbalGearInventoryChanged(ModuleInventoryPart changedInventory)
+        {
+            if (!setInitialValues || kerbalEVA == null || changedInventory == null ||
+                changedInventory != kerbalEVA.ModuleInventoryPartReference)
+            {
+                return;
+            }
+
+            refreshInventoryOverrides(changedInventory);
+            applyActiveOverrides();
         }
         #endregion
 
         #region Helpers
+        /// <summary>
+        /// Rebuilds the strongest EVA overrides supplied by the current inventory contents.
+        /// </summary>
+        /// <param name="inventory">The EVA inventory containing KerbalGear parts.</param>
+        private void refreshInventoryOverrides(ModuleInventoryPart inventory)
+        {
+            maxPressureOverride = 0;
+            maxBuoyancy = 0;
+            swimSpeedMultiplier = 0;
+
+            if (inventory == null || inventory.storedParts.Count <= 0)
+                return;
+
+            int[] keys = inventory.storedParts.Keys.ToArray();
+            for (int index = 0; index < keys.Length; index++)
+                updatePartOverrides(inventory.storedParts[keys[index]].partName);
+        }
+
+        /// <summary>
+        /// Applies the currently calculated inventory overrides to the active EVA Kerbal.
+        /// </summary>
+        private void applyActiveOverrides()
+        {
+            if (kerbalEVA == null)
+                return;
+
+            kerbalEVA.swimSpeed = swimSpeedMultiplier > 0
+                ? originalSwimSpeed * swimSpeedMultiplier
+                : originalSwimSpeed;
+            part.buoyancy = maxBuoyancy > 0
+                ? maxBuoyancy
+                : buoyancyOverride > 0 ? buoyancyOverride : originalBuoyancy;
+            part.maxPressure = maxPressureOverride > 0
+                ? maxPressureOverride
+                : originalMaxPressure;
+        }
+
+        /// <summary>
+        /// Accumulates the strongest EVA overrides supplied by one carried cargo part.
+        /// </summary>
+        /// <param name="partName">The internal part name whose EVA_OVERRIDES node is inspected.</param>
         void updatePartOverrides(string partName)
         {
             // Get the part config

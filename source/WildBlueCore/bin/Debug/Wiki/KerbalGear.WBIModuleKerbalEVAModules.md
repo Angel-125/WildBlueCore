@@ -1,26 +1,35 @@
             
-Special thanks to Vali for figuring out this issue! :) The Vintage, Standard, and Future suits are all defined in separate part modules that are combined when KSP starts. The problem is that when Module Manager is used to add part modules to the kerbal, you'll get duplicates. One solution is to disable or outright remove the duplicate part module, but we have several part modules to manage. So to get around that problem, the WBIModuleKerbalEVAModules adds a custom LoadingSystem that adds any part modules defined by a KERBAL_EVA_MODULES node to the kerbals. Simply define a KERBAL_EVA_MODULES config node with one or more standard MODULE config nodes, and they'll be added to the kerbals.
-            
-            
-> #### Example
-```
-
-            KERBAL_EVA_MODULES
-            {
-                MODULE
-                {
-                    name = WBIModuleWearablesController
-                    debugMode = false
-                }
-                
-                MODULE
-                {
-                    name = WBIModuleEVAOverrides
-                }
-            }
-            
-```
-
-            
+Adds the always-present KerbalGear controller to EVA prefabs and registers the remaining KERBAL_EVA_MODULES entries for on-demand creation by that controller.
         
+## Methods
+
+
+### TryGetModuleDefinition(System.String,WildBlueCore.KerbalGear.KerbalGearModuleDefinition@)
+Finds the configuration used to create a requested EVA module at runtime.
+> #### Parameters
+> **moduleName:** The requested PartModule class name.
+
+> **definition:** The registered definition, when found.
+
+> #### Return value
+> True when KERBAL_EVA_MODULES defines the requested module.
+
+### EVAModulesLoader.IsReady
+Indicates that the loader has no asynchronous work to finish.
+> #### Return value
+> Always true.
+
+### EVAModulesLoader.StartLoad
+Builds the dynamic module registry and installs the KerbalGear controller.
+
+### EVAModulesLoader.registerDynamicModule(System.String,ConfigNode)
+Registers a dynamic module and removes loader-only values from its runtime config.
+> #### Parameters
+> **moduleName:** The PartModule class name.
+
+> **sourceConfig:** The KERBAL_EVA_MODULES module node.
+
+
+### Awake
+Inserts the KerbalGear loader immediately after KSP's PartLoader.
 

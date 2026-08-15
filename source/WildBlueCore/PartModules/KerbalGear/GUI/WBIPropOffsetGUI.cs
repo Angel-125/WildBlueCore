@@ -59,18 +59,30 @@ namespace WildBlueCore.KerbalGear
         public WBIPropOffsetGUI() :
         base("Prop Offsets", 635, 400)
         {
-            WindowTitle = Localizer.Format("#LOC_SUNKWORKS_propOffsetTitle");
+            WindowTitle = Localizer.Format("#LOC_WILDBLUECORE_propOffsetTitle");
             Resizable = false;
         }
         #endregion
 
         public override void SetVisible(bool newValue)
         {
-            base.SetVisible(newValue);
-
             if (newValue)
             {
-                partPropNames = wearablePartProps.Keys.ToArray();
+                if (wearablePartProps == null)
+                {
+                    base.SetVisible(false);
+                    return;
+                }
+
+                partPropNames = wearablePartProps
+                    .Where(entry => entry.Value != null && entry.Value.Count > 0)
+                    .Select(entry => entry.Key)
+                    .ToArray();
+                if (partPropNames.Length == 0)
+                {
+                    base.SetVisible(false);
+                    return;
+                }
 
                 List<SWearableProp> wearableProps = wearablePartProps[partPropNames[0]];
                 wearableProp = wearableProps[0];
@@ -80,6 +92,8 @@ namespace WildBlueCore.KerbalGear
 
                 setInitialOffsets();
             }
+
+            base.SetVisible(newValue);
         }
 
         protected override void DrawWindowContents(int windowId)
@@ -126,12 +140,12 @@ namespace WildBlueCore.KerbalGear
 
             // Offsets
             bool updateNeeded = false;
-            offsetXString = drawOffsetControls("#LOC_SUNKWORKS_OffsetX", offsetXString, ref offsetXDelta, ref updateNeeded);
-            offsetYString = drawOffsetControls("#LOC_SUNKWORKS_OffsetY", offsetYString, ref offsetYDelta, ref updateNeeded);
-            offsetZString = drawOffsetControls("#LOC_SUNKWORKS_OffsetZ", offsetZString, ref offsetZDelta, ref updateNeeded);
-            offsetRollString = drawOffsetControls("#LOC_SUNKWORKS_OffsetRoll", offsetRollString, ref offsetRollDelta, ref updateNeeded);
-            offsetPitchString = drawOffsetControls("#LOC_SUNKWORKS_OffsetPitch", offsetPitchString, ref offsetPitchDelta, ref updateNeeded);
-            offsetYawString = drawOffsetControls("#LOC_SUNKWORKS_OffsetYaw", offsetYawString, ref offsetYawDelta, ref updateNeeded);
+            offsetXString = drawOffsetControls("#LOC_WILDBLUECORE_OffsetX", offsetXString, ref offsetXDelta, ref updateNeeded);
+            offsetYString = drawOffsetControls("#LOC_WILDBLUECORE_OffsetY", offsetYString, ref offsetYDelta, ref updateNeeded);
+            offsetZString = drawOffsetControls("#LOC_WILDBLUECORE_OffsetZ", offsetZString, ref offsetZDelta, ref updateNeeded);
+            offsetRollString = drawOffsetControls("#LOC_WILDBLUECORE_OffsetRoll", offsetRollString, ref offsetRollDelta, ref updateNeeded);
+            offsetPitchString = drawOffsetControls("#LOC_WILDBLUECORE_OffsetPitch", offsetPitchString, ref offsetPitchDelta, ref updateNeeded);
+            offsetYawString = drawOffsetControls("#LOC_WILDBLUECORE_OffsetYaw", offsetYawString, ref offsetYawDelta, ref updateNeeded);
 
             // Update position offset
             positionOffset.x = offsetXDelta;
@@ -151,7 +165,7 @@ namespace WildBlueCore.KerbalGear
             }
 
             // Copy offsets to clipboard button
-            if (GUILayout.Button(Localizer.Format("#LOC_SUNKWORKS_copyOffsetsButton")))
+            if (GUILayout.Button(Localizer.Format("#LOC_WILDBLUECORE_copyOffsetsButton")))
             {
                 StringBuilder outputString = new StringBuilder();
                 outputString.AppendLine(string.Format("positionOffset = {0:n4}, {1:n4}, {2:n4}", offsetXDelta, offsetYDelta, offsetZDelta));

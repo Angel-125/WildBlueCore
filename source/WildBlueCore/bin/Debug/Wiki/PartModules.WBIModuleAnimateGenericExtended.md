@@ -21,6 +21,8 @@ Flag to indicate whether or not to make a resource requirements check before pla
 Flag to indicate whether or not looped animations are allowed to be stopped.
 ### canUseRemoteResources
 Flag to indicate whether or not when checking resources, resources can come from other vessels. Default is true.
+### deployedMass
+Mass of the part after being deployed.
 ### startSoundURL
 URL for the start sound played when the animation starts.
 ### startSoundPitch
@@ -39,6 +41,8 @@ URL four the stop sound, played when the animation is completed.
 Pitch level for the stop sound.
 ### stopSoundVolume
 Volume level for the stop sound.
+### isDeployed
+Flag indicating if the animation is deployed.
 ## Methods
 
 

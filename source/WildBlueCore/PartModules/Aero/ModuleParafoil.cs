@@ -62,17 +62,17 @@ namespace WildBlueCore.PartModules.Aero
         #region Housekeeping
         const float disabledControlSurfaceRange = 0.0001f;
 
-        ModuleLiftingSurface liftingSurface;
-        ModuleControlSurface controlSurface;
+        List<ModuleLiftingSurface> liftingSurfaces;
+        List<float> deployedLiftCoefficients;
+        List<ModuleControlSurface> controlSurfaces;
+        List<float> deployedControlSurfaceLiftCoefficients;
+        List<float> maximumControlSurfaceRanges;
+        List<bool> originalIgnorePitch;
+        List<bool> originalIgnoreRoll;
+        List<bool> originalIgnoreYaw;
         List<ModuleParafoilStabilizer> stabilizerSurfaces;
         List<float> deployedStabilizerLiftCoefficients;
-        float deployedLiftCoefficient;
-        float deployedControlSurfaceLiftCoefficient;
         float originalMaximumDrag;
-        float maximumControlSurfaceRange;
-        bool originalIgnorePitch;
-        bool originalIgnoreRoll;
-        bool originalIgnoreYaw;
         Quaternion originalCanopyLocalRotation;
         bool hasOriginalCanopyLocalRotation;
         bool parafoilFlightActive;
@@ -90,29 +90,38 @@ namespace WildBlueCore.PartModules.Aero
             // Capture the part's unmodified values before ModuleParachute initializes its drag.
             originalMaximumDrag = part.maximum_drag;
 
-            // ModuleControlSurface derives from ModuleLiftingSurface, so explicitly
-            // exclude it and the stabilizers when locating the primary lifting surface.
-            liftingSurface = part.FindModulesImplementing<ModuleLiftingSurface>()
-                .FirstOrDefault(module =>
+            // ModuleControlSurface and ModuleParafoilStabilizer derive from
+            // ModuleLiftingSurface, so exclude them from the primary lift collection.
+            liftingSurfaces = part.FindModulesImplementing<ModuleLiftingSurface>()
+                .Where(module =>
                     !(module is ModuleControlSurface) &&
-                    !(module is ModuleParafoilStabilizer));
-            controlSurface = part.FindModuleImplementing<ModuleControlSurface>();
+                    !(module is ModuleParafoilStabilizer))
+                .ToList();
+            deployedLiftCoefficients = liftingSurfaces
+                .Select(module => module.deflectionLiftCoeff)
+                .ToList();
+
+            controlSurfaces = part.FindModulesImplementing<ModuleControlSurface>();
+            deployedControlSurfaceLiftCoefficients = controlSurfaces
+                .Select(module => module.deflectionLiftCoeff)
+                .ToList();
+            maximumControlSurfaceRanges = controlSurfaces
+                .Select(module => module.ctrlSurfaceRange)
+                .ToList();
+            originalIgnorePitch = controlSurfaces
+                .Select(module => module.ignorePitch)
+                .ToList();
+            originalIgnoreRoll = controlSurfaces
+                .Select(module => module.ignoreRoll)
+                .ToList();
+            originalIgnoreYaw = controlSurfaces
+                .Select(module => module.ignoreYaw)
+                .ToList();
+
             stabilizerSurfaces = part.FindModulesImplementing<ModuleParafoilStabilizer>();
             deployedStabilizerLiftCoefficients = stabilizerSurfaces
                 .Select(module => module.deflectionLiftCoeff)
                 .ToList();
-
-            if (liftingSurface != null)
-                deployedLiftCoefficient = liftingSurface.deflectionLiftCoeff;
-
-            if (controlSurface != null)
-            {
-                deployedControlSurfaceLiftCoefficient = controlSurface.deflectionLiftCoeff;
-                maximumControlSurfaceRange = controlSurface.ctrlSurfaceRange;
-                originalIgnorePitch = controlSurface.ignorePitch;
-                originalIgnoreRoll = controlSurface.ignoreRoll;
-                originalIgnoreYaw = controlSurface.ignoreYaw;
-            }
 
             // The surface modules can generate forces as soon as physics starts,
             // regardless of whether the parachute canopy is visible. Neutralize
@@ -176,8 +185,8 @@ namespace WildBlueCore.PartModules.Aero
             if (parafoilFlightActive)
                 RestoreCanopyRotation();
 
-            if (liftingSurface != null ||
-                controlSurface != null ||
+            if ((liftingSurfaces != null && liftingSurfaces.Count > 0) ||
+                (controlSurfaces != null && controlSurfaces.Count > 0) ||
                 (stabilizerSurfaces != null && stabilizerSurfaces.Count > 0))
             {
                 float deploymentCurveTime = Mathf.Clamp01(Mathf.Pow(animTime, deploymentCurve));
@@ -194,8 +203,8 @@ namespace WildBlueCore.PartModules.Aero
                     case deploymentStates.DEPLOYED:
                         float deployedStartControlCoeff = enableControlInSemiDeploy ? semiDeployedCtlSfcDeflectionLiftCoeff : 0f;
 
-                        SetLiftCoefficient(Mathf.Lerp(semiDeployedDeflectionLiftCoeff, deployedLiftCoefficient, deploymentCurveTime));
-                        SetControlSurfaceCoefficient(Mathf.Lerp(deployedStartControlCoeff, deployedControlSurfaceLiftCoefficient, deploymentCurveTime));
+                        SetLiftCoefficientsFromSemiDeployment(deploymentCurveTime);
+                        SetControlSurfaceCoefficientsFromSemiDeployment(deployedStartControlCoeff, deploymentCurveTime);
 
                         if (parafoilFlightActive)
                         {
@@ -288,37 +297,48 @@ namespace WildBlueCore.PartModules.Aero
             if (vessel != null)
                 message.Append(" vessel.srfVelocity=").Append(FormatVector(vessel.srf_velocity));
 
-            if (liftingSurface != null)
+            int liftingSurfaceCount = liftingSurfaces != null ? liftingSurfaces.Count : 0;
+            message.Append(" liftingSurface.count=").Append(liftingSurfaceCount);
+            for (int index = 0; index < liftingSurfaceCount; index++)
             {
-                message.Append(" liftingSurface.found=True");
-                message.Append(" liftingSurface.targetCoeff=").Append(deployedLiftCoefficient.ToString("F4"));
-                message.Append(" liftCoeff=").Append(liftingSurface.deflectionLiftCoeff.ToString("F4"));
-                message.Append(" liftingSurface.liftScalar=").Append(liftingSurface.liftScalar.ToString("F4"));
-                message.Append(" liftingSurface.dragScalar=").Append(liftingSurface.dragScalar.ToString("F4"));
-            }
-            else
-            {
-                message.Append(" liftingSurface.found=False");
-                message.Append(" liftCoeff=<null>");
+                ModuleLiftingSurface liftingSurface = liftingSurfaces[index];
+                message.Append(" liftingSurface[").Append(index).Append("].transformName=")
+                    .Append(string.IsNullOrEmpty(liftingSurface.transformName) ? "<part-root>" : liftingSurface.transformName);
+                message.Append(" liftingSurface[").Append(index).Append("].targetCoeff=")
+                    .Append(deployedLiftCoefficients[index].ToString("F4"));
+                message.Append(" liftingSurface[").Append(index).Append("].coeff=")
+                    .Append(liftingSurface.deflectionLiftCoeff.ToString("F4"));
+                message.Append(" liftingSurface[").Append(index).Append("].liftScalar=")
+                    .Append(liftingSurface.liftScalar.ToString("F4"));
+                message.Append(" liftingSurface[").Append(index).Append("].dragScalar=")
+                    .Append(liftingSurface.dragScalar.ToString("F4"));
             }
 
-            if (controlSurface != null)
+            int controlSurfaceCount = controlSurfaces != null ? controlSurfaces.Count : 0;
+            message.Append(" controlSurface.count=").Append(controlSurfaceCount);
+            for (int index = 0; index < controlSurfaceCount; index++)
             {
-                message.Append(" controlSurface.found=True");
-                message.Append(" controlSurface.targetCoeff=").Append(deployedControlSurfaceLiftCoefficient.ToString("F4"));
-                message.Append(" controlCoeff=").Append(controlSurface.deflectionLiftCoeff.ToString("F4"));
-                message.Append(" controlSurface.liftScalar=").Append(controlSurface.liftScalar.ToString("F4"));
-                message.Append(" controlSurface.dragScalar=").Append(controlSurface.dragScalar.ToString("F4"));
-                message.Append(" controlRange=").Append(controlSurface.ctrlSurfaceRange.ToString("F4"));
-                message.Append(" controlArea=").Append(controlSurface.ctrlSurfaceArea.ToString("F4"));
-                message.Append(" ignorePitch=").Append(controlSurface.ignorePitch);
-                message.Append(" ignoreRoll=").Append(controlSurface.ignoreRoll);
-                message.Append(" ignoreYaw=").Append(controlSurface.ignoreYaw);
-            }
-            else
-            {
-                message.Append(" controlSurface.found=False");
-                message.Append(" controlCoeff=<null>");
+                ModuleControlSurface controlSurface = controlSurfaces[index];
+                message.Append(" controlSurface[").Append(index).Append("].transformName=")
+                    .Append(string.IsNullOrEmpty(controlSurface.transformName) ? "<part-root>" : controlSurface.transformName);
+                message.Append(" controlSurface[").Append(index).Append("].targetCoeff=")
+                    .Append(deployedControlSurfaceLiftCoefficients[index].ToString("F4"));
+                message.Append(" controlSurface[").Append(index).Append("].coeff=")
+                    .Append(controlSurface.deflectionLiftCoeff.ToString("F4"));
+                message.Append(" controlSurface[").Append(index).Append("].liftScalar=")
+                    .Append(controlSurface.liftScalar.ToString("F4"));
+                message.Append(" controlSurface[").Append(index).Append("].dragScalar=")
+                    .Append(controlSurface.dragScalar.ToString("F4"));
+                message.Append(" controlSurface[").Append(index).Append("].range=")
+                    .Append(controlSurface.ctrlSurfaceRange.ToString("F4"));
+                message.Append(" controlSurface[").Append(index).Append("].area=")
+                    .Append(controlSurface.ctrlSurfaceArea.ToString("F4"));
+                message.Append(" controlSurface[").Append(index).Append("].ignorePitch=")
+                    .Append(controlSurface.ignorePitch);
+                message.Append(" controlSurface[").Append(index).Append("].ignoreRoll=")
+                    .Append(controlSurface.ignoreRoll);
+                message.Append(" controlSurface[").Append(index).Append("].ignoreYaw=")
+                    .Append(controlSurface.ignoreYaw);
             }
 
             int stabilizerCount = stabilizerSurfaces != null ? stabilizerSurfaces.Count : 0;
@@ -418,13 +438,17 @@ namespace WildBlueCore.PartModules.Aero
 
         private void DisableControlSurface()
         {
-            if (controlSurface == null)
+            if (controlSurfaces == null)
                 return;
 
-            controlSurface.ignorePitch = true;
-            controlSurface.ignoreRoll = true;
-            controlSurface.ignoreYaw = true;
-            controlSurface.ctrlSurfaceRange = disabledControlSurfaceRange;
+            for (int index = 0; index < controlSurfaces.Count; index++)
+            {
+                ModuleControlSurface controlSurface = controlSurfaces[index];
+                controlSurface.ignorePitch = true;
+                controlSurface.ignoreRoll = true;
+                controlSurface.ignoreYaw = true;
+                controlSurface.ctrlSurfaceRange = disabledControlSurfaceRange;
+            }
         }
 
         private void DisableAerodynamicSurfaces()
@@ -445,21 +469,36 @@ namespace WildBlueCore.PartModules.Aero
 
         private void UpdateControlAuthority()
         {
-            if (controlSurface == null)
+            if (controlSurfaces == null ||
+                maximumControlSurfaceRanges == null ||
+                originalIgnorePitch == null ||
+                originalIgnoreRoll == null ||
+                originalIgnoreYaw == null)
                 return;
-
-            controlSurface.ignorePitch = originalIgnorePitch;
-            controlSurface.ignoreRoll = originalIgnoreRoll;
-            controlSurface.ignoreYaw = originalIgnoreYaw;
 
             float rampProgress = controlAuthorityRampTime <= 0f
                 ? 1f
                 : Mathf.Clamp01((float)((Planetarium.GetUniversalTime() - controlAuthorityRampStartTime) / controlAuthorityRampTime));
 
-            controlSurface.ctrlSurfaceRange = Mathf.Lerp(
-                disabledControlSurfaceRange,
-                maximumControlSurfaceRange,
-                rampProgress);
+            int controlSurfaceCount = Math.Min(
+                controlSurfaces.Count,
+                Math.Min(
+                    maximumControlSurfaceRanges.Count,
+                    Math.Min(
+                        originalIgnorePitch.Count,
+                        Math.Min(originalIgnoreRoll.Count, originalIgnoreYaw.Count))));
+
+            for (int index = 0; index < controlSurfaceCount; index++)
+            {
+                ModuleControlSurface controlSurface = controlSurfaces[index];
+                controlSurface.ignorePitch = originalIgnorePitch[index];
+                controlSurface.ignoreRoll = originalIgnoreRoll[index];
+                controlSurface.ignoreYaw = originalIgnoreYaw[index];
+                controlSurface.ctrlSurfaceRange = Mathf.Lerp(
+                    disabledControlSurfaceRange,
+                    maximumControlSurfaceRanges[index],
+                    rampProgress);
+            }
         }
 
         private void UpdateStabilizerAuthority()
@@ -485,14 +524,50 @@ namespace WildBlueCore.PartModules.Aero
 
         private void SetLiftCoefficient(float liftCoefficient)
         {
-            if (liftingSurface != null)
-                liftingSurface.deflectionLiftCoeff = liftCoefficient;
+            if (liftingSurfaces == null)
+                return;
+
+            for (int index = 0; index < liftingSurfaces.Count; index++)
+                liftingSurfaces[index].deflectionLiftCoeff = liftCoefficient;
         }
 
         private void SetControlSurfaceCoefficient(float controlSurfaceLiftCoefficient)
         {
-            if (controlSurface != null)
-                controlSurface.deflectionLiftCoeff = controlSurfaceLiftCoefficient;
+            if (controlSurfaces == null)
+                return;
+
+            for (int index = 0; index < controlSurfaces.Count; index++)
+                controlSurfaces[index].deflectionLiftCoeff = controlSurfaceLiftCoefficient;
+        }
+
+        private void SetLiftCoefficientsFromSemiDeployment(float deploymentCurveTime)
+        {
+            if (liftingSurfaces == null || deployedLiftCoefficients == null)
+                return;
+
+            int liftingSurfaceCount = Math.Min(liftingSurfaces.Count, deployedLiftCoefficients.Count);
+            for (int index = 0; index < liftingSurfaceCount; index++)
+            {
+                liftingSurfaces[index].deflectionLiftCoeff = Mathf.Lerp(
+                    semiDeployedDeflectionLiftCoeff,
+                    deployedLiftCoefficients[index],
+                    deploymentCurveTime);
+            }
+        }
+
+        private void SetControlSurfaceCoefficientsFromSemiDeployment(float deployedStartControlCoeff, float deploymentCurveTime)
+        {
+            if (controlSurfaces == null || deployedControlSurfaceLiftCoefficients == null)
+                return;
+
+            int controlSurfaceCount = Math.Min(controlSurfaces.Count, deployedControlSurfaceLiftCoefficients.Count);
+            for (int index = 0; index < controlSurfaceCount; index++)
+            {
+                controlSurfaces[index].deflectionLiftCoeff = Mathf.Lerp(
+                    deployedStartControlCoeff,
+                    deployedControlSurfaceLiftCoefficients[index],
+                    deploymentCurveTime);
+            }
         }
         #endregion
     }

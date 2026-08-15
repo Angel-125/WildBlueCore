@@ -20,7 +20,7 @@ namespace WildBlueCore.PartModules
     /// Third, it can check for and consume parts stored in an inventory. Those parts can be pulled form the parts vessel and/or from a remote vessel.
     /// Finally, you can provide a list of part modules that will be enabled after tne animation completes, and disabled when when not complete.
     /// </summary>
-    public class WBIModuleAnimateGenericExtended: ModuleAnimateGeneric
+    public class WBIModuleAnimateGenericExtended: ModuleAnimateGeneric, IPartMassModifier
     {
         #region Fields
         /// <summary>
@@ -83,6 +83,12 @@ namespace WildBlueCore.PartModules
         /// </summary>
         [KSPField]
         public bool canUseRemoteResources = true;
+
+        /// <summary>
+        /// Mass of the part after being deployed.
+        /// </summary>
+        [KSPField]
+        public float deployedMass = 0f;
         #endregion
 
         #region Effects
@@ -139,6 +145,11 @@ namespace WildBlueCore.PartModules
         /// </summary>
         [KSPField]
         public float stopSoundVolume = 0.5f;
+
+        /// <summary>
+        /// Flag indicating if the animation is deployed.
+        /// </summary>
+        public bool isDeployed = false;
         #endregion
 
         #endregion
@@ -150,6 +161,7 @@ namespace WildBlueCore.PartModules
         AudioSource startSound = null;
         AudioSource stopSound = null;
         Animation animation = null;
+        float originalMass = 0f;
         #endregion
 
         #region Overrides
@@ -188,11 +200,7 @@ namespace WildBlueCore.PartModules
                     Fields["endEventGivesResources"].guiActive = true;
             }
 
-            // Disable part modules if we haven't completed the animation.
-            //updateManagedModules();
-
-            // Clear resources if we haven't completed the animation.
-            //updateManagedResources();
+            originalMass = part.prefabMass;
 
             setupSounds();
 
@@ -336,9 +344,15 @@ namespace WildBlueCore.PartModules
             return info.ToString();
         }
 
-        public new void FixedUpdate()
+        public override void OnUpdate()
         {
-            base.FixedUpdate();
+            base.OnUpdate();
+            isDeployed = Events["Toggle"].guiName == endEventGUIName;
+
+            if (isDeployed && isOneShot && HighLogic.LoadedSceneIsFlight)
+            {
+                Events["Toggle"].active = false;
+            }
         }
 
         public void OnDestroy()
@@ -417,6 +431,9 @@ namespace WildBlueCore.PartModules
         #region Helpers
         bool canToggleAnimation()
         {
+            if (isOneShot && HighLogic.LoadedSceneIsFlight && isDeployed)
+                return false;
+
             // Check for skill requirements
             if (!hasRequiredSkill())
                 return false;
@@ -624,7 +641,7 @@ namespace WildBlueCore.PartModules
                     Debug.Log("[WBIModuleAnimateGenericExtended] - part config node not found");
                 return;
             }
-            bool isDeployed = Events["Toggle"].guiName == endEventGUIName;
+            isDeployed = Events["Toggle"].guiName == endEventGUIName;
 
             if (!node.HasNode("MANAGED_RESOURCE"))
             {
@@ -637,6 +654,7 @@ namespace WildBlueCore.PartModules
             ConfigNode resourceNode;
             string resourceName;
             double maxAmount;
+            PartResourceDefinitionList definitions = PartResourceLibrary.Instance.resourceDefinitions;
             for (int index = 0; index < resourceNodes.Length; index++)
             {
                 resourceNode = resourceNodes[index];
@@ -649,12 +667,19 @@ namespace WildBlueCore.PartModules
 
                 // Remove the resource if the animation isn't deployed.
                 resourceName = resourceNode.GetValue("name");
+                PartResourceDefinition resourceDef = definitions[resourceName];
+                if (resourceDef == null)
+                {
+                    Debug.LogError("[WBIModuleAnimateGenericExtended] - cannot manage unknown resource: " + resourceName);
+                    continue;
+                }
+
                 if (part.Resources.Contains(resourceName) && isDeployed == false)
                 {
                     if (debugMode)
-                        Debug.Log("[WBIModuleAnimateGenericExtended] - removing resource: " + resourceName);
+                        Debug.Log("[WBIModuleAnimateGenericExtended] - removing resource: " + resourceName + " ID: " + resourceDef.id);
 
-                    part.Resources.Remove(resourceName);
+                    part.RemoveResource(resourceName);
 
                     continue;
                 }
@@ -663,7 +688,7 @@ namespace WildBlueCore.PartModules
                 if (double.TryParse(resourceNode.GetValue("maxAmount"), out maxAmount) == false)
                 {
                     if (debugMode)
-                        Debug.Log("[WBIModuleAnimateGenericExtended] - cannot parse maxAmount from managed resource named " + resourceName);
+                        Debug.Log("[WBIModuleAnimateGenericExtended] - cannot parse maxAmount from managed resource named " + resourceName + " ID: " + resourceDef.id);
                     continue;
                 }
 
@@ -671,9 +696,18 @@ namespace WildBlueCore.PartModules
                 if (part.Resources.Contains(resourceName) == false && isDeployed)
                 {
                     if (debugMode)
-                        Debug.Log("[WBIModuleAnimateGenericExtended] - adding resource: " + resourceName);
+                        Debug.Log("[WBIModuleAnimateGenericExtended] - adding resource: " + resourceName + " ID: " + resourceDef.id);
 
-                    part.Resources.Add(resourceName, 0, maxAmount, true, true, false, true, PartResource.FlowMode.Both);
+                    ConfigNode newResourceNode = new ConfigNode("RESOURCE");
+                    newResourceNode.AddValue("name", resourceName);
+                    newResourceNode.AddValue("amount", 0d);
+                    newResourceNode.AddValue("maxAmount", maxAmount);
+                    newResourceNode.AddValue("flowState", true);
+                    newResourceNode.AddValue("isTweakable", true);
+                    newResourceNode.AddValue("hideFlow", false);
+                    newResourceNode.AddValue("isVisible", true);
+                    newResourceNode.AddValue("flowMode", PartResource.FlowMode.Both);
+                    part.AddResource(newResourceNode);
                 }
             }
 
@@ -852,6 +886,8 @@ namespace WildBlueCore.PartModules
 
         void onStopAnimation(float deployedPercentage)
         {
+            isDeployed = Events["Toggle"].guiName == endEventGUIName;
+
             if (!HighLogic.LoadedSceneIsFlight)
             {
                 if (HighLogic.LoadedSceneIsEditor)
@@ -872,6 +908,28 @@ namespace WildBlueCore.PartModules
 
             return Localizer.Format("#LOC_WILDBLUECORE_resourceInfo", new string[2] { resourceName, string.Format("{0:n2}", resource.amount) });
         }
+
+        #region IPartMassModifier
+        float IPartMassModifier.GetModuleMass(float defaultMass, ModifierStagingSituation sit)
+        {
+            if (isDeployed && deployedMass > 0)
+            {
+                return deployedMass;
+            }
+            else if (part.partInfo != null && part.partInfo.partPrefab != null)
+            {
+                return part.partInfo.partPrefab.mass;
+            }
+
+            return 0;
+        }
+
+        ModifierChangeWhen IPartMassModifier.GetModuleMassChangeWhen()
+        {
+            return ModifierChangeWhen.CONSTANTLY;
+        }
+        #endregion
+
         #endregion
     }
 }

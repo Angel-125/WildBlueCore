@@ -10,6 +10,111 @@ using Expansions.Serenity;
 
 namespace WildBlueCore.KerbalGear
 {
+    static class WBISuitAssignmentUtils
+    {
+        internal static bool ApplySuitCombo(ProtoCrewMember crewMember, SuitCombo suitCombo,
+            SuitCombos suitCombos, bool isUserSelection)
+        {
+            ProtoCrewMember.KerbalSuit suitType;
+            if (!TryGetSuitType(suitCombo, out suitType))
+            {
+                Debug.LogError("[WBISuitAssignment] - Invalid suit type '" + suitCombo.suitType +
+                    "' for suit combo " + suitCombo.name + ".");
+                return false;
+            }
+
+            // Set and verify the mesh type before committing the texture selection. ProtoCrewMember's
+            // setter can reject suit types that KSP considers unavailable.
+            crewMember.suit = suitType;
+            if (crewMember.suit != suitType)
+            {
+                Debug.LogError("[WBISuitAssignment] - KSP rejected suit type " + suitType +
+                    " for " + crewMember.name + "; suit combo " + suitCombo.name +
+                    " was not applied.");
+                return false;
+            }
+
+            bool isStockSuit = suitCombos.StockCombos.Contains(suitCombo);
+            crewMember.ComboId = suitCombo.name;
+            crewMember.UseStockTexture = isStockSuit;
+
+            // Match HelmetSuitPickerWindow: stock combos use the textures embedded in the selected
+            // EVA prefab, while extra combos persist all custom asset paths.
+            crewMember.SuitTexturePath = isStockSuit ? null : suitCombo.suitTexture;
+            crewMember.NormalTexturePath = isStockSuit ? null : suitCombo.normalTexture;
+            crewMember.SpritePath = isStockSuit ? null : suitCombo.sprite;
+
+            if (isUserSelection)
+                crewMember.completedFirstEVA = true;
+
+            return true;
+        }
+
+        internal static bool RepairCrewMember(ProtoCrewMember crewMember, SuitCombos suitCombos)
+        {
+            if (crewMember == null || string.IsNullOrEmpty(crewMember.ComboId))
+                return false;
+
+            SuitCombo suitCombo = suitCombos.GetCombo(crewMember.ComboId);
+            ProtoCrewMember.KerbalSuit expectedSuitType;
+            if (suitCombo == null || !TryGetSuitType(suitCombo, out expectedSuitType) ||
+                crewMember.suit == expectedSuitType)
+            {
+                return false;
+            }
+
+            Debug.LogWarning("[WBISuitAssignment] - Repairing mismatched suit assignment for " +
+                crewMember.name + ": combo " + crewMember.ComboId + " requires " +
+                expectedSuitType + " but the saved suit type is " + crewMember.suit + ".");
+            return ApplySuitCombo(crewMember, suitCombo, suitCombos, false);
+        }
+
+        internal static bool TryGetSuitType(SuitCombo suitCombo,
+            out ProtoCrewMember.KerbalSuit suitType)
+        {
+            suitType = ProtoCrewMember.KerbalSuit.Default;
+            if (suitCombo == null || string.IsNullOrEmpty(suitCombo.suitType))
+                return false;
+
+            return Enum.TryParse(suitCombo.suitType, true, out suitType) &&
+                Enum.IsDefined(typeof(ProtoCrewMember.KerbalSuit), suitType);
+        }
+    }
+
+    /// <summary>
+    /// Repairs stale suit combo and EVA mesh assignments whenever a flight scene starts.
+    /// </summary>
+    [KSPAddon(KSPAddon.Startup.Flight, false)]
+    sealed class WBISuitAssignmentRepair : MonoBehaviour
+    {
+        public void Start()
+        {
+            if (HighLogic.CurrentGame == null || HighLogic.CurrentGame.CrewRoster == null)
+                return;
+
+            SuitCombos suitCombos = GameDatabase.Instance.GetComponent<SuitCombos>();
+            if (suitCombos == null)
+            {
+                Debug.LogError("[WBISuitAssignment] - SuitCombos is unavailable; saved suit " +
+                    "assignments cannot be validated.");
+                return;
+            }
+
+            int repairedCount = 0;
+            foreach (ProtoCrewMember crewMember in HighLogic.CurrentGame.CrewRoster.Kerbals())
+            {
+                if (WBISuitAssignmentUtils.RepairCrewMember(crewMember, suitCombos))
+                    repairedCount++;
+            }
+
+            if (repairedCount > 0)
+            {
+                Debug.Log("[WBISuitAssignment] - Repaired " + repairedCount +
+                    " saved suit assignment(s) before EVA.");
+            }
+        }
+    }
+
     public class WBISuitCombo : SuitCombo
     {
         public bool isStockSuit = true;
@@ -113,6 +218,8 @@ namespace WildBlueCore.KerbalGear
                 crewList = part.protoModuleCrew;
                 if (crewList != null && crewList.Count > 0)
                 {
+                    repairCrewSuitAssignments();
+                    selectedCrewIndex = 0;
                     selectedCrew = crewList[0];
                     selectedCombo = suitCombos.GetCombo(selectedCrew.ComboId);
                     updateSuitCombos();
@@ -144,27 +251,21 @@ namespace WildBlueCore.KerbalGear
 
             GUILayout.BeginScrollView(Vector2.zero, suitPreviewPanelWidth);
 
-            ProtoCrewMember.KerbalSuit suitType = ProtoCrewMember.KerbalSuit.Default;
-
             if (selectedCombo != null)
             {
                 string suitTypeString = string.Empty;
                 switch (selectedCombo.suitType.ToLower())
                 {
                     case "vintage":
-                        suitType = ProtoCrewMember.KerbalSuit.Vintage;
                         suitTypeString = Localizer.Format("#autoLOC_8012022");
                         break;
                     case "future":
-                        suitType = ProtoCrewMember.KerbalSuit.Future;
                         suitTypeString = Localizer.Format("#autoLOC_8012023");
                         break;
                     case "slim":
-                        suitType = ProtoCrewMember.KerbalSuit.Slim;
                         suitTypeString = Localizer.Format("#autoLOC_6011176");
                         break;
                     default:
-                        suitType = ProtoCrewMember.KerbalSuit.Default;
                         suitTypeString = Localizer.Format("#autoLOC_8012021");
                         break;
                 }
@@ -179,20 +280,7 @@ namespace WildBlueCore.KerbalGear
 
             if (GUILayout.Button(Localizer.Format("#LOC_WILDBLUECORE_suitSwitcherSelectSuit")) && selectedCrew != null && selectedCombo != null)
             {
-                selectedCrew.ComboId = selectedCombo.name;
-                selectedCrew.SuitTexturePath = selectedCombo.suitTexture;
-                selectedCrew.NormalTexturePath = selectedCombo.normalTexture;
-                selectedCrew.suit = suitType;
-                selectedCrew.UseStockTexture = suitCombos.StockCombos.Contains(selectedCombo);
-
-                part.protoModuleCrew[selectedCrewIndex] = selectedCrew;
-
-                Debug.Log("[WBIWardrobeGUI] - Changing wardrobe for: " + selectedCrew.name);
-                Debug.Log("[WBIWardrobeGUI] - selectedCrew.ComboId: " + selectedCrew.ComboId);
-                Debug.Log("[WBIWardrobeGUI] - selectedCrew.SuitTexturePath: " + selectedCrew.SuitTexturePath);
-                Debug.Log("[WBIWardrobeGUI] - selectedCrew.NormalTexturePath: " + selectedCrew.NormalTexturePath);
-                Debug.Log("[WBIWardrobeGUI] - selectedCrew.suit: " + selectedCrew.suit.ToString());
-                Debug.Log("[WBIWardrobeGUI] - selectedCrew.UseStockTexture: " + selectedCrew.UseStockTexture.ToString());
+                applySuitCombo(selectedCrew, selectedCrewIndex, selectedCombo, true);
             }
 
             GUILayout.EndVertical();
@@ -298,6 +386,36 @@ namespace WildBlueCore.KerbalGear
         #endregion
 
         #region Helpers
+        bool applySuitCombo(ProtoCrewMember crewMember, int crewIndex, SuitCombo suitCombo, bool isUserSelection)
+        {
+            if (!WBISuitAssignmentUtils.ApplySuitCombo(crewMember, suitCombo, suitCombos,
+                isUserSelection))
+            {
+                return false;
+            }
+
+            part.protoModuleCrew[crewIndex] = crewMember;
+
+            Debug.Log("[WBIWardrobeGUI] - Changing wardrobe for: " + crewMember.name);
+            Debug.Log("[WBIWardrobeGUI] - crewMember.ComboId: " + crewMember.ComboId);
+            Debug.Log("[WBIWardrobeGUI] - crewMember.SuitTexturePath: " + crewMember.SuitTexturePath);
+            Debug.Log("[WBIWardrobeGUI] - crewMember.NormalTexturePath: " + crewMember.NormalTexturePath);
+            Debug.Log("[WBIWardrobeGUI] - crewMember.SpritePath: " + crewMember.SpritePath);
+            Debug.Log("[WBIWardrobeGUI] - crewMember.suit: " + crewMember.suit.ToString());
+            Debug.Log("[WBIWardrobeGUI] - crewMember.UseStockTexture: " + crewMember.UseStockTexture.ToString());
+            return true;
+        }
+
+        void repairCrewSuitAssignments()
+        {
+            for (int index = 0; index < crewList.Count; index++)
+            {
+                ProtoCrewMember crewMember = crewList[index];
+                if (WBISuitAssignmentUtils.RepairCrewMember(crewMember, suitCombos))
+                    part.protoModuleCrew[index] = crewMember;
+            }
+        }
+
         void getWardrobeIcons()
         {
             wardrobeIcons = new Dictionary<string, string>();

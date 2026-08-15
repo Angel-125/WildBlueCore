@@ -41,7 +41,7 @@ namespace WildBlueCore
         void DrawWindow();
     }
 
-    public abstract class Dialog<T> : MonoBehaviour, IManagedWindow
+    public abstract class Dialog<T> : IManagedWindow
     {
         private int windowId;
         private string configNodeName;

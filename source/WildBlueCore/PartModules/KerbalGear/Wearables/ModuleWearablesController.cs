@@ -7,6 +7,76 @@ using UnityEngine;
 
 namespace WildBlueCore.KerbalGear
 {
+    /// <summary>
+    /// Receives a single notification after KerbalGear has reconciled an EVA inventory change.
+    /// Implement this interface when an active EVA module needs to refresh data derived from
+    /// inventory contents without being deactivated and reactivated.
+    /// </summary>
+    public interface IKerbalGearInventoryListener
+    {
+        /// <summary>
+        /// Refreshes inventory-derived state after the EVA inventory reaches its final state.
+        /// </summary>
+        /// <param name="inventory">The EVA inventory whose contents changed.</param>
+        void OnKerbalGearInventoryChanged(ModuleInventoryPart inventory);
+    }
+
+    /// <summary>
+    /// Receives the exact inventory providers assigned to a dynamic KerbalGear module instance.
+    /// Implement this interface when module behavior or state belongs to particular carried items.
+    /// </summary>
+    public interface IKerbalGearProviderListener
+    {
+        /// <summary>
+        /// Refreshes provider-specific state after KerbalGear reconciles the EVA inventory.
+        /// </summary>
+        /// <param name="inventory">The EVA inventory containing the providers.</param>
+        /// <param name="providers">The providers assigned according to the configured module mode.</param>
+        void OnKerbalGearProvidersChanged(ModuleInventoryPart inventory,
+            KerbalGearModuleProvider[] providers);
+    }
+
+    /// <summary>
+    /// Identifies one stored cargo stack that requests a dynamic EVA module.
+    /// </summary>
+    public sealed class KerbalGearModuleProvider
+    {
+        /// <summary>
+        /// Gets the stable provider key used while reconciling and persisting dynamic modules.
+        /// </summary>
+        public string ProviderKey { get; private set; }
+
+        /// <summary>
+        /// Gets the current inventory slot.
+        /// </summary>
+        public int SlotIndex { get; private set; }
+
+        /// <summary>
+        /// Gets the stored cargo stack represented by this provider.
+        /// </summary>
+        public StoredPart StoredPart { get; private set; }
+
+        /// <summary>
+        /// Gets the wearable-specific overrides for the requested EVA module.
+        /// </summary>
+        internal ConfigNode ModuleConfig { get; private set; }
+
+        /// <summary>
+        /// Creates a provider descriptor for a stored cargo stack.
+        /// </summary>
+        /// <param name="providerKey">The stable reconciliation key.</param>
+        /// <param name="slotIndex">The current inventory slot.</param>
+        /// <param name="storedPart">The stored cargo stack.</param>
+        internal KerbalGearModuleProvider(string providerKey, int slotIndex, StoredPart storedPart,
+            ConfigNode moduleConfig)
+        {
+            ProviderKey = providerKey;
+            SlotIndex = slotIndex;
+            StoredPart = storedPart;
+            ModuleConfig = moduleConfig;
+        }
+    }
+
     #region SWearableProp
     /// <summary>
     /// Represents an instance of a wearable prop. One SWearableProp corresponds to a part's WBIModuleWearableItem part module.
@@ -53,6 +123,11 @@ namespace WildBlueCore.KerbalGear
         /// Rotation offset of the prop.
         /// </summary>
         public Vector3 rotationOffset;
+
+        /// <summary>
+        /// Flag to indicate whether the compact stock ChuteStTransform should remain visible while the prop is equipped on the kerbal's back.
+        /// </summary>
+        public bool showChuteTransforms;
     }
     #endregion
 
@@ -75,6 +150,9 @@ namespace WildBlueCore.KerbalGear
     {
         #region Constants
         public const string kJetpackPartName = "evaJetpack";
+        public const string kChutePartName = "evaChute";
+        const string kSavedModuleNode = "KERBAL_GEAR_MODULE";
+        const string kSavedInstanceKey = "kerbalGearInstanceKey";
         #endregion
 
         #region Fields
@@ -87,13 +165,102 @@ namespace WildBlueCore.KerbalGear
 
         #region Housekeeping
         KerbalEVA kerbalEVA;
+        ModuleEvaChute evaChute;
         ModuleInventoryPart inventory;
         WBIPropOffsetGUI propOffsetView = null;
         Dictionary<string, List<SWearableProp>> wearablePartProps;
-        Dictionary<string, string[]> wearablePartModules;
+        Dictionary<string, Dictionary<string, WearableEVAModuleRequest>> wearablePartModules;
+        readonly Dictionary<string, ActiveEVAModule> activeEVAModules =
+            new Dictionary<string, ActiveEVAModule>();
+        readonly Dictionary<string, ConfigNode> savedEVAModuleStates =
+            new Dictionary<string, ConfigNode>();
+        readonly HashSet<string> missingModuleWarnings = new HashSet<string>();
+        readonly HashSet<string> exclusiveModuleWarnings = new HashSet<string>();
+        readonly HashSet<string> conflictingModuleConfigWarnings = new HashSet<string>();
+        bool inventoryRefreshPending;
+        bool inventoryRefreshCoroutineRunning;
+        bool inventoryEventsSubscribed;
+
+        /// <summary>
+        /// Stores a cargo prefab's request and whether it came from the preferred node syntax.
+        /// </summary>
+        sealed class WearableEVAModuleRequest
+        {
+            internal ConfigNode moduleConfig;
+            internal bool isExplicit;
+        }
+
+        /// <summary>
+        /// Tracks one module instance created and owned by this controller.
+        /// </summary>
+        sealed class ActiveEVAModule
+        {
+            internal string instanceKey;
+            internal KerbalGearModuleDefinition definition;
+            internal PartModule module;
+            internal KerbalGearModuleProvider[] providers;
+            internal string configSignature;
+        }
+
+        /// <summary>
+        /// Describes one module instance required by the current inventory contents.
+        /// </summary>
+        sealed class DesiredEVAModule
+        {
+            internal string instanceKey;
+            internal KerbalGearModuleDefinition definition;
+            internal KerbalGearModuleProvider[] providers;
+            internal ConfigNode moduleConfig;
+            internal string configSignature;
+        }
         #endregion
 
         #region Overrides
+        /// <summary>
+        /// Restores state saved for dynamic modules. The modules themselves are created after the
+        /// live EVA inventory becomes available during OnStart.
+        /// </summary>
+        /// <param name="node">The controller's saved configuration.</param>
+        public override void OnLoad(ConfigNode node)
+        {
+            base.OnLoad(node);
+            if (!node.HasNode(kSavedModuleNode))
+                return;
+
+            savedEVAModuleStates.Clear();
+            ConfigNode[] savedNodes = node.GetNodes(kSavedModuleNode);
+            for (int index = 0; index < savedNodes.Length; index++)
+            {
+                ConfigNode savedNode = savedNodes[index];
+                string instanceKey = savedNode.GetValue(kSavedInstanceKey);
+                if (!string.IsNullOrEmpty(instanceKey))
+                    savedEVAModuleStates[instanceKey] = savedNode.CreateCopy();
+            }
+        }
+
+        /// <summary>
+        /// Persists each live dynamic module inside the always-present controller so its state can
+        /// be restored even though the ability module is intentionally absent from the EVA prefab.
+        /// </summary>
+        /// <param name="node">The controller's save node.</param>
+        public override void OnSave(ConfigNode node)
+        {
+            base.OnSave(node);
+            foreach (ActiveEVAModule activeModule in activeEVAModules.Values)
+            {
+                if (activeModule.module == null)
+                    continue;
+
+                ConfigNode savedNode = node.AddNode(kSavedModuleNode);
+                activeModule.module.Save(savedNode);
+                savedNode.AddValue(kSavedInstanceKey, activeModule.instanceKey);
+            }
+        }
+
+        /// <summary>
+        /// Initializes wearable visuals and creates only the EVA modules requested by carried gear.
+        /// </summary>
+        /// <param name="state">KSP's current startup state.</param>
         public override void OnStart(StartState state)
         {
             base.OnStart(state);
@@ -108,12 +275,16 @@ namespace WildBlueCore.KerbalGear
                 return;
 
             getKerbalModules();
+            if (kerbalEVA == null || inventory == null)
+                return;
+
             setupWearableParts();
 
             GameEvents.onModuleInventoryChanged.Add(onModuleInventoryChanged);
             GameEvents.onModuleInventorySlotChanged.Add(onModuleInventorySlotChanged);
+            inventoryEventsSubscribed = true;
 
-            onModuleInventoryChanged(inventory);
+            reconcileInventory();
 
             if (debugMode)
             {
@@ -123,12 +294,51 @@ namespace WildBlueCore.KerbalGear
             }
         }
 
+        /// <summary>
+        /// Coalesces stock inventory events and keeps wearable meshes synchronized.
+        /// </summary>
         public override void OnUpdate()
         {
             base.OnUpdate();
+
+            // Stock commonly fires both inventory events for one operation. The reconciliation can
+            // add or remove PartModules, so do not perform it inline during Part.ModulesOnUpdate.
+            // Deferring it until the end of the frame keeps KSP's index-based module update loop
+            // from seeing its PartModuleList change underneath it.
+            if (inventoryRefreshPending && !inventoryRefreshCoroutineRunning)
+                StartCoroutine(reconcileInventoryDeferred());
+
             if (kerbalEVA == null)
                 return;
+        }
+
+        /// <summary>
+        /// Applies wearable pack visibility after stock KerbalEVA has updated its own pack models.
+        /// </summary>
+        public void LateUpdate()
+        {
+            if (!HighLogic.LoadedSceneIsFlight || kerbalEVA == null)
+                return;
+
             hidePackMeshes();
+        }
+
+        /// <summary>
+        /// Stops listening to stock inventory events when this EVA controller is destroyed.
+        /// Module teardown is left to KSP so scene changes do not generate duplicate OnInactive calls.
+        /// </summary>
+        public void OnDestroy()
+        {
+            if (!inventoryEventsSubscribed)
+                return;
+
+            GameEvents.onModuleInventoryChanged.Remove(onModuleInventoryChanged);
+            GameEvents.onModuleInventorySlotChanged.Remove(onModuleInventorySlotChanged);
+            inventoryEventsSubscribed = false;
+            inventoryRefreshPending = false;
+            inventoryRefreshCoroutineRunning = false;
+            activeEVAModules.Clear();
+            savedEVAModuleStates.Clear();
         }
         #endregion
 
@@ -136,7 +346,7 @@ namespace WildBlueCore.KerbalGear
         /// <summary>
         /// Debug button that shows the prop offset view.
         /// </summary>
-        [KSPEvent(guiName = "#LOC_SUNKWORKS_propOffsetButton")]
+        [KSPEvent(guiName = "#LOC_WILDBLUECORE_propOffsetButton")]
         public void ShowPropOffsetView()
         {
             propOffsetView.wearablePartProps = wearablePartProps;
@@ -186,92 +396,440 @@ namespace WildBlueCore.KerbalGear
             if (!HighLogic.LoadedSceneIsFlight || partInventory != inventory)
                 return;
 
-            // Hide all wearable props and disable their part modules.
-            hideAllProps();
-
-            StoredPart storedPart;
-            int[] storedPartKeys = inventory.storedParts.Keys.ToArray();
-            string[] moduleNames;
-            List<SWearableProp> wearableProps;
-            SWearableProp wearableProp;
-            int count;
-
-            for (int index = 0; index < storedPartKeys.Length; index++)
-            {
-                storedPart = inventory.storedParts[storedPartKeys[index]];
-
-                // Enable props
-                if (wearablePartProps.ContainsKey(storedPart.partName))
-                {
-                    wearableProps = wearablePartProps[storedPart.partName];
-                    count = wearableProps.Count;
-                    for (int propIndex = 0; propIndex < count; propIndex++)
-                    {
-                        wearableProp = wearableProps[propIndex];
-
-                        wearableProp.prop.SetActive(true);
-
-                        wearableProp.meshTransform.localEulerAngles = wearableProp.rotationOffset;
-                        if (wearableProp.bodyLocation != BodyLocations.backOrJetpack)
-                            wearableProp.meshTransform.localPosition = wearableProp.positionOffset;
-                        else
-                            wearableProp.meshTransform.localPosition = inventory.ContainsPart(kJetpackPartName) ? wearableProp.positionOffsetJetpack : wearableProp.positionOffset;
-                    }
-                }
-
-                // Enable the part modules
-                if (wearablePartModules.ContainsKey(storedPart.partName))
-                {
-                    moduleNames = wearablePartModules[storedPart.partName];
-                    for (int moduleIndex = 0; moduleIndex < moduleNames.Length; moduleIndex++)
-                    {
-                        if (part.Modules.Contains(moduleNames[moduleIndex]))
-                        {
-                            part.Modules[moduleNames[moduleIndex]].moduleIsEnabled = true;
-                            part.Modules[moduleNames[moduleIndex]].enabled = true;
-                            part.Modules[moduleNames[moduleIndex]].OnActive();
-                        }
-                    }
-                }
-            }
+            inventoryRefreshPending = true;
         }
 
+        /// <summary>
+        /// Queues the same coalesced refresh used by the general inventory-changed event.
+        /// </summary>
+        /// <param name="partInventory">The inventory whose slot changed.</param>
+        /// <param name="slotIndex">The changed inventory slot.</param>
         private void onModuleInventorySlotChanged(ModuleInventoryPart partInventory, int slotIndex)
         {
-            onModuleInventoryChanged(partInventory);
+            if (!HighLogic.LoadedSceneIsFlight || partInventory != inventory)
+                return;
+
+            inventoryRefreshPending = true;
         }
 
-        private void hideAllProps()
+        /// <summary>
+        /// Runs the pending inventory reconciliation after the current frame's module update pass.
+        /// KSP iterates Part.Modules by index inside Part.ModulesOnUpdate, so changing that list from
+        /// this controller's OnUpdate can throw an ArgumentOutOfRangeException on the next module.
+        /// </summary>
+        private System.Collections.IEnumerator reconcileInventoryDeferred()
         {
-            // Hide the props
-            List<SWearableProp> wearableProps;
-            string[] keys = wearablePartProps.Keys.ToArray();
-            int count;
-            for (int index = 0; index < keys.Length; index++)
+            inventoryRefreshCoroutineRunning = true;
+            yield return new WaitForEndOfFrame();
+            inventoryRefreshCoroutineRunning = false;
+
+            if (isCargoPartHeld())
+                yield break;
+
+            if (inventoryRefreshPending)
+                reconcileInventory();
+        }
+
+        /// <summary>
+        /// Reports whether stock inventory UI is currently holding a cargo part between source and
+        /// destination slots. KerbalGear must not add or remove EVA modules during that transaction,
+        /// because the stock cargo UI keeps the held Part and source slot state in static fields.
+        /// </summary>
+        private static bool isCargoPartHeld()
+        {
+            UIPartActionControllerInventory inventoryController =
+                UIPartActionControllerInventory.Instance;
+            return inventoryController != null && inventoryController.CurrentCargoPart != null;
+        }
+
+        /// <summary>
+        /// Reconciles wearable props and EVA modules with the inventory's current contents.
+        /// The desired module map is rebuilt from scratch so duplicate stock events cannot corrupt
+        /// lifetime counts or provider ownership.
+        /// </summary>
+        private void reconcileInventory()
+        {
+            inventoryRefreshPending = false;
+            if (!HighLogic.LoadedSceneIsFlight || inventory == null || wearablePartProps == null ||
+                wearablePartModules == null)
+                return;
+
+            HashSet<string> storedPartNames = new HashSet<string>();
+            Dictionary<string, List<KerbalGearModuleProvider>> moduleProviders =
+                new Dictionary<string, List<KerbalGearModuleProvider>>();
+            int[] storedPartKeys = inventory.storedParts.Keys.OrderBy(key => key).ToArray();
+            for (int index = 0; index < storedPartKeys.Length; index++)
             {
-                wearableProps = wearablePartProps[keys[index]];
-                count = wearableProps.Count;
-                for (int propIndex = 0; propIndex < count; propIndex++)
+                int slotIndex = storedPartKeys[index];
+                StoredPart storedPart = inventory.storedParts[slotIndex];
+                if (storedPart == null || string.IsNullOrEmpty(storedPart.partName))
+                    continue;
+
+                storedPartNames.Add(storedPart.partName);
+
+                Dictionary<string, WearableEVAModuleRequest> moduleConfigs;
+                if (!wearablePartModules.TryGetValue(storedPart.partName, out moduleConfigs))
+                    continue;
+
+                foreach (KeyValuePair<string, WearableEVAModuleRequest> moduleEntry in moduleConfigs)
                 {
-                    wearableProps[propIndex].prop.SetActive(false);
+                    string moduleName = moduleEntry.Key;
+
+                    List<KerbalGearModuleProvider> providers;
+                    if (!moduleProviders.TryGetValue(moduleName, out providers))
+                    {
+                        providers = new List<KerbalGearModuleProvider>();
+                        moduleProviders.Add(moduleName, providers);
+                    }
+
+                    providers.Add(new KerbalGearModuleProvider(
+                        getProviderKey(slotIndex, storedPart), slotIndex, storedPart,
+                        moduleEntry.Value.moduleConfig.CreateCopy()));
                 }
             }
 
-            // Disable the part modules
-            string[] evaModules;
-            keys = wearablePartModules.Keys.ToArray();
-            for (int index = 0; index < keys.Length; index++)
+            reconcileWearableProps(storedPartNames);
+            Dictionary<string, DesiredEVAModule> desiredEVAModules =
+                buildDesiredEVAModules(moduleProviders);
+
+            string[] activeInstanceKeys = activeEVAModules.Keys.ToArray();
+            for (int index = 0; index < activeInstanceKeys.Length; index++)
             {
-                evaModules = wearablePartModules[keys[index]];
-                for (int moduleIndex = 0; moduleIndex < evaModules.Length; moduleIndex++)
+                if (!desiredEVAModules.ContainsKey(activeInstanceKeys[index]))
+                    removeEVAModule(activeInstanceKeys[index]);
+            }
+
+            foreach (DesiredEVAModule desiredModule in desiredEVAModules.Values)
+            {
+                ActiveEVAModule activeModule;
+                if (!activeEVAModules.TryGetValue(desiredModule.instanceKey, out activeModule))
                 {
-                    if (part.Modules.Contains(evaModules[moduleIndex]))
-                    {
-                        part.Modules[evaModules[moduleIndex]].OnInactive();
-                        part.Modules[evaModules[moduleIndex]].moduleIsEnabled = false;
-                        part.Modules[evaModules[moduleIndex]].enabled = false;
-                    }
+                    addEVAModule(desiredModule);
+                    continue;
                 }
+
+                if (activeModule.configSignature != desiredModule.configSignature)
+                {
+                    removeEVAModule(desiredModule.instanceKey);
+                    addEVAModule(desiredModule);
+                    continue;
+                }
+
+                activeModule.providers = desiredModule.providers;
+                notifyModuleProviders(activeModule);
+            }
+        }
+
+        /// <summary>
+        /// Converts provider requests into concrete module instances according to each registered
+        /// module's Exclusive, Aggregate, or PerProvider policy.
+        /// </summary>
+        /// <param name="moduleProviders">Providers grouped by requested PartModule class.</param>
+        /// <returns>The exact dynamic module instances required by the current inventory.</returns>
+        private Dictionary<string, DesiredEVAModule> buildDesiredEVAModules(
+            Dictionary<string, List<KerbalGearModuleProvider>> moduleProviders)
+        {
+            Dictionary<string, DesiredEVAModule> desiredModules =
+                new Dictionary<string, DesiredEVAModule>();
+
+            foreach (KeyValuePair<string, List<KerbalGearModuleProvider>> providerEntry in
+                moduleProviders)
+            {
+                KerbalGearModuleDefinition definition;
+                if (!WBIModuleKerbalEVAModules.TryGetModuleDefinition(providerEntry.Key,
+                    out definition))
+                {
+                    if (missingModuleWarnings.Add(providerEntry.Key))
+                    {
+                        Debug.LogWarning("[WildBlueCore] KerbalGear item requests " +
+                            providerEntry.Key +
+                            ", but no matching KERBAL_EVA_MODULES definition was found.");
+                    }
+                    continue;
+                }
+
+                List<KerbalGearModuleProvider> providers = providerEntry.Value;
+                switch (definition.Mode)
+                {
+                    case KerbalGearModuleMode.Aggregate:
+                        warnAboutConflictingConfigs(definition, providers);
+                        addDesiredModule(desiredModules, definition,
+                            getAggregateInstanceKey(definition), providers.ToArray(),
+                            providers[0].ModuleConfig);
+                        break;
+
+                    case KerbalGearModuleMode.PerProvider:
+                        for (int providerIndex = 0; providerIndex < providers.Count; providerIndex++)
+                        {
+                            KerbalGearModuleProvider provider = providers[providerIndex];
+                            addDesiredModule(desiredModules, definition,
+                                definition.ModuleName + ":provider:" + provider.ProviderKey,
+                                new KerbalGearModuleProvider[] { provider }, provider.ModuleConfig);
+                        }
+                        break;
+
+                    default:
+                        if (providers.Count > 1 &&
+                            exclusiveModuleWarnings.Add(definition.ModuleName))
+                        {
+                            Debug.LogWarning("[WildBlueCore] Multiple carried items request " +
+                                definition.ModuleName +
+                                " in Exclusive mode; the first inventory provider owns the module.");
+                        }
+
+                        KerbalGearModuleProvider exclusiveProvider = providers[0];
+                        addDesiredModule(desiredModules, definition,
+                            definition.ModuleName + ":exclusive:" +
+                                exclusiveProvider.ProviderKey,
+                            new KerbalGearModuleProvider[] { exclusiveProvider },
+                            exclusiveProvider.ModuleConfig);
+                        break;
+                }
+            }
+
+            return desiredModules;
+        }
+
+        /// <summary>
+        /// Adds one concrete module request to the desired instance map.
+        /// </summary>
+        private static void addDesiredModule(Dictionary<string, DesiredEVAModule> desiredModules,
+            KerbalGearModuleDefinition definition, string instanceKey,
+            KerbalGearModuleProvider[] providers, ConfigNode overrides)
+        {
+            ConfigNode moduleConfig = mergeModuleConfig(definition.ModuleConfig, overrides);
+            desiredModules[instanceKey] = new DesiredEVAModule
+            {
+                instanceKey = instanceKey,
+                definition = definition,
+                providers = providers,
+                moduleConfig = moduleConfig,
+                configSignature = moduleConfig.ToString()
+            };
+        }
+
+        /// <summary>
+        /// Applies wearable-specific values and child nodes over the registered module defaults.
+        /// Child nodes with matching names are replaced as a group, which supports curves such as
+        /// atmosphereCurve without combining incompatible keys from two definitions.
+        /// </summary>
+        private static ConfigNode mergeModuleConfig(ConfigNode defaults, ConfigNode overrides)
+        {
+            ConfigNode mergedConfig = defaults.CreateCopy();
+            if (overrides == null)
+                return mergedConfig;
+
+            foreach (ConfigNode.Value value in overrides.values)
+            {
+                if (value.name != "name")
+                    mergedConfig.SetValue(value.name, value.value, true);
+            }
+
+            HashSet<string> replacedNodeNames = new HashSet<string>();
+            foreach (ConfigNode childNode in overrides.nodes)
+            {
+                if (replacedNodeNames.Add(childNode.name))
+                    mergedConfig.RemoveNodes(childNode.name);
+                mergedConfig.AddNode(childNode.CreateCopy());
+            }
+            return mergedConfig;
+        }
+
+        /// <summary>
+        /// Aggregate modules use the first inventory provider's configuration. Warn once when
+        /// another provider requests the same shared instance with different overrides.
+        /// </summary>
+        private void warnAboutConflictingConfigs(KerbalGearModuleDefinition definition,
+            List<KerbalGearModuleProvider> providers)
+        {
+            if (providers.Count < 2)
+                return;
+
+            string firstConfig = providers[0].ModuleConfig.ToString();
+            for (int index = 1; index < providers.Count; index++)
+            {
+                if (providers[index].ModuleConfig.ToString() == firstConfig)
+                    continue;
+
+                if (conflictingModuleConfigWarnings.Add(definition.ModuleName))
+                {
+                    Debug.LogWarning("[WildBlueCore] Multiple carried items request aggregate " +
+                        definition.ModuleName + " with different EVA_PART_MODULE settings; " +
+                        "the first inventory provider's settings will be used.");
+                }
+                return;
+            }
+        }
+
+        /// <summary>
+        /// Creates the stable key used by the single Aggregate module instance.
+        /// </summary>
+        private static string getAggregateInstanceKey(KerbalGearModuleDefinition definition)
+        {
+            return definition.ModuleName + ":aggregate";
+        }
+
+        /// <summary>
+        /// Creates a provider key that survives inventory slot moves whenever the stored snapshot
+        /// has a persistent KSP part identifier.
+        /// </summary>
+        private static string getProviderKey(int slotIndex, StoredPart storedPart)
+        {
+            if (storedPart.snapshot != null)
+            {
+                if (storedPart.snapshot.persistentId != 0U)
+                    return "pid-" + storedPart.snapshot.persistentId;
+                if (storedPart.snapshot.flightID != 0U)
+                    return "fid-" + storedPart.snapshot.flightID;
+            }
+
+            return "slot-" + slotIndex + "-" + storedPart.partName;
+        }
+
+        /// <summary>
+        /// Shows only the wearable props represented by parts currently stored in the EVA inventory.
+        /// </summary>
+        /// <param name="storedPartNames">Unique part names currently present in the inventory.</param>
+        private void reconcileWearableProps(HashSet<string> storedPartNames)
+        {
+            bool hasJetpack = storedPartNames.Contains(kJetpackPartName);
+            foreach (KeyValuePair<string, List<SWearableProp>> wearableEntry in wearablePartProps)
+            {
+                bool shouldBeActive = storedPartNames.Contains(wearableEntry.Key);
+                List<SWearableProp> wearableProps = wearableEntry.Value;
+                for (int propIndex = 0; propIndex < wearableProps.Count; propIndex++)
+                {
+                    SWearableProp wearableProp = wearableProps[propIndex];
+                    if (wearableProp.prop != null && wearableProp.prop.activeSelf != shouldBeActive)
+                        wearableProp.prop.SetActive(shouldBeActive);
+
+                    if (!shouldBeActive || wearableProp.meshTransform == null)
+                        continue;
+
+                    wearableProp.meshTransform.localEulerAngles = wearableProp.rotationOffset;
+                    wearableProp.meshTransform.localPosition =
+                        wearableProp.bodyLocation == BodyLocations.backOrJetpack && hasJetpack
+                            ? wearableProp.positionOffsetJetpack
+                            : wearableProp.positionOffset;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Creates, restores, starts, and activates one requested EVA module.
+        /// </summary>
+        /// <param name="desiredModule">The desired instance and its assigned providers.</param>
+        private void addEVAModule(DesiredEVAModule desiredModule)
+        {
+            ConfigNode moduleConfig = desiredModule.moduleConfig.CreateCopy();
+            PartModule evaModule = part.AddModule(moduleConfig, true);
+            if (evaModule == null)
+            {
+                Debug.LogError("[WildBlueCore] Unable to dynamically add KerbalGear module " +
+                    desiredModule.definition.ModuleName + ".");
+                return;
+            }
+
+            ConfigNode savedState;
+            if (savedEVAModuleStates.TryGetValue(desiredModule.instanceKey, out savedState))
+                evaModule.Load(savedState);
+
+            // Start from an inactive baseline so modules that inspect their enabled state in
+            // OnStart do not perform their active work twice.
+            evaModule.moduleIsEnabled = false;
+            evaModule.enabled = false;
+            evaModule.OnStart(getStartState());
+            evaModule.moduleIsEnabled = true;
+            evaModule.enabled = true;
+            evaModule.OnActive();
+
+            ActiveEVAModule activeModule = new ActiveEVAModule
+            {
+                instanceKey = desiredModule.instanceKey,
+                definition = desiredModule.definition,
+                module = evaModule,
+                providers = desiredModule.providers,
+                configSignature = desiredModule.configSignature
+            };
+            activeEVAModules.Add(activeModule.instanceKey, activeModule);
+            notifyModuleProviders(activeModule, false);
+            MonoUtilities.RefreshContextWindows(part);
+        }
+
+        /// <summary>
+        /// Deactivates and destroys one module instance after its last applicable request disappears.
+        /// </summary>
+        /// <param name="instanceKey">The dynamic module instance key.</param>
+        private void removeEVAModule(string instanceKey)
+        {
+            ActiveEVAModule activeModule;
+            if (!activeEVAModules.TryGetValue(instanceKey, out activeModule))
+                return;
+
+            activeEVAModules.Remove(instanceKey);
+            if (activeModule.module != null)
+            {
+                activeModule.module.OnInactive();
+                activeModule.module.moduleIsEnabled = false;
+                activeModule.module.enabled = false;
+                part.RemoveModule(activeModule.module);
+            }
+
+            savedEVAModuleStates.Remove(instanceKey);
+            MonoUtilities.RefreshContextWindows(part);
+        }
+
+        /// <summary>
+        /// Notifies a retained or newly created module about the providers assigned by its mode.
+        /// Provider-aware modules receive exact ownership; legacy aggregate modules receive the
+        /// coalesced inventory notification used by the existing KerbalGear API.
+        /// </summary>
+        /// <param name="activeModule">The live dynamic module.</param>
+        /// <param name="notifyLegacyListener">Whether an existing inventory-only listener should
+        /// receive a retained-module refresh.</param>
+        private void notifyModuleProviders(ActiveEVAModule activeModule,
+            bool notifyLegacyListener = true)
+        {
+            IKerbalGearProviderListener providerListener =
+                activeModule.module as IKerbalGearProviderListener;
+            if (providerListener != null)
+            {
+                providerListener.OnKerbalGearProvidersChanged(inventory,
+                    activeModule.providers);
+                return;
+            }
+
+            if (notifyLegacyListener)
+            {
+                IKerbalGearInventoryListener inventoryListener =
+                    activeModule.module as IKerbalGearInventoryListener;
+                if (inventoryListener != null)
+                    inventoryListener.OnKerbalGearInventoryChanged(inventory);
+            }
+        }
+
+        /// <summary>
+        /// Maps the live EVA vessel situation to the startup state expected by a new PartModule.
+        /// </summary>
+        private StartState getStartState()
+        {
+            if (vessel == null)
+                return StartState.None;
+
+            switch (vessel.situation)
+            {
+                case Vessel.Situations.LANDED:
+                    return StartState.Landed;
+                case Vessel.Situations.SPLASHED:
+                    return StartState.Splashed;
+                case Vessel.Situations.SUB_ORBITAL:
+                    return StartState.SubOrbital;
+                case Vessel.Situations.ORBITING:
+                    return StartState.Orbital;
+                case Vessel.Situations.FLYING:
+                    return StartState.Flying;
+                default:
+                    return StartState.None;
             }
         }
 
@@ -295,11 +853,38 @@ namespace WildBlueCore.KerbalGear
             return false;
         }
 
+        private bool shouldShowChuteTransforms()
+        {
+            if (!inventory.ContainsPart(kChutePartName))
+                return false;
+
+            List<SWearableProp> wearableProps;
+            SWearableProp wearableProp;
+            string[] keys = wearablePartProps.Keys.ToArray();
+            int count;
+            for (int index = 0; index < keys.Length; index++)
+            {
+                wearableProps = wearablePartProps[keys[index]];
+                count = wearableProps.Count;
+                for (int propIndex = 0; propIndex < count; propIndex++)
+                {
+                    wearableProp = wearableProps[propIndex];
+                    if (wearableProp.showChuteTransforms &&
+                        inventory.ContainsPart(wearableProp.partName) &&
+                        (wearableProp.bodyLocation == BodyLocations.back || wearableProp.bodyLocation == BodyLocations.backOrJetpack))
+                        return true;
+                }
+            }
+            return false;
+        }
+
         private void hidePackMeshes()
         {
             // Make sure we have a backpack prop
             if (!hasBackpackProp())
+            {
                 return;
+            }
 
             List<FlagDecal> flags = part.FindModulesImplementing<FlagDecal>();
             FlagDecal decal;
@@ -320,8 +905,27 @@ namespace WildBlueCore.KerbalGear
             kerbalEVA.StorageTransform.gameObject.SetActive(false);
             kerbalEVA.StorageSlimTransform.gameObject.SetActive(false);
             kerbalEVA.ChuteJetpackTransform.gameObject.SetActive(false);
-            kerbalEVA.ChuteStTransform.gameObject.SetActive(false);
-            kerbalEVA.ChuteContainerTransform.gameObject.SetActive(false);
+            if (shouldShowChuteTransforms())
+            {
+                // A wearable counts as an additional inventory item, which makes stock KSP select
+                // ChuteContainerTransform. Stock UpdatePackModels can make that selection again
+                // without notifying this controller, so keep ModuleEvaChute pointed at the compact
+                // hierarchy until deployment starts. Once semi-deployed, SetCanopy must not be
+                // called because it deliberately hides the canopy it selects.
+                if (evaChute != null &&
+                    (evaChute.deploymentState == ModuleParachute.deploymentStates.STOWED ||
+                     evaChute.deploymentState == ModuleParachute.deploymentStates.ACTIVE))
+                {
+                    evaChute.SetCanopy(kerbalEVA.ChuteStTransform);
+                }
+                kerbalEVA.ChuteContainerTransform.gameObject.SetActive(false);
+                kerbalEVA.ChuteStTransform.gameObject.SetActive(true);
+            }
+            else
+            {
+                kerbalEVA.ChuteStTransform.gameObject.SetActive(false);
+                kerbalEVA.ChuteContainerTransform.gameObject.SetActive(false);
+            }
         }
 
         private void setupWearableParts()
@@ -341,7 +945,8 @@ namespace WildBlueCore.KerbalGear
             List<SWearableProp> wearableProps;
 
             wearablePartProps = new Dictionary<string, List<SWearableProp>>();
-            wearablePartModules = new Dictionary<string, string[]>();
+            wearablePartModules =
+                new Dictionary<string, Dictionary<string, WearableEVAModuleRequest>>();
 
             for (int index = 0; index < count; index++)
             {
@@ -368,12 +973,67 @@ namespace WildBlueCore.KerbalGear
                         wearableProp.positionOffset = wearableItem.positionOffset;
                         wearableProp.positionOffsetJetpack = wearableItem.positionOffsetJetpack;
                         wearableProp.rotationOffset = wearableItem.rotationOffset;
+                        wearableProp.showChuteTransforms = wearableItem.showChuteTransforms;
 
-                        // Setup part module names
+                        // Setup configurable EVA module requests. Explicit EVA_PART_MODULE nodes
+                        // take precedence over legacy evaModules entries with no overrides.
+                        Dictionary<string, WearableEVAModuleRequest> evaModuleConfigs;
+                        if (!wearablePartModules.TryGetValue(availablePart.name,
+                            out evaModuleConfigs))
+                        {
+                            evaModuleConfigs =
+                                new Dictionary<string, WearableEVAModuleRequest>();
+                            wearablePartModules.Add(availablePart.name, evaModuleConfigs);
+                        }
+
+                        ConfigNode[] configuredModuleNodes =
+                            wearableItem.GetEVAPartModuleConfigs();
+                        for (int moduleIndex = 0; moduleIndex < configuredModuleNodes.Length;
+                            moduleIndex++)
+                        {
+                            ConfigNode moduleConfig = configuredModuleNodes[moduleIndex];
+                            string moduleName = moduleConfig.GetValue("name");
+                            WearableEVAModuleRequest existingRequest;
+                            if (evaModuleConfigs.TryGetValue(moduleName, out existingRequest) &&
+                                existingRequest.isExplicit &&
+                                existingRequest.moduleConfig.ToString() != moduleConfig.ToString())
+                            {
+                                string warningKey = availablePart.name + ":" + moduleName;
+                                if (conflictingModuleConfigWarnings.Add(warningKey))
+                                {
+                                    Debug.LogWarning("[WildBlueCore] " + availablePart.name +
+                                        " contains different EVA_PART_MODULE settings for " +
+                                        moduleName + "; the first settings will be used.");
+                                }
+                                continue;
+                            }
+                            evaModuleConfigs[moduleName] = new WearableEVAModuleRequest
+                            {
+                                moduleConfig = moduleConfig.CreateCopy(),
+                                isExplicit = true
+                            };
+                        }
+
+                        // Legacy compatibility: an explicit node wins if both request the same
+                        // module. Otherwise create an empty override node that uses global defaults.
                         if (!string.IsNullOrEmpty(wearableItem.evaModules))
                         {
-                            string[] evaModules = wearableItem.evaModules.Split(new char[] { ';' });
-                            wearablePartModules.Add(availablePart.name, evaModules);
+                            string[] configuredModules = wearableItem.evaModules.Split(new char[] { ';' });
+                            for (int moduleIndex = 0; moduleIndex < configuredModules.Length; moduleIndex++)
+                            {
+                                string moduleName = configuredModules[moduleIndex].Trim();
+                                if (string.IsNullOrEmpty(moduleName) ||
+                                    evaModuleConfigs.ContainsKey(moduleName))
+                                    continue;
+
+                                ConfigNode legacyConfig = new ConfigNode("EVA_PART_MODULE");
+                                legacyConfig.AddValue("name", moduleName);
+                                evaModuleConfigs.Add(moduleName, new WearableEVAModuleRequest
+                                {
+                                    moduleConfig = legacyConfig,
+                                    isExplicit = false
+                                });
+                            }
                         }
 
                         // Get the attachment transform
@@ -426,7 +1086,11 @@ namespace WildBlueCore.KerbalGear
         private void getKerbalModules()
         {
             kerbalEVA = part.FindModuleImplementing<KerbalEVA>();
-            inventory = kerbalEVA.ModuleInventoryPartReference;
+            if (kerbalEVA != null)
+            {
+                inventory = kerbalEVA.ModuleInventoryPartReference;
+                evaChute = part.FindModuleImplementing<ModuleEvaChute>();
+            }
         }
         #endregion
     }

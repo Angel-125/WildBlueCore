@@ -1,5 +1,5 @@
             
-This module represents an equippable cargo item that appears as a 3D model on the kerbal. When equipping the item, this part module can also activate one or more part modules on the kerbal that provide various abilities. For example, an item can activate the WBIModuleEVAOverrides to improve the kerbal's swim speed. The activated part modules are defined in KERBAL_EVA_MODULES config nodes. You can have more than one WBIModuleWearableItem part module per cargo part.
+This module represents an equippable cargo item that appears as a 3D model on the kerbal. When equipping the item, this part module can also request one or more part modules on the kerbal that provide various abilities. For example, an item can request the WBIModuleEVAOverrides to improve the kerbal's swim speed. The requested part modules and their multiplicity are registered in KERBAL_EVA_MODULES config nodes and are created dynamically while needed. EVA_PART_MODULE child nodes request modules and may override their runtime configuration for this wearable. You can have more than one WBIModuleWearableItem part module per cargo part.
             
             
 > #### Example
@@ -15,7 +15,11 @@ This module represents an equippable cargo item that appears as a 3D model on th
                     positionOffset = 0.0000, 0.0200, 0.0900
                     positionOffsetJetpack = 0,0,0
                     rotationOffset = -70.0000, 0.0000, 0.0000
-                    evaModules = WBIModuleEVADiveComputer
+                    showChuteTransforms = false
+                    EVA_PART_MODULE
+                    {
+                        name = WBIModuleEVADiveComputer
+                    }
                }
             
 ```
@@ -38,6 +42,22 @@ Position offsets (x,y,z).
 Position offset that is used when the kerbal has a jetpack in addition to the wearable item (x,y,z). Requires bodyLocation = backOrJetpack
 ### rotationOffset
 Rotation offsets in degrees
+### showChuteTransforms
+Flag to indicate whether the compact stock ChuteStTransform should remain visible while this wearable item is equipped on the kerbal's back. The kerbal must also be carrying the stock evaChute inventory part.
 ### evaModules
-Name of the part modules to enable on the kerbal when you equip the wearable item. Separate names with a semicolon.
+Legacy list of part modules to create on the kerbal when you equip the wearable item. Separate names with a semicolon. Prefer EVA_PART_MODULE child nodes for new configs.
+## Methods
+
+
+### OnLoad(ConfigNode)
+Loads configurable EVA module requests. Each EVA_PART_MODULE node names a module registered by KERBAL_EVA_MODULES and may override that definition's runtime fields.
+> #### Parameters
+> **node:** The wearable item's MODULE configuration.
+
+
+### GetEVAPartModuleConfigs
+Gets copies of the explicitly configured EVA_PART_MODULE requests.
+
+### RequestsEVAModule(System.String)
+Reports whether this wearable requests the named EVA module through either the new EVA_PART_MODULE nodes or the legacy semicolon-delimited evaModules field.
 

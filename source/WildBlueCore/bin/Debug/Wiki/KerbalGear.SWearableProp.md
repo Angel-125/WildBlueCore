@@ -19,4 +19,6 @@ Position offset of the prop.
 Position offset of the prop if the kerbal has a jetpack and bodyLocation is backOrJetpack.
 ### rotationOffset
 Rotation offset of the prop.
+### showChuteTransforms
+Flag to indicate whether the compact stock ChuteStTransform should remain visible while the prop is equipped on the kerbal's back.
 
