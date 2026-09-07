@@ -1,100 +1,12 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\",
-  "Documents": [
-    {
-      "AbsoluteMoniker": "D:0:0:{7D8D783F-DDA6-4C96-BF65-8905FAB07CB5}|WildBlueCore.csproj|c:\\projects\\ksp\\wildblueindustries\\wildbluecore\\source\\wildbluecore\\partmodules\\kerbalgear\\wearables\\modulewearableitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7D8D783F-DDA6-4C96-BF65-8905FAB07CB5}|WildBlueCore.csproj|solutionrelative:partmodules\\kerbalgear\\wearables\\modulewearableitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7D8D783F-DDA6-4C96-BF65-8905FAB07CB5}|WildBlueCore.csproj|C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\partmodules\\kerbalgear\\evamodules\\wbimoduleevaemotor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7D8D783F-DDA6-4C96-BF65-8905FAB07CB5}|WildBlueCore.csproj|solutionrelative:partmodules\\kerbalgear\\evamodules\\wbimoduleevaemotor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7D8D783F-DDA6-4C96-BF65-8905FAB07CB5}|WildBlueCore.csproj|C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\partmodules\\kerbalgear\\wearables\\modulewearablescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7D8D783F-DDA6-4C96-BF65-8905FAB07CB5}|WildBlueCore.csproj|solutionrelative:partmodules\\kerbalgear\\wearables\\modulewearablescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7D8D783F-DDA6-4C96-BF65-8905FAB07CB5}|WildBlueCore.csproj|C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\partmodules\\aero\\moduleparafoil.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7D8D783F-DDA6-4C96-BF65-8905FAB07CB5}|WildBlueCore.csproj|solutionrelative:partmodules\\aero\\moduleparafoil.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{0727F77B-B856-4D7D-8B2C-C1318B1EE46F}|..\\..\\..\\MOLE\\MoleUtils\\MoleUtils.csproj|c:\\projects\\ksp\\wildblueindustries\\mole\\moleutils\\wbiwetworkshop.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    }
-  ],
+  "Documents": [],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
       "VerticalTabListWidth": 256,
-      "DocumentGroups": [
-        {
-          "DockedWidth": 200,
-          "SelectedChildIndex": 0,
-          "Children": [
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "ModuleWearableItem.cs",
-              "DocumentMoniker": "C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\PartModules\\KerbalGear\\Wearables\\ModuleWearableItem.cs",
-              "RelativeDocumentMoniker": "PartModules\\KerbalGear\\Wearables\\ModuleWearableItem.cs",
-              "ToolTip": "C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\PartModules\\KerbalGear\\Wearables\\ModuleWearableItem.cs",
-              "RelativeToolTip": "PartModules\\KerbalGear\\Wearables\\ModuleWearableItem.cs",
-              "ViewState": "AgIAAEEAAAAAAAAAAAAowHkAAAAtAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-14T20:11:42.275Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "WBIModuleEVAEMotor.cs",
-              "DocumentMoniker": "C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\PartModules\\KerbalGear\\EVAModules\\WBIModuleEVAEMotor.cs",
-              "RelativeDocumentMoniker": "PartModules\\KerbalGear\\EVAModules\\WBIModuleEVAEMotor.cs",
-              "ToolTip": "C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\PartModules\\KerbalGear\\EVAModules\\WBIModuleEVAEMotor.cs",
-              "RelativeToolTip": "PartModules\\KerbalGear\\EVAModules\\WBIModuleEVAEMotor.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAiAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-14T19:27:34.143Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "ModuleParafoil.cs",
-              "DocumentMoniker": "C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\PartModules\\Aero\\ModuleParafoil.cs",
-              "RelativeDocumentMoniker": "PartModules\\Aero\\ModuleParafoil.cs",
-              "ToolTip": "C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\PartModules\\Aero\\ModuleParafoil.cs",
-              "RelativeToolTip": "PartModules\\Aero\\ModuleParafoil.cs",
-              "ViewState": "AgIAAGUAAAAAAAAAAAAowJ0AAAAlAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-13T00:24:11.154Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "ModuleWearablesController.cs",
-              "DocumentMoniker": "C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\PartModules\\KerbalGear\\Wearables\\ModuleWearablesController.cs",
-              "RelativeDocumentMoniker": "PartModules\\KerbalGear\\Wearables\\ModuleWearablesController.cs",
-              "ToolTip": "C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\PartModules\\KerbalGear\\Wearables\\ModuleWearablesController.cs",
-              "RelativeToolTip": "PartModules\\KerbalGear\\Wearables\\ModuleWearablesController.cs",
-              "ViewState": "AgIAADMAAAAAAAAAAAA4wKIAAAAdAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-13T00:23:08.422Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "WBIWetWorkshop.cs",
-              "DocumentMoniker": "C:\\Projects\\KSP\\WildBlueIndustries\\MOLE\\MoleUtils\\WBIWetWorkshop.cs",
-              "RelativeDocumentMoniker": "..\\..\\..\\MOLE\\MoleUtils\\WBIWetWorkshop.cs",
-              "ToolTip": "C:\\Projects\\KSP\\WildBlueIndustries\\MOLE\\MoleUtils\\WBIWetWorkshop.cs",
-              "RelativeToolTip": "..\\..\\..\\MOLE\\MoleUtils\\WBIWetWorkshop.cs",
-              "ViewState": "AgIAAMAAAAAAAAAAAAAowPgAAAA9AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-09T19:22:13.55Z"
-            }
-          ]
-        }
-      ]
+      "DocumentGroups": []
     }
   ]
 }

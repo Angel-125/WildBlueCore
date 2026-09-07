@@ -53,6 +53,9 @@ namespace WildBlueCore.KerbalGear
         GameObject selectedProp = null;
         SWearableProp wearableProp;
         string[] partPropNames = null;
+        bool disableIdleAnimationsEnabled = true;
+        bool idleAnimationsDisabled;
+        bool previousAlternateIdleDisabled;
         #endregion
 
         #region Constructors
@@ -68,32 +71,30 @@ namespace WildBlueCore.KerbalGear
         {
             if (newValue)
             {
-                if (wearablePartProps == null)
+                if (!refreshCarriedProps())
                 {
-                    base.SetVisible(false);
+                    SetVisible(false);
                     return;
                 }
 
-                partPropNames = wearablePartProps
-                    .Where(entry => entry.Value != null && entry.Value.Count > 0)
-                    .Select(entry => entry.Key)
-                    .ToArray();
-                if (partPropNames.Length == 0)
-                {
-                    base.SetVisible(false);
-                    return;
-                }
-
-                List<SWearableProp> wearableProps = wearablePartProps[partPropNames[0]];
-                wearableProp = wearableProps[0];
-
-                selectedPropName = wearableProp.name;
-                selectedProp = wearableProp.prop;
-
-                setInitialOffsets();
+                if (disableIdleAnimationsEnabled)
+                    disableIdleAnimations();
             }
+            else
+                restoreIdleAnimations();
 
             base.SetVisible(newValue);
+        }
+
+        /// <summary>
+        /// Refreshes the prop selector after the EVA inventory changes. If the selected prop is no
+        /// longer carried, another carried prop is selected. The window closes when no wearable
+        /// items remain in the inventory.
+        /// </summary>
+        public void RefreshCarriedProps()
+        {
+            if (!refreshCarriedProps() && IsVisible())
+                SetVisible(false);
         }
 
         protected override void DrawWindowContents(int windowId)
@@ -121,12 +122,7 @@ namespace WildBlueCore.KerbalGear
                 {
                     partProp = wearableProps[propIndex];
                     if (GUILayout.Button(partProp.name))
-                    {
-                        wearableProp = partProp;
-                        selectedPropName = wearableProp.name;
-                        selectedProp = wearableProp.prop;
-                        setInitialOffsets();
-                    }
+                        selectProp(partProp);
                 }
             }
 
@@ -134,6 +130,19 @@ namespace WildBlueCore.KerbalGear
             GUILayout.EndVertical();
 
             GUILayout.BeginVertical();
+
+            // Idle animation toggle
+            bool newDisableIdleAnimationsEnabled = GUILayout.Toggle(
+                disableIdleAnimationsEnabled,
+                Localizer.Format("#LOC_WILDBLUECORE_disableIdleAnimations"));
+            if (newDisableIdleAnimationsEnabled != disableIdleAnimationsEnabled)
+            {
+                disableIdleAnimationsEnabled = newDisableIdleAnimationsEnabled;
+                if (disableIdleAnimationsEnabled)
+                    disableIdleAnimations();
+                else
+                    restoreIdleAnimations();
+            }
 
             // Delta buttons
             buttonGroupIndex = GUILayout.SelectionGrid(buttonGroupIndex, buttonTexts, buttonTexts.Length);
@@ -213,6 +222,89 @@ namespace WildBlueCore.KerbalGear
             }
 
             return offsetValue;
+        }
+
+        /// <summary>
+        /// Rebuilds the selectable part list from wearable items in the live EVA inventory.
+        /// </summary>
+        /// <returns>True when at least one carried wearable prop is available.</returns>
+        private bool refreshCarriedProps()
+        {
+            ModuleInventoryPart inventory = kerbalEVA != null
+                ? kerbalEVA.ModuleInventoryPartReference
+                : null;
+            if (wearablePartProps == null || inventory == null)
+            {
+                partPropNames = new string[0];
+                return false;
+            }
+
+            partPropNames = wearablePartProps
+                .Where(entry => entry.Value != null && entry.Value.Count > 0 &&
+                    inventory.ContainsPart(entry.Key))
+                .Select(entry => entry.Key)
+                .ToArray();
+            if (partPropNames.Length == 0)
+            {
+                selectedPropName = string.Empty;
+                selectedProp = null;
+                return false;
+            }
+
+            bool selectedPartIsCarried = selectedProp != null &&
+                partPropNames.Contains(wearableProp.partName);
+            if (!selectedPartIsCarried)
+            {
+                List<SWearableProp> wearableProps = wearablePartProps[partPropNames[0]];
+                selectProp(wearableProps[0]);
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Selects a wearable prop and loads its configured offsets into the controls.
+        /// </summary>
+        private void selectProp(SWearableProp newWearableProp)
+        {
+            wearableProp = newWearableProp;
+            selectedPropName = wearableProp.name;
+            selectedProp = wearableProp.prop;
+            setInitialOffsets();
+        }
+
+        /// <summary>
+        /// Prevents stock KerbalEVA from starting alternate grounded idle animations while offsets
+        /// are being adjusted. If one is already playing, return to the neutral idle immediately.
+        /// </summary>
+        private void disableIdleAnimations()
+        {
+            if (kerbalEVA == null || idleAnimationsDisabled)
+                return;
+
+            previousAlternateIdleDisabled = kerbalEVA.alternateIdleDisabled;
+            kerbalEVA.alternateIdleDisabled = true;
+            idleAnimationsDisabled = true;
+
+            if (kerbalEVA.fsm != null && kerbalEVA.fsm.Started &&
+                kerbalEVA.fsm.CurrentState == kerbalEVA.st_idle_b_gr)
+            {
+                kerbalEVA.fsm.RunEvent(kerbalEVA.On_return_idle);
+            }
+        }
+
+        /// <summary>
+        /// Restores the alternate-idle setting that was active before the window opened.
+        /// </summary>
+        private void restoreIdleAnimations()
+        {
+            if (!idleAnimationsDisabled)
+                return;
+
+            if (kerbalEVA != null)
+                kerbalEVA.alternateIdleDisabled = previousAlternateIdleDisabled;
+
+            idleAnimationsDisabled = false;
         }
 
         private void setInitialOffsets()

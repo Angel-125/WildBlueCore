@@ -167,8 +167,6 @@
     <Compile Include="Wrappers\WildBlueTools\WBTWrapper.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Experimental\" />
-    <Folder Include="PartModules\Experimental\" />
     <Folder Include="PartModules\KerbalGear\SupportClasses\" />
   </ItemGroup>
   <PropertyGroup>
@@ -182,6 +180,7 @@
     <Publicize Include="Assembly-CSharp:KerbalEVA.GetL19Contact" />
     <Publicize Include="Assembly-CSharp:KerbalEVA.SurfaceContact" />
     <Publicize Include="Assembly-CSharp:KerbalEVA.SurfaceOrSplashed" />
+    <Publicize Include="Assembly-CSharp:KerbalEVA.alternateIdleDisabled" />
     <Publicize Include="Assembly-CSharp:n2.CrewListItem.OpenHelmetSuitPickerWindow" />
     <Publicize Include="Assembly-CSharp:n2.BaseCrewAssignmentDialog.AddAvailItem" />
   </ItemGroup>

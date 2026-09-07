@@ -92,6 +92,9 @@ namespace WildBlueCore.PartModules.Resources
         [KSPField(isPersistant = true)]
         internal PumpingMode pumpMode;
 
+        [KSPField(isPersistant = true)]
+        public string pumpModeString = string.Empty;
+
         [KSPField(guiActive = true, isPersistant = true, guiActiveEditor = true, groupName = "FuelPump", groupDisplayName = "#LOC_WILDBLUECORE_fuelPumpTitle", guiName = "#LOC_WILDBLUECORE_fuelPumpRate", guiFormat = "n0", guiUnits = "%")]
         [UI_FloatRange(affectSymCounterparts = UI_Scene.All, minValue = 1f, maxValue = 20f, stepIncrement = 1f)]
         public float pumpRate = 10f;
@@ -147,6 +150,10 @@ namespace WildBlueCore.PartModules.Resources
             cacheStringStatusReceiveReady = Localizer.Format("#LOC_WILDBLUECORE_fuelPumpStatusReceiveReady");
             cacheStringStatusSendReady = Localizer.Format("#LOC_WILDBLUECORE_fuelPumpStatusSendReady");
             cacheStringStatusDistributeReady = Localizer.Format("#LOC_WILDBLUECORE_fuelPumpStatusDistrubuteReady");
+
+            PumpingMode parsedPumpMode;
+            if (!string.IsNullOrEmpty(pumpModeString) & Enum.TryParse(pumpModeString, out parsedPumpMode))
+                pumpMode = parsedPumpMode;
 
             wasActivated = isActivated;
             updatePumpModeUI();

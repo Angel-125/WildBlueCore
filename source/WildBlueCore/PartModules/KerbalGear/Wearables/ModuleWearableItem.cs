@@ -41,7 +41,97 @@ namespace WildBlueCore.KerbalGear
         /// <summary>
         /// The right bicep of the kerbal.
         /// </summary>
-        rightBicep
+        rightBicep,
+
+        /// <summary>
+        /// The head of the kerbal.
+        /// </summary>
+        head,
+
+        /// <summary>
+        /// The neck of the kerbal.
+        /// </summary>
+        neck,
+
+        /// <summary>
+        /// The chest of the kerbal.
+        /// </summary>
+        chest,
+
+        /// <summary>
+        /// The waist of the kerbal.
+        /// </summary>
+        waist,
+
+        /// <summary>
+        /// The left shoulder of the kerbal.
+        /// </summary>
+        leftShoulder,
+
+        /// <summary>
+        /// The right shoulder of the kerbal.
+        /// </summary>
+        rightShoulder,
+
+        /// <summary>
+        /// The left forearm of the kerbal.
+        /// </summary>
+        leftForearm,
+
+        /// <summary>
+        /// The right forearm of the kerbal.
+        /// </summary>
+        rightForearm,
+
+        /// <summary>
+        /// The left hand of the kerbal.
+        /// </summary>
+        leftHand,
+
+        /// <summary>
+        /// The right hand of the kerbal.
+        /// </summary>
+        rightHand,
+
+        /// <summary>
+        /// The left palm of the kerbal.
+        /// </summary>
+        leftPalm,
+
+        /// <summary>
+        /// The right palm of the kerbal.
+        /// </summary>
+        rightPalm,
+
+        /// <summary>
+        /// The left thigh of the kerbal.
+        /// </summary>
+        leftThigh,
+
+        /// <summary>
+        /// The right thigh of the kerbal.
+        /// </summary>
+        rightThigh,
+
+        /// <summary>
+        /// The left calf of the kerbal.
+        /// </summary>
+        leftCalf,
+
+        /// <summary>
+        /// The right calf of the kerbal.
+        /// </summary>
+        rightCalf,
+
+        /// <summary>
+        /// The left toes of the kerbal.
+        /// </summary>
+        leftToes,
+
+        /// <summary>
+        /// The right toes of the kerbal.
+        /// </summary>
+        rightToes
     }
     #endregion
 

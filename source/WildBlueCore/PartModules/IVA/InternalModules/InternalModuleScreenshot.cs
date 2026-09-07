@@ -76,7 +76,8 @@ namespace WildBlueCore.PartModules.IVA
         public override void OnDestroy()
         {
             base.OnDestroy();
-            screenView.SetVisible(false);
+            if (screenView != null)
+                screenView.SetVisible(false);
             screenView = null;
             textureShown = null;
             rendererMaterial = null;

@@ -329,6 +329,9 @@ namespace WildBlueCore.KerbalGear
         /// </summary>
         public void OnDestroy()
         {
+            if (propOffsetView != null)
+                propOffsetView.SetVisible(false);
+
             if (!inventoryEventsSubscribed)
                 return;
 
@@ -381,6 +384,78 @@ namespace WildBlueCore.KerbalGear
 
                 case BodyLocations.rightBicep:
                     transformName = "bn_r_elbow_a01";
+                    break;
+
+                case BodyLocations.head:
+                    transformName = "bn_upperJaw01";
+                    break;
+
+                case BodyLocations.neck:
+                    transformName = "bn_neck01";
+                    break;
+
+                case BodyLocations.chest:
+                    transformName = "bn_spD01";
+                    break;
+
+                case BodyLocations.waist:
+                    transformName = "bn_spA01";
+                    break;
+
+                case BodyLocations.leftShoulder:
+                    transformName = "bn_l_shld01";
+                    break;
+
+                case BodyLocations.rightShoulder:
+                    transformName = "bn_r_shld01";
+                    break;
+
+                case BodyLocations.leftForearm:
+                    transformName = "bn_l_elbow_b01";
+                    break;
+
+                case BodyLocations.rightForearm:
+                    transformName = "bn_r_elbow_b01";
+                    break;
+
+                case BodyLocations.leftHand:
+                    transformName = "bn_l_wrist01";
+                    break;
+
+                case BodyLocations.rightHand:
+                    transformName = "bn_r_wrist01";
+                    break;
+
+                case BodyLocations.leftPalm:
+                    transformName = "bn_l_mid_a01";
+                    break;
+
+                case BodyLocations.rightPalm:
+                    transformName = "bn_r_mid_a01";
+                    break;
+
+                case BodyLocations.leftThigh:
+                    transformName = "bn_l_hip01";
+                    break;
+
+                case BodyLocations.rightThigh:
+                    transformName = "bn_r_hip01";
+                    break;
+
+                case BodyLocations.leftCalf:
+                    transformName = "bn_l_knee_b01";
+                    break;
+
+                case BodyLocations.rightCalf:
+                    transformName = "bn_r_knee_b01";
+                    break;
+
+                case BodyLocations.leftToes:
+                    transformName = "bn_l_ball01";
+                    break;
+
+                case BodyLocations.rightToes:
+                    transformName = "bn_r_ball01";
                     break;
 
                 default:
@@ -489,6 +564,9 @@ namespace WildBlueCore.KerbalGear
             }
 
             reconcileWearableProps(storedPartNames);
+            if (propOffsetView != null && propOffsetView.IsVisible())
+                propOffsetView.RefreshCarriedProps();
+
             Dictionary<string, DesiredEVAModule> desiredEVAModules =
                 buildDesiredEVAModules(moduleProviders);
 
