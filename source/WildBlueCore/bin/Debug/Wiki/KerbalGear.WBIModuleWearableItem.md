@@ -16,6 +16,7 @@ This module represents an equippable cargo item that appears as a 3D model on th
                     positionOffsetJetpack = 0,0,0
                     rotationOffset = -70.0000, 0.0000, 0.0000
                     showChuteTransforms = false
+                    hideTransformsWhenWorn = displayModel;groundBase
                     EVA_PART_MODULE
                     {
                         name = WBIModuleEVADiveComputer
@@ -36,6 +37,10 @@ Where to place the item, such as on the back of the kerbal, the end of the backp
 Name of the high-level anchor transform. This will follow the bodyLocation bone as it moves.
 ### meshTransform
 Name of the 3D model. This will be rotated and positioned relative to the anchorTransform.
+### hideMeshTransformWhenDropped
+When true, hides meshTransform on the physical part while it is dropped in flight. The wearable copy remains visible on the Kerbal. Defaults to false.
+### hideTransformsWhenWorn
+Semicolon-delimited names of model transforms to hide on the wearable copy while this part is carried in a Kerbal's inventory. Transform names are case-sensitive. The source part prefab is not changed, so these transforms remain visible when the part is dropped. This field may be placed on a hide-only WBIModuleWearableItem that does not specify an anchorTransform or meshTransform. When this field is set, the Kerbal's stock backpack, storage pack, jetpack/chute pack, and chute models are also hidden while the item is worn.
 ### positionOffset
 Position offsets (x,y,z).
 ### positionOffsetJetpack
@@ -48,6 +53,12 @@ Flag to indicate whether the compact stock ChuteStTransform should remain visibl
 Legacy list of part modules to create on the kerbal when you equip the wearable item. Separate names with a semicolon. Prefer EVA_PART_MODULE child nodes for new configs.
 ## Methods
 
+
+### OnStart(PartModule.StartState)
+Hides the configured wearable mesh on a physical part loaded in flight.
+
+### OnPartCreatedFomInventory(ModuleInventoryPart)
+Ensures the configured wearable mesh is hidden immediately when stock inventory creates the physical dropped part.
 
 ### OnLoad(ConfigNode)
 Loads configurable EVA module requests. Each EVA_PART_MODULE node names a module registered by KERBAL_EVA_MODULES and may override that definition's runtime fields.

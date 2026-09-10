@@ -1915,6 +1915,7 @@
                     positionOffsetJetpack = 0,0,0
                     rotationOffset = -70.0000, 0.0000, 0.0000
                     showChuteTransforms = false
+                    hideTransformsWhenWorn = displayModel;groundBase
                     EVA_PART_MODULE
                     {
                         name = WBIModuleEVADiveComputer
@@ -1943,6 +1944,22 @@
             Name of the 3D model. This will be rotated and positioned relative to the anchorTransform.
             </summary>
         </member>
+        <member name="F:WildBlueCore.KerbalGear.WBIModuleWearableItem.hideMeshTransformWhenDropped">
+            <summary>
+            When true, hides meshTransform on the physical part while it is dropped in flight.
+            The wearable copy remains visible on the Kerbal. Defaults to false.
+            </summary>
+        </member>
+        <member name="F:WildBlueCore.KerbalGear.WBIModuleWearableItem.hideTransformsWhenWorn">
+            <summary>
+            Semicolon-delimited names of model transforms to hide on the wearable copy while this
+            part is carried in a Kerbal's inventory. Transform names are case-sensitive. The source
+            part prefab is not changed, so these transforms remain visible when the part is dropped.
+            This field may be placed on a hide-only WBIModuleWearableItem that does not specify an
+            anchorTransform or meshTransform. When this field is set, the Kerbal's stock backpack,
+            storage pack, jetpack/chute pack, and chute models are also hidden while the item is worn.
+            </summary>
+        </member>
         <member name="F:WildBlueCore.KerbalGear.WBIModuleWearableItem.positionOffset">
             <summary>
             Position offsets (x,y,z).
@@ -1969,6 +1986,17 @@
             <summary>
             Legacy list of part modules to create on the kerbal when you equip the wearable item.
             Separate names with a semicolon. Prefer EVA_PART_MODULE child nodes for new configs.
+            </summary>
+        </member>
+        <member name="M:WildBlueCore.KerbalGear.WBIModuleWearableItem.OnStart(PartModule.StartState)">
+            <summary>
+            Hides the configured wearable mesh on a physical part loaded in flight.
+            </summary>
+        </member>
+        <member name="M:WildBlueCore.KerbalGear.WBIModuleWearableItem.OnPartCreatedFomInventory(ModuleInventoryPart)">
+            <summary>
+            Ensures the configured wearable mesh is hidden immediately when stock inventory creates
+            the physical dropped part.
             </summary>
         </member>
         <member name="M:WildBlueCore.KerbalGear.WBIModuleWearableItem.OnLoad(ConfigNode)">
@@ -2274,6 +2302,15 @@
             <summary>
             Maps the live EVA vessel situation to the startup state expected by a new PartModule.
             </summary>
+        </member>
+        <member name="M:WildBlueCore.KerbalGear.WBIModuleWearablesController.hideTransforms(UnityEngine.GameObject,System.Collections.Generic.HashSet{System.String})">
+            <summary>
+            Hides each configured transform found within a wearable prop hierarchy.
+            A part can create multiple props, so names that do not occur in this particular clone
+            are intentionally ignored.
+            </summary>
+            <param name="prop">The instantiated wearable prop.</param>
+            <param name="hiddenTransformNames">Case-sensitive transform names to hide.</param>
         </member>
         <member name="T:WildBlueCore.WBIBasePartModule">
             <summary>

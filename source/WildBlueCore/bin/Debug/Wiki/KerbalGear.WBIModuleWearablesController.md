@@ -124,3 +124,11 @@ Notifies a retained or newly created module about the providers assigned by its 
 ### getStartState
 Maps the live EVA vessel situation to the startup state expected by a new PartModule.
 
+### hideTransforms(UnityEngine.GameObject,System.Collections.Generic.HashSet{System.String})
+Hides each configured transform found within a wearable prop hierarchy. A part can create multiple props, so names that do not occur in this particular clone are intentionally ignored.
+> #### Parameters
+> **prop:** The instantiated wearable prop.
+
+> **hiddenTransformNames:** Case-sensitive transform names to hide.
+
+

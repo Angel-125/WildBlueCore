@@ -170,6 +170,7 @@ namespace WildBlueCore.KerbalGear
         WBIPropOffsetGUI propOffsetView = null;
         Dictionary<string, List<SWearableProp>> wearablePartProps;
         Dictionary<string, Dictionary<string, WearableEVAModuleRequest>> wearablePartModules;
+        readonly HashSet<string> wearablePartsHidingStockPacks = new HashSet<string>();
         readonly Dictionary<string, ActiveEVAModule> activeEVAModules =
             new Dictionary<string, ActiveEVAModule>();
         readonly Dictionary<string, ConfigNode> savedEVAModuleStates =
@@ -913,6 +914,9 @@ namespace WildBlueCore.KerbalGear
 
         private bool hasBackpackProp()
         {
+            if (hasStockPackHidingPart())
+                return true;
+
             List<SWearableProp> wearableProps;
             SWearableProp wearableProp;
             string[] keys = wearablePartProps.Keys.ToArray();
@@ -927,6 +931,16 @@ namespace WildBlueCore.KerbalGear
                     if (inventory.ContainsPart(wearableProp.partName) && (wearableProp.bodyLocation == BodyLocations.back || wearableProp.bodyLocation == BodyLocations.backOrJetpack))
                         return true;
                 }
+            }
+            return false;
+        }
+
+        private bool hasStockPackHidingPart()
+        {
+            foreach (string partName in wearablePartsHidingStockPacks)
+            {
+                if (inventory.ContainsPart(partName))
+                    return true;
             }
             return false;
         }
@@ -958,8 +972,10 @@ namespace WildBlueCore.KerbalGear
 
         private void hidePackMeshes()
         {
+            bool hideAllStockPacks = hasStockPackHidingPart();
+
             // Make sure we have a backpack prop
-            if (!hasBackpackProp())
+            if (!hideAllStockPacks && !hasBackpackProp())
             {
                 return;
             }
@@ -983,7 +999,7 @@ namespace WildBlueCore.KerbalGear
             kerbalEVA.StorageTransform.gameObject.SetActive(false);
             kerbalEVA.StorageSlimTransform.gameObject.SetActive(false);
             kerbalEVA.ChuteJetpackTransform.gameObject.SetActive(false);
-            if (shouldShowChuteTransforms())
+            if (!hideAllStockPacks && shouldShowChuteTransforms())
             {
                 // A wearable counts as an additional inventory item, which makes stock KSP select
                 // ChuteContainerTransform. Stock UpdatePackModels can make that selection again
@@ -1025,6 +1041,7 @@ namespace WildBlueCore.KerbalGear
             wearablePartProps = new Dictionary<string, List<SWearableProp>>();
             wearablePartModules =
                 new Dictionary<string, Dictionary<string, WearableEVAModuleRequest>>();
+            wearablePartsHidingStockPacks.Clear();
 
             for (int index = 0; index < count; index++)
             {
@@ -1032,6 +1049,30 @@ namespace WildBlueCore.KerbalGear
                 if (availablePart.partPrefab.HasModuleImplementing<WBIModuleWearableItem>())
                 {
                     wearableItems = availablePart.partPrefab.FindModulesImplementing<WBIModuleWearableItem>();
+
+                    // Hide directives are part-wide so a configuration-only wearable module can
+                    // remove ground/display meshes from every applicable wearable clone without
+                    // needing to create a prop of its own.
+                    HashSet<string> hiddenTransformNames = new HashSet<string>(StringComparer.Ordinal);
+                    for (int hideItemIndex = 0; hideItemIndex < wearableItems.Count; hideItemIndex++)
+                    {
+                        string configuredNames = wearableItems[hideItemIndex].hideTransformsWhenWorn;
+                        if (string.IsNullOrEmpty(configuredNames))
+                            continue;
+
+                        string[] transformNames = configuredNames.Split(new char[] { ';' },
+                            StringSplitOptions.RemoveEmptyEntries);
+                        for (int transformIndex = 0; transformIndex < transformNames.Length;
+                            transformIndex++)
+                        {
+                            string transformName = transformNames[transformIndex].Trim();
+                            if (!string.IsNullOrEmpty(transformName))
+                                hiddenTransformNames.Add(transformName);
+                        }
+                    }
+
+                    if (hiddenTransformNames.Count > 0)
+                        wearablePartsHidingStockPacks.Add(availablePart.name);
 
                     // Setup our wearable props for this part.
                     wearableProps = new List<SWearableProp>();
@@ -1128,6 +1169,11 @@ namespace WildBlueCore.KerbalGear
                         prop.name = wearableItem.moduleID;
                         wearableProp.prop = prop;
 
+                        // Only the instantiated Kerbal prop is modified. KSP will therefore use
+                        // the untouched part prefab, with these transforms enabled, when the cargo
+                        // item is dropped back into the world.
+                        hideTransforms(prop, hiddenTransformNames);
+
                         // Add the TrackingRigObject. The tracking rig moves the prop (GameObject) associated with the anchorTransform.
                         TrackRigObject trackRig = prop.AddComponent<TrackRigObject>();
                         trackRig.target = attachTransform;
@@ -1168,6 +1214,27 @@ namespace WildBlueCore.KerbalGear
             {
                 inventory = kerbalEVA.ModuleInventoryPartReference;
                 evaChute = part.FindModuleImplementing<ModuleEvaChute>();
+            }
+        }
+
+        /// <summary>
+        /// Hides each configured transform found within a wearable prop hierarchy.
+        /// A part can create multiple props, so names that do not occur in this particular clone
+        /// are intentionally ignored.
+        /// </summary>
+        /// <param name="prop">The instantiated wearable prop.</param>
+        /// <param name="hiddenTransformNames">Case-sensitive transform names to hide.</param>
+        private static void hideTransforms(GameObject prop, HashSet<string> hiddenTransformNames)
+        {
+            if (prop == null || hiddenTransformNames == null || hiddenTransformNames.Count == 0)
+                return;
+
+            Transform[] transforms = prop.GetComponentsInChildren<Transform>(true);
+            for (int transformIndex = 0; transformIndex < transforms.Length; transformIndex++)
+            {
+                Transform candidate = transforms[transformIndex];
+                if (candidate != null && hiddenTransformNames.Contains(candidate.name))
+                    candidate.gameObject.SetActive(false);
             }
         }
         #endregion

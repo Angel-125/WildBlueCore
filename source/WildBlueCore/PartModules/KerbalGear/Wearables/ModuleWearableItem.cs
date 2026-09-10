@@ -155,6 +155,7 @@ namespace WildBlueCore.KerbalGear
     ///         positionOffsetJetpack = 0,0,0
     ///         rotationOffset = -70.0000, 0.0000, 0.0000
     ///         showChuteTransforms = false
+    ///         hideTransformsWhenWorn = displayModel;groundBase
     ///         EVA_PART_MODULE
     ///         {
     ///             name = WBIModuleEVADiveComputer
@@ -199,6 +200,24 @@ namespace WildBlueCore.KerbalGear
         public string meshTransform;
 
         /// <summary>
+        /// When true, hides meshTransform on the physical part while it is dropped in flight.
+        /// The wearable copy remains visible on the Kerbal. Defaults to false.
+        /// </summary>
+        [KSPField]
+        public bool hideMeshTransformWhenDropped;
+
+        /// <summary>
+        /// Semicolon-delimited names of model transforms to hide on the wearable copy while this
+        /// part is carried in a Kerbal's inventory. Transform names are case-sensitive. The source
+        /// part prefab is not changed, so these transforms remain visible when the part is dropped.
+        /// This field may be placed on a hide-only WBIModuleWearableItem that does not specify an
+        /// anchorTransform or meshTransform. When this field is set, the Kerbal's stock backpack,
+        /// storage pack, jetpack/chute pack, and chute models are also hidden while the item is worn.
+        /// </summary>
+        [KSPField]
+        public string hideTransformsWhenWorn;
+
+        /// <summary>
         /// Position offsets (x,y,z).
         /// </summary>
         [KSPField]
@@ -230,6 +249,27 @@ namespace WildBlueCore.KerbalGear
         /// </summary>
         [KSPField]
         public string evaModules = null;
+
+        /// <summary>
+        /// Hides the configured wearable mesh on a physical part loaded in flight.
+        /// </summary>
+        public override void OnStart(StartState state)
+        {
+            base.OnStart(state);
+
+            if (HighLogic.LoadedSceneIsFlight)
+                hideDroppedMeshTransform();
+        }
+
+        /// <summary>
+        /// Ensures the configured wearable mesh is hidden immediately when stock inventory creates
+        /// the physical dropped part.
+        /// </summary>
+        public override void OnPartCreatedFomInventory(ModuleInventoryPart moduleInventoryPart)
+        {
+            base.OnPartCreatedFomInventory(moduleInventoryPart);
+            hideDroppedMeshTransform();
+        }
 
         /// <summary>
         /// Loads configurable EVA module requests. Each EVA_PART_MODULE node names a module
@@ -291,6 +331,16 @@ namespace WildBlueCore.KerbalGear
                     return true;
             }
             return false;
+        }
+
+        private void hideDroppedMeshTransform()
+        {
+            if (!hideMeshTransformWhenDropped || part == null || string.IsNullOrEmpty(meshTransform))
+                return;
+
+            Transform droppedMesh = part.FindModelTransform(meshTransform);
+            if (droppedMesh != null)
+                droppedMesh.gameObject.SetActive(false);
         }
     }
 }
