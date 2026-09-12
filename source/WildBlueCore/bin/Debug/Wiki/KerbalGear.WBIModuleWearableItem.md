@@ -16,6 +16,7 @@ This module represents an equippable cargo item that appears as a 3D model on th
                     positionOffsetJetpack = 0,0,0
                     rotationOffset = -70.0000, 0.0000, 0.0000
                     showChuteTransforms = false
+                    hideStockPacksWhenWorn = true
                     hideTransformsWhenWorn = displayModel;groundBase
                     EVA_PART_MODULE
                     {
@@ -40,7 +41,9 @@ Name of the 3D model. This will be rotated and positioned relative to the anchor
 ### hideMeshTransformWhenDropped
 When true, hides meshTransform on the physical part while it is dropped in flight. The wearable copy remains visible on the Kerbal. Defaults to false.
 ### hideTransformsWhenWorn
-Semicolon-delimited names of model transforms to hide on the wearable copy while this part is carried in a Kerbal's inventory. Transform names are case-sensitive. The source part prefab is not changed, so these transforms remain visible when the part is dropped. This field may be placed on a hide-only WBIModuleWearableItem that does not specify an anchorTransform or meshTransform. When this field is set, the Kerbal's stock backpack, storage pack, jetpack/chute pack, and chute models are also hidden while the item is worn.
+Semicolon-delimited names of model transforms to hide on the wearable copy while this part is carried in a Kerbal's inventory. Transform names are case-sensitive. The source part prefab is not changed, so these transforms remain visible when the part is dropped. This field may be placed on a hide-only WBIModuleWearableItem that does not specify an anchorTransform or meshTransform.
+### hideStockPacksWhenWorn
+When true, hides the Kerbal's stock backpack, storage pack, jetpack/chute pack, and chute models while this item is worn. Defaults to true.
 ### positionOffset
 Position offsets (x,y,z).
 ### positionOffsetJetpack

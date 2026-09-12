@@ -155,6 +155,7 @@ namespace WildBlueCore.KerbalGear
     ///         positionOffsetJetpack = 0,0,0
     ///         rotationOffset = -70.0000, 0.0000, 0.0000
     ///         showChuteTransforms = false
+    ///         hideStockPacksWhenWorn = true
     ///         hideTransformsWhenWorn = displayModel;groundBase
     ///         EVA_PART_MODULE
     ///         {
@@ -211,11 +212,17 @@ namespace WildBlueCore.KerbalGear
         /// part is carried in a Kerbal's inventory. Transform names are case-sensitive. The source
         /// part prefab is not changed, so these transforms remain visible when the part is dropped.
         /// This field may be placed on a hide-only WBIModuleWearableItem that does not specify an
-        /// anchorTransform or meshTransform. When this field is set, the Kerbal's stock backpack,
-        /// storage pack, jetpack/chute pack, and chute models are also hidden while the item is worn.
+        /// anchorTransform or meshTransform.
         /// </summary>
         [KSPField]
         public string hideTransformsWhenWorn;
+
+        /// <summary>
+        /// When true, hides the Kerbal's stock backpack, storage pack, jetpack/chute pack, and
+        /// chute models while this item is worn. Defaults to true.
+        /// </summary>
+        [KSPField]
+        public bool hideStockPacksWhenWorn = true;
 
         /// <summary>
         /// Position offsets (x,y,z).

@@ -631,10 +631,12 @@ namespace WildBlueCore.KerbalGear
                 switch (definition.Mode)
                 {
                     case KerbalGearModuleMode.Aggregate:
-                        warnAboutConflictingConfigs(definition, providers);
+                        bool providerAware = isProviderAware(definition);
+                        if (!providerAware)
+                            warnAboutConflictingConfigs(definition, providers);
                         addDesiredModule(desiredModules, definition,
                             getAggregateInstanceKey(definition), providers.ToArray(),
-                            providers[0].ModuleConfig);
+                            providerAware ? null : providers[0].ModuleConfig);
                         break;
 
                     case KerbalGearModuleMode.PerProvider:
@@ -667,6 +669,21 @@ namespace WildBlueCore.KerbalGear
             }
 
             return desiredModules;
+        }
+
+        /// <summary>
+        /// Provider-aware aggregate modules receive all contributing configurations directly and
+        /// therefore use their registered defaults instead of inheriting the first provider's
+        /// EVA_PART_MODULE overrides. For example, WBIModuleEVAExperienceEffects receives every
+        /// carried item's provider descriptor and combines duplicate RepairSkill requests into one
+        /// active effect using the highest requested tier.
+        /// </summary>
+        private static bool isProviderAware(KerbalGearModuleDefinition definition)
+        {
+            Type moduleType = AssemblyLoader.GetClassByName(typeof(PartModule),
+                definition.ModuleName);
+            return moduleType != null &&
+                typeof(IKerbalGearProviderListener).IsAssignableFrom(moduleType);
         }
 
         /// <summary>
@@ -1052,11 +1069,17 @@ namespace WildBlueCore.KerbalGear
 
                     // Hide directives are part-wide so a configuration-only wearable module can
                     // remove ground/display meshes from every applicable wearable clone without
-                    // needing to create a prop of its own.
+                    // needing to create a prop of its own. Stock pack suppression is also
+                    // part-wide: any wearable module can request it for the carried item.
                     HashSet<string> hiddenTransformNames = new HashSet<string>(StringComparer.Ordinal);
+                    bool hideStockPacksWhenWorn = false;
                     for (int hideItemIndex = 0; hideItemIndex < wearableItems.Count; hideItemIndex++)
                     {
-                        string configuredNames = wearableItems[hideItemIndex].hideTransformsWhenWorn;
+                        WBIModuleWearableItem hideItem = wearableItems[hideItemIndex];
+                        if (hideItem.hideStockPacksWhenWorn)
+                            hideStockPacksWhenWorn = true;
+
+                        string configuredNames = hideItem.hideTransformsWhenWorn;
                         if (string.IsNullOrEmpty(configuredNames))
                             continue;
 
@@ -1071,7 +1094,7 @@ namespace WildBlueCore.KerbalGear
                         }
                     }
 
-                    if (hiddenTransformNames.Count > 0)
+                    if (hideStockPacksWhenWorn)
                         wearablePartsHidingStockPacks.Add(availablePart.name);
 
                     // Setup our wearable props for this part.
@@ -1153,6 +1176,24 @@ namespace WildBlueCore.KerbalGear
                                     isExplicit = false
                                 });
                             }
+                        }
+
+                        // EXPERIENCE_EFFECT nodes are declarative part-level overrides. Their
+                        // presence implicitly requests the aggregate manager, so authors do not
+                        // also need evaModules or an EVA_PART_MODULE node.
+                        if (WBIModuleEVAExperienceEffects.PartHasExperienceEffects(availablePart) &&
+                            !evaModuleConfigs.ContainsKey(
+                                WBIModuleEVAExperienceEffects.ModuleName))
+                        {
+                            ConfigNode effectConfig = new ConfigNode("EVA_PART_MODULE");
+                            effectConfig.AddValue("name",
+                                WBIModuleEVAExperienceEffects.ModuleName);
+                            evaModuleConfigs.Add(WBIModuleEVAExperienceEffects.ModuleName,
+                                new WearableEVAModuleRequest
+                                {
+                                    moduleConfig = effectConfig,
+                                    isExplicit = false
+                                });
                         }
 
                         // Get the attachment transform

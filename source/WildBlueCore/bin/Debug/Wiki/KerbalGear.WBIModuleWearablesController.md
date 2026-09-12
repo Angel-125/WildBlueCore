@@ -80,6 +80,9 @@ Converts provider requests into concrete module instances according to each regi
 > #### Return value
 > The exact dynamic module instances required by the current inventory.
 
+### isProviderAware(WildBlueCore.KerbalGear.KerbalGearModuleDefinition)
+Provider-aware aggregate modules receive all contributing configurations directly and therefore use their registered defaults instead of inheriting the first provider's EVA_PART_MODULE overrides. For example, WBIModuleEVAExperienceEffects receives every carried item's provider descriptor and combines duplicate RepairSkill requests into one active effect using the highest requested tier.
+
 ### addDesiredModule(System.Collections.Generic.Dictionary{System.String,WildBlueCore.KerbalGear.WBIModuleWearablesController.DesiredEVAModule},WildBlueCore.KerbalGear.KerbalGearModuleDefinition,System.String,WildBlueCore.KerbalGear.KerbalGearModuleProvider[],ConfigNode)
 Adds one concrete module request to the desired instance map.
 

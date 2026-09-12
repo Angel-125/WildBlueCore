@@ -133,6 +133,7 @@
     <Compile Include="PartModules\KerbalGear\GUI\WBIPropOffsetGUI.cs" />
     <Compile Include="PartModules\KerbalGear\GUI\WBIWardrobeGUI.cs" />
     <Compile Include="PartModules\KerbalGear\EVAModules\WBIModuleEVAOverrides.cs" />
+    <Compile Include="PartModules\KerbalGear\EVAModules\WBIModuleEVAExperienceEffects.cs" />
     <Compile Include="PartModules\KerbalGear\EVAModules\WBIModuleKerbalEVAModules.cs" />
     <Compile Include="PartModules\KerbalGear\Suits\ModuleSuitSwitcher.cs" />
     <Compile Include="PartModules\KerbalGear\Wearables\ModuleWearableItem.cs" />
