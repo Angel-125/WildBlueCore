@@ -123,7 +123,7 @@ namespace WildBlueCore.PartModules.Decals
         /// <summary>
         /// Toggles visibility of the decal.
         /// </summary>
-        [KSPEvent(guiActive = true, guiActiveEditor = true, guiName = "Toggle Decal")]
+        [KSPEvent(guiActive = true, guiActiveEditor = true, guiName = "Toggle Decal", groupName = "#LOC_WILDBLUECORE_decalGroup", groupDisplayName = "#LOC_WILDBLUECORE_decalGroup")]
         public void ToggleDecal()
         {
             isVisible = !isVisible;
@@ -138,7 +138,7 @@ namespace WildBlueCore.PartModules.Decals
         /// <summary>
         /// Changes the decal
         /// </summary>
-        [KSPEvent(guiActive = true, guiActiveEditor = true, guiName = "Select Decal")]
+        [KSPEvent(guiActive = true, guiActiveEditor = true, guiName = "Select Decal", groupName = "#LOC_WILDBLUECORE_decalGroup", groupDisplayName = "#LOC_WILDBLUECORE_decalGroup")]
         public void SelectDecal()
         {
             decalURL = HighLogic.CurrentGame.flagURL;
@@ -149,7 +149,7 @@ namespace WildBlueCore.PartModules.Decals
         /// <summary>
         /// Reverses the decal if the transform specified by reverseDecalTransformName and normalDecalTransformName both exist.
         /// </summary>
-        [KSPEvent(guiActive = true, guiActiveEditor = true, guiName = "Reverse Decal")]
+        [KSPEvent(guiActive = true, guiActiveEditor = true, guiName = "Reverse Decal", groupName = "#LOC_WILDBLUECORE_decalGroup", groupDisplayName = "#LOC_WILDBLUECORE_decalGroup")]
         public void ReverseDecal()
         {
             // Make sure that we have the normal and reversed decals

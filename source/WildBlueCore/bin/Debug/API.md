@@ -38,6 +38,19 @@ Lets ModuleParachute control deployment, then hands fully deployed flight to the
 Identifies a ModuleLiftingSurface as a passive parafoil stabilizer. ModuleParafoil keeps the surface disabled until the parafoil is fully deployed, then ramps it to its configured deflectionLiftCoeff.
         
 
+# PartModules.Coupling.WBIModuleDockingNodeController
+            
+Adds persistent PAW toggles that enable or disable each WBIModuleDockingNode on the part.
+        
+## Methods
+
+
+### OnLoad(ConfigNode)
+
+### OnSave(ConfigNode)
+
+### OnStart(PartModule.StartState)
+
 # PartModules.Decals.WBIModuleDecal
             
 This part module lets you change the decal using the stock flag selector. It does so independently of the mission flag.

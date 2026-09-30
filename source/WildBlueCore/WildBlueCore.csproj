@@ -113,7 +113,9 @@
   <ItemGroup>
     <Compile Include="PartModules\Aero\ModuleParafoil.cs" />
     <Compile Include="PartModules\Aero\ModuleParafoilStabilizer.cs" />
-    <Compile Include="PartModules\Decals\ModuleDecal.cs" />
+    <Compile Include="PartModules\Coupling\WBIModuleDockingNode.cs" />
+    <Compile Include="PartModules\Coupling\WBIModuleDockingNodeController.cs" />
+    <Compile Include="PartModules\Decals\WBIModuleDecal.cs" />
     <Compile Include="PartModules\IVA\GUI\ScreenshotView.cs" />
     <Compile Include="PartModules\IVA\InternalModules\InternalBaseModule.cs" />
     <Compile Include="PartModules\IVA\InternalModules\InternalModuleAnimation.cs" />
@@ -129,7 +131,7 @@
     <Compile Include="PartModules\KerbalGear\EVAModules\WBIModuleEVAEMotor.cs" />
     <Compile Include="PartModules\KerbalGear\EVAModules\WBIModuleEVAResourceTransfer.cs" />
     <Compile Include="PartModules\KerbalGear\EVAModules\WBIModuleEVAAblator.cs" />
-    <Compile Include="PartModules\Resources\ModuleFuelPump.cs" />
+    <Compile Include="PartModules\Resources\WBIModuleFuelPump.cs" />
     <Compile Include="PartModules\KerbalGear\GUI\WBIPropOffsetGUI.cs" />
     <Compile Include="PartModules\KerbalGear\GUI\WBIWardrobeGUI.cs" />
     <Compile Include="PartModules\KerbalGear\EVAModules\WBIModuleEVAOverrides.cs" />
@@ -139,11 +141,11 @@
     <Compile Include="PartModules\KerbalGear\Wearables\ModuleWearableItem.cs" />
     <Compile Include="PartModules\KerbalGear\Wearables\ModuleWearablesController.cs" />
     <Compile Include="PartModules\Animation\ModuleAnimateGenericExtended.cs" />
-    <Compile Include="PartModules\Resources\ModuleResourceConverterExtended.cs" />
-    <Compile Include="PartModules\Resources\ModuleSupplyLine.cs" />
-    <Compile Include="PartModules\Thermal\ModuleThermalShield.cs" />
+    <Compile Include="PartModules\Resources\WBIModuleResourceConverterExtended.cs" />
+    <Compile Include="PartModules\Resources\WBIModuleSupplyLine.cs" />
+    <Compile Include="PartModules\Thermal\WBIModuleThermalShield.cs" />
     <Compile Include="PartModules\IVA\InternalModules\ModuleInternalVariants.cs" />
-    <Compile Include="PartModules\Variants\ModulePartSubvariants.cs" />
+    <Compile Include="PartModules\Variants\WBIModulePartSubvariants.cs" />
     <Compile Include="SettingsAndScenario\WildBlueCoreScenario.cs" />
     <Compile Include="SettingsAndScenario\WildBlueCoreSettings.cs" />
     <Compile Include="Utilities\BaseDialog\Dialog.cs" />
@@ -153,9 +155,9 @@
     <Compile Include="PartModules\Breaking Ground\ModulePowerUnitConverter.cs" />
     <Compile Include="PartModules\Breaking Ground\ModulePowerUnitDistributor.cs" />
     <Compile Include="PartModules\IVA\SupportingPartModules\ModuleIVAVariants.cs" />
-    <Compile Include="PartModules\Variants\ModulePartGridVariants.cs" />
-    <Compile Include="PartModules\Variants\ModuleResourceVariants.cs" />
-    <Compile Include="PartModules\Wheels\ModuleWheelSFX.cs" />
+    <Compile Include="PartModules\Variants\WBIModulePartGridVariants.cs" />
+    <Compile Include="PartModules\Variants\WBIModuleResourceVariants.cs" />
+    <Compile Include="PartModules\Wheels\WBIModuleWheelSFX.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\SupportClasses\MutablePartSet.cs" />
     <Compile Include="Utilities\SupportClasses\TriggerClickWatcher.cs" />

@@ -3,7 +3,88 @@
   "WorkspaceRootPath": "C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{6E7577B1-A073-4A6F-8171-0797EEF9044E}|..\\..\\..\\Sandcastle\\source\\Sandcastle\\Sandcastle.csproj|c:\\projects\\ksp\\wildblueindustries\\sandcastle\\source\\sandcastle\\partmodules\\evaconstruction\\wbimoduleevapartdestroyer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{6E7577B1-A073-4A6F-8171-0797EEF9044E}|..\\..\\..\\Sandcastle\\source\\Sandcastle\\Sandcastle.csproj|c:\\projects\\ksp\\wildblueindustries\\sandcastle\\source\\sandcastle\\partmodules\\printshop\\wbishipbreaker.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7D8D783F-DDA6-4C96-BF65-8905FAB07CB5}|WildBlueCore.csproj|c:\\projects\\ksp\\wildblueindustries\\wildbluecore\\source\\wildbluecore\\partmodules\\decals\\wbimoduledecal.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7D8D783F-DDA6-4C96-BF65-8905FAB07CB5}|WildBlueCore.csproj|solutionrelative:partmodules\\decals\\wbimoduledecal.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7D8D783F-DDA6-4C96-BF65-8905FAB07CB5}|WildBlueCore.csproj|C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\partmodules\\coupling\\wbimoduledockingnode.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7D8D783F-DDA6-4C96-BF65-8905FAB07CB5}|WildBlueCore.csproj|solutionrelative:partmodules\\coupling\\wbimoduledockingnode.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7D8D783F-DDA6-4C96-BF65-8905FAB07CB5}|WildBlueCore.csproj|C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\partmodules\\variants\\wbimodulepartsubvariants.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7D8D783F-DDA6-4C96-BF65-8905FAB07CB5}|WildBlueCore.csproj|solutionrelative:partmodules\\variants\\wbimodulepartsubvariants.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7D8D783F-DDA6-4C96-BF65-8905FAB07CB5}|WildBlueCore.csproj|C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\partmodules\\variants\\wbimoduleresourcevariants.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7D8D783F-DDA6-4C96-BF65-8905FAB07CB5}|WildBlueCore.csproj|solutionrelative:partmodules\\variants\\wbimoduleresourcevariants.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7D8D783F-DDA6-4C96-BF65-8905FAB07CB5}|WildBlueCore.csproj|C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\partmodules\\variants\\wbimodulepartgridvariants.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7D8D783F-DDA6-4C96-BF65-8905FAB07CB5}|WildBlueCore.csproj|solutionrelative:partmodules\\variants\\wbimodulepartgridvariants.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7D8D783F-DDA6-4C96-BF65-8905FAB07CB5}|WildBlueCore.csproj|C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\partmodules\\thermal\\wbimodulethermalshield.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7D8D783F-DDA6-4C96-BF65-8905FAB07CB5}|WildBlueCore.csproj|solutionrelative:partmodules\\thermal\\wbimodulethermalshield.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7D8D783F-DDA6-4C96-BF65-8905FAB07CB5}|WildBlueCore.csproj|C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\partmodules\\resources\\wbimodulefuelpump.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7D8D783F-DDA6-4C96-BF65-8905FAB07CB5}|WildBlueCore.csproj|solutionrelative:partmodules\\resources\\wbimodulefuelpump.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7D8D783F-DDA6-4C96-BF65-8905FAB07CB5}|WildBlueCore.csproj|C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\partmodules\\resources\\wbimodulesupplyline.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7D8D783F-DDA6-4C96-BF65-8905FAB07CB5}|WildBlueCore.csproj|solutionrelative:partmodules\\resources\\wbimodulesupplyline.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{74BD7D76-7EAB-42B8-90AD-58486C5D12C0}|..\\..\\..\\Blueshift\\Source\\Blueshift\\Blueshift.csproj|c:\\projects\\ksp\\wildblueindustries\\blueshift\\source\\blueshift\\kerbalgear\\fxclasses\\wbigravioliumbeam.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{74BD7D76-7EAB-42B8-90AD-58486C5D12C0}|..\\..\\..\\Blueshift\\Source\\Blueshift\\Blueshift.csproj|c:\\projects\\ksp\\wildblueindustries\\blueshift\\source\\blueshift\\kerbalgear\\wbievagravitics.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{74BD7D76-7EAB-42B8-90AD-58486C5D12C0}|..\\..\\..\\Blueshift\\Source\\Blueshift\\Blueshift.csproj|C:\\Projects\\KSP\\WildBlueIndustries\\blueshift\\source\\blueshift\\utilitypartmodules\\wbianimatedtexture.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6E7577B1-A073-4A6F-8171-0797EEF9044E}|..\\..\\..\\Sandcastle\\source\\Sandcastle\\Sandcastle.csproj|C:\\Projects\\KSP\\WildBlueIndustries\\sandcastle\\source\\sandcastle\\partmodules\\printshop\\wbibaseprinter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7D8D783F-DDA6-4C96-BF65-8905FAB07CB5}|WildBlueCore.csproj|C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\partmodules\\wbibasepartmodule.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7D8D783F-DDA6-4C96-BF65-8905FAB07CB5}|WildBlueCore.csproj|solutionrelative:partmodules\\wbibasepartmodule.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6E7577B1-A073-4A6F-8171-0797EEF9044E}|..\\..\\..\\Sandcastle\\source\\Sandcastle\\Sandcastle.csproj|C:\\Projects\\KSP\\WildBlueIndustries\\sandcastle\\source\\sandcastle\\scenario\\sandcastlesettings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C268110B-4CA9-4F94-9A7C-50B377F8762C}|..\\..\\..\\WBIAnimations\\source\\WBIAnimations\\WBIAnimations.csproj|C:\\Projects\\KSP\\WildBlueIndustries\\wbianimations\\source\\wbianimations\\wbianimatedtexture.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C268110B-4CA9-4F94-9A7C-50B377F8762C}|..\\..\\..\\WBIAnimations\\source\\WBIAnimations\\WBIAnimations.csproj|C:\\Projects\\KSP\\WildBlueIndustries\\wbianimations\\source\\wbianimations\\wbipartmodule.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{74BD7D76-7EAB-42B8-90AD-58486C5D12C0}|..\\..\\..\\Blueshift\\Source\\Blueshift\\Blueshift.csproj|C:\\Projects\\KSP\\WildBlueIndustries\\blueshift\\source\\blueshift\\utilitypartmodules\\wbipartmodule.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6E7577B1-A073-4A6F-8171-0797EEF9044E}|..\\..\\..\\Sandcastle\\source\\Sandcastle\\Sandcastle.csproj|C:\\Projects\\KSP\\WildBlueIndustries\\sandcastle\\source\\sandcastle\\partmodules\\printshop\\wbiprintshop.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{74BD7D76-7EAB-42B8-90AD-58486C5D12C0}|..\\..\\..\\Blueshift\\Source\\Blueshift\\Blueshift.csproj|C:\\Projects\\KSP\\WildBlueIndustries\\blueshift\\source\\blueshift\\gravtech\\wbiflexgravgenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{AD41263E-2A61-4916-9D63-7101EA917811}|..\\..\\..\\Pathfinder\\Pathfinder.csproj|C:\\Projects\\KSP\\WildBlueIndustries\\pathfinder\\gui\\pipelinewindow.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6E7577B1-A073-4A6F-8171-0797EEF9044E}|..\\..\\..\\Sandcastle\\source\\Sandcastle\\Sandcastle.csproj|C:\\Projects\\KSP\\WildBlueIndustries\\sandcastle\\source\\sandcastle\\partmodules\\printshop\\wbiprinterrequirements.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9E6C131F-3161-486A-84F3-9F16768B4D4B}|..\\..\\..\\WBIResources\\Source\\WBIResources.csproj|C:\\Projects\\KSP\\WildBlueIndustries\\wbiresources\\source\\commoncore\\wbiopsmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9E6C131F-3161-486A-84F3-9F16768B4D4B}|..\\..\\..\\WBIResources\\Source\\WBIResources.csproj|C:\\Projects\\KSP\\WildBlueIndustries\\wbiresources\\source\\omni\\wbiomnistorage.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6E7577B1-A073-4A6F-8171-0797EEF9044E}|..\\..\\..\\Sandcastle\\source\\Sandcastle\\Sandcastle.csproj|C:\\Projects\\KSP\\WildBlueIndustries\\sandcastle\\source\\sandcastle\\partmodules\\evaconstruction\\wbimoduleevapartdestroyer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{7D8D783F-DDA6-4C96-BF65-8905FAB07CB5}|WildBlueCore.csproj|C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\partmodules\\kerbalgear\\wearables\\modulewearableitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -22,6 +103,296 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "WBIShipbreaker.cs",
+              "DocumentMoniker": "C:\\Projects\\KSP\\WildBlueIndustries\\Sandcastle\\source\\Sandcastle\\PartModules\\PrintShop\\WBIShipbreaker.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\Sandcastle\\source\\Sandcastle\\PartModules\\PrintShop\\WBIShipbreaker.cs",
+              "ToolTip": "C:\\Projects\\KSP\\WildBlueIndustries\\Sandcastle\\source\\Sandcastle\\PartModules\\PrintShop\\WBIShipbreaker.cs",
+              "RelativeToolTip": "..\\..\\..\\Sandcastle\\source\\Sandcastle\\PartModules\\PrintShop\\WBIShipbreaker.cs",
+              "ViewState": "AgIAAM4EAAAAAAAAAAAAwPIEAACWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-29T03:34:57.274Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "WBIModuleDecal.cs",
+              "DocumentMoniker": "C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\PartModules\\Decals\\WBIModuleDecal.cs",
+              "RelativeDocumentMoniker": "PartModules\\Decals\\WBIModuleDecal.cs",
+              "ToolTip": "C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\PartModules\\Decals\\WBIModuleDecal.cs",
+              "RelativeToolTip": "PartModules\\Decals\\WBIModuleDecal.cs",
+              "ViewState": "AgIAAGMAAAAAAAAAAAAowJsAAABjAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-28T21:25:37.856Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "WBIModuleDockingNode.cs",
+              "DocumentMoniker": "C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\PartModules\\Coupling\\WBIModuleDockingNode.cs",
+              "RelativeDocumentMoniker": "PartModules\\Coupling\\WBIModuleDockingNode.cs",
+              "ToolTip": "C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\PartModules\\Coupling\\WBIModuleDockingNode.cs",
+              "RelativeToolTip": "PartModules\\Coupling\\WBIModuleDockingNode.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB8AAABeAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-28T17:50:56.986Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "WBIModuleResourceVariants.cs",
+              "DocumentMoniker": "C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\PartModules\\Variants\\WBIModuleResourceVariants.cs",
+              "RelativeDocumentMoniker": "PartModules\\Variants\\WBIModuleResourceVariants.cs",
+              "ToolTip": "C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\PartModules\\Variants\\WBIModuleResourceVariants.cs",
+              "RelativeToolTip": "PartModules\\Variants\\WBIModuleResourceVariants.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-28T17:45:47.67Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "WBIModulePartSubvariants.cs",
+              "DocumentMoniker": "C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\PartModules\\Variants\\WBIModulePartSubvariants.cs",
+              "RelativeDocumentMoniker": "PartModules\\Variants\\WBIModulePartSubvariants.cs",
+              "ToolTip": "C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\PartModules\\Variants\\WBIModulePartSubvariants.cs",
+              "RelativeToolTip": "PartModules\\Variants\\WBIModulePartSubvariants.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-28T17:45:37.12Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "WBIModulePartGridVariants.cs",
+              "DocumentMoniker": "C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\PartModules\\Variants\\WBIModulePartGridVariants.cs",
+              "RelativeDocumentMoniker": "PartModules\\Variants\\WBIModulePartGridVariants.cs",
+              "ToolTip": "C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\PartModules\\Variants\\WBIModulePartGridVariants.cs",
+              "RelativeToolTip": "PartModules\\Variants\\WBIModulePartGridVariants.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-28T17:45:29.105Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "WBIModuleThermalShield.cs",
+              "DocumentMoniker": "C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\PartModules\\Thermal\\WBIModuleThermalShield.cs",
+              "RelativeDocumentMoniker": "PartModules\\Thermal\\WBIModuleThermalShield.cs",
+              "ToolTip": "C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\PartModules\\Thermal\\WBIModuleThermalShield.cs",
+              "RelativeToolTip": "PartModules\\Thermal\\WBIModuleThermalShield.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-28T17:45:18.069Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "WBIModuleFuelPump.cs",
+              "DocumentMoniker": "C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\PartModules\\Resources\\WBIModuleFuelPump.cs",
+              "RelativeDocumentMoniker": "PartModules\\Resources\\WBIModuleFuelPump.cs",
+              "ToolTip": "C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\PartModules\\Resources\\WBIModuleFuelPump.cs",
+              "RelativeToolTip": "PartModules\\Resources\\WBIModuleFuelPump.cs",
+              "ViewState": "AgIAABMAAAAAAAAAAAAcwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-28T17:44:28.383Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "WBIModuleSupplyLine.cs",
+              "DocumentMoniker": "C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\PartModules\\Resources\\WBIModuleSupplyLine.cs",
+              "RelativeDocumentMoniker": "PartModules\\Resources\\WBIModuleSupplyLine.cs",
+              "ToolTip": "C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\PartModules\\Resources\\WBIModuleSupplyLine.cs",
+              "RelativeToolTip": "PartModules\\Resources\\WBIModuleSupplyLine.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-28T17:44:17.952Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "WBIGravioliumBeam.cs",
+              "DocumentMoniker": "C:\\Projects\\KSP\\WildBlueIndustries\\Blueshift\\Source\\Blueshift\\KerbalGear\\FXClasses\\WBIGravioliumBeam.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\Blueshift\\Source\\Blueshift\\KerbalGear\\FXClasses\\WBIGravioliumBeam.cs",
+              "ToolTip": "C:\\Projects\\KSP\\WildBlueIndustries\\Blueshift\\Source\\Blueshift\\KerbalGear\\FXClasses\\WBIGravioliumBeam.cs",
+              "RelativeToolTip": "..\\..\\..\\Blueshift\\Source\\Blueshift\\KerbalGear\\FXClasses\\WBIGravioliumBeam.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAABFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-25T20:04:14.936Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "WBIEVAGravitics.cs",
+              "DocumentMoniker": "C:\\Projects\\KSP\\WildBlueIndustries\\Blueshift\\Source\\Blueshift\\KerbalGear\\WBIEVAGravitics.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\Blueshift\\Source\\Blueshift\\KerbalGear\\WBIEVAGravitics.cs",
+              "ToolTip": "C:\\Projects\\KSP\\WildBlueIndustries\\Blueshift\\Source\\Blueshift\\KerbalGear\\WBIEVAGravitics.cs",
+              "RelativeToolTip": "..\\..\\..\\Blueshift\\Source\\Blueshift\\KerbalGear\\WBIEVAGravitics.cs",
+              "ViewState": "AgIAACkAAAAAAAAAAAAowDMKAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-25T05:12:18.092Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "SandcastleSettings.cs",
+              "DocumentMoniker": "C:\\Projects\\KSP\\WildBlueIndustries\\Sandcastle\\source\\Sandcastle\\Scenario\\SandcastleSettings.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\Sandcastle\\source\\Sandcastle\\Scenario\\SandcastleSettings.cs",
+              "ToolTip": "C:\\Projects\\KSP\\WildBlueIndustries\\Sandcastle\\source\\Sandcastle\\Scenario\\SandcastleSettings.cs",
+              "RelativeToolTip": "..\\..\\..\\Sandcastle\\source\\Sandcastle\\Scenario\\SandcastleSettings.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAjAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-19T22:07:13.377Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "WBIBasePartModule.cs",
+              "DocumentMoniker": "C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\PartModules\\WBIBasePartModule.cs",
+              "RelativeDocumentMoniker": "PartModules\\WBIBasePartModule.cs",
+              "ToolTip": "C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\PartModules\\WBIBasePartModule.cs",
+              "RelativeToolTip": "PartModules\\WBIBasePartModule.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB4AAAAmAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-19T22:06:34.313Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "WBIBasePrinter.cs",
+              "DocumentMoniker": "C:\\Projects\\KSP\\WildBlueIndustries\\Sandcastle\\source\\Sandcastle\\PartModules\\PrintShop\\WBIBasePrinter.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\Sandcastle\\source\\Sandcastle\\PartModules\\PrintShop\\WBIBasePrinter.cs",
+              "ToolTip": "C:\\Projects\\KSP\\WildBlueIndustries\\Sandcastle\\source\\Sandcastle\\PartModules\\PrintShop\\WBIBasePrinter.cs",
+              "RelativeToolTip": "..\\..\\..\\Sandcastle\\source\\Sandcastle\\PartModules\\PrintShop\\WBIBasePrinter.cs",
+              "ViewState": "AgIAALEAAAAAAAAAAAAowOkAAAA1AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-19T22:06:20.71Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "WBIPartModule.cs",
+              "DocumentMoniker": "C:\\Projects\\KSP\\WildBlueIndustries\\WBIAnimations\\source\\WBIAnimations\\WBIPartModule.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\WBIAnimations\\source\\WBIAnimations\\WBIPartModule.cs",
+              "ToolTip": "C:\\Projects\\KSP\\WildBlueIndustries\\WBIAnimations\\source\\WBIAnimations\\WBIPartModule.cs",
+              "RelativeToolTip": "..\\..\\..\\WBIAnimations\\source\\WBIAnimations\\WBIPartModule.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAAXAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-19T18:55:54.29Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "WBIAnimatedTexture.cs",
+              "DocumentMoniker": "C:\\Projects\\KSP\\WildBlueIndustries\\WBIAnimations\\source\\WBIAnimations\\WBIAnimatedTexture.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\WBIAnimations\\source\\WBIAnimations\\WBIAnimatedTexture.cs",
+              "ToolTip": "C:\\Projects\\KSP\\WildBlueIndustries\\WBIAnimations\\source\\WBIAnimations\\WBIAnimatedTexture.cs",
+              "RelativeToolTip": "..\\..\\..\\WBIAnimations\\source\\WBIAnimations\\WBIAnimatedTexture.cs",
+              "ViewState": "AgIAAEoBAAAAAAAAAAAowIIBAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-19T18:55:12.505Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "WBIPrintShop.cs",
+              "DocumentMoniker": "C:\\Projects\\KSP\\WildBlueIndustries\\Sandcastle\\source\\Sandcastle\\PartModules\\PrintShop\\WBIPrintShop.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\Sandcastle\\source\\Sandcastle\\PartModules\\PrintShop\\WBIPrintShop.cs",
+              "ToolTip": "C:\\Projects\\KSP\\WildBlueIndustries\\Sandcastle\\source\\Sandcastle\\PartModules\\PrintShop\\WBIPrintShop.cs",
+              "RelativeToolTip": "..\\..\\..\\Sandcastle\\source\\Sandcastle\\PartModules\\PrintShop\\WBIPrintShop.cs",
+              "ViewState": "AgIAABwAAAAAAAAAAAAowO0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-19T01:44:42.603Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "WBIFlexGravGenerator.cs",
+              "DocumentMoniker": "C:\\Projects\\KSP\\WildBlueIndustries\\Blueshift\\Source\\Blueshift\\GravTech\\WBIFlexGravGenerator.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\Blueshift\\Source\\Blueshift\\GravTech\\WBIFlexGravGenerator.cs",
+              "ToolTip": "C:\\Projects\\KSP\\WildBlueIndustries\\Blueshift\\Source\\Blueshift\\GravTech\\WBIFlexGravGenerator.cs",
+              "RelativeToolTip": "..\\..\\..\\Blueshift\\Source\\Blueshift\\GravTech\\WBIFlexGravGenerator.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-18T01:58:07.878Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "PipelineWindow.cs",
+              "DocumentMoniker": "C:\\Projects\\KSP\\WildBlueIndustries\\Pathfinder\\GUI\\PipelineWindow.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\Pathfinder\\GUI\\PipelineWindow.cs",
+              "ToolTip": "C:\\Projects\\KSP\\WildBlueIndustries\\Pathfinder\\GUI\\PipelineWindow.cs",
+              "RelativeToolTip": "..\\..\\..\\Pathfinder\\GUI\\PipelineWindow.cs",
+              "ViewState": "AgIAAAEEAAAAAAAAAAAowDkEAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-13T02:34:48.867Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 21,
+              "Title": "WBIPrinterRequirements.cs",
+              "DocumentMoniker": "C:\\Projects\\KSP\\WildBlueIndustries\\Sandcastle\\source\\Sandcastle\\PartModules\\PrintShop\\WBIPrinterRequirements.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\Sandcastle\\source\\Sandcastle\\PartModules\\PrintShop\\WBIPrinterRequirements.cs",
+              "ToolTip": "C:\\Projects\\KSP\\WildBlueIndustries\\Sandcastle\\source\\Sandcastle\\PartModules\\PrintShop\\WBIPrinterRequirements.cs",
+              "RelativeToolTip": "..\\..\\..\\Sandcastle\\source\\Sandcastle\\PartModules\\PrintShop\\WBIPrinterRequirements.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABoAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-13T02:11:20.527Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 22,
+              "Title": "WBIOpsManager.cs",
+              "DocumentMoniker": "C:\\Projects\\KSP\\WildBlueIndustries\\WBIResources\\Source\\CommonCore\\WBIOpsManager.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\WBIResources\\Source\\CommonCore\\WBIOpsManager.cs",
+              "ToolTip": "C:\\Projects\\KSP\\WildBlueIndustries\\WBIResources\\Source\\CommonCore\\WBIOpsManager.cs",
+              "RelativeToolTip": "..\\..\\..\\WBIResources\\Source\\CommonCore\\WBIOpsManager.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADQAAAAyAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-14T23:59:36.887Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 23,
+              "Title": "WBIOmniStorage.cs",
+              "DocumentMoniker": "C:\\Projects\\KSP\\WildBlueIndustries\\WBIResources\\Source\\Omni\\WBIOmniStorage.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\WBIResources\\Source\\Omni\\WBIOmniStorage.cs",
+              "ToolTip": "C:\\Projects\\KSP\\WildBlueIndustries\\WBIResources\\Source\\Omni\\WBIOmniStorage.cs",
+              "RelativeToolTip": "..\\..\\..\\WBIResources\\Source\\Omni\\WBIOmniStorage.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAGgBAAAWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-14T23:59:36.888Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "WBIPartModule.cs",
+              "DocumentMoniker": "C:\\Projects\\KSP\\WildBlueIndustries\\Blueshift\\Source\\Blueshift\\UtilityPartModules\\WBIPartModule.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\Blueshift\\Source\\Blueshift\\UtilityPartModules\\WBIPartModule.cs",
+              "ToolTip": "C:\\Projects\\KSP\\WildBlueIndustries\\Blueshift\\Source\\Blueshift\\UtilityPartModules\\WBIPartModule.cs",
+              "RelativeToolTip": "..\\..\\..\\Blueshift\\Source\\Blueshift\\UtilityPartModules\\WBIPartModule.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAGcAAAAZAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-12T21:56:47.217Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "WBIAnimatedTexture.cs",
+              "DocumentMoniker": "C:\\Projects\\KSP\\WildBlueIndustries\\Blueshift\\Source\\Blueshift\\UtilityPartModules\\WBIAnimatedTexture.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\Blueshift\\Source\\Blueshift\\UtilityPartModules\\WBIAnimatedTexture.cs",
+              "ToolTip": "C:\\Projects\\KSP\\WildBlueIndustries\\Blueshift\\Source\\Blueshift\\UtilityPartModules\\WBIAnimatedTexture.cs",
+              "RelativeToolTip": "..\\..\\..\\Blueshift\\Source\\Blueshift\\UtilityPartModules\\WBIAnimatedTexture.cs",
+              "ViewState": "AgIAAAEBAAAAAAAAAAAAwBUBAABAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-12T21:55:46.502Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 24,
               "Title": "WBIModuleEVAPartDestroyer.cs",
               "DocumentMoniker": "C:\\Projects\\KSP\\WildBlueIndustries\\Sandcastle\\source\\Sandcastle\\PartModules\\EVAConstruction\\WBIModuleEVAPartDestroyer.cs",
               "RelativeDocumentMoniker": "..\\..\\..\\Sandcastle\\source\\Sandcastle\\PartModules\\EVAConstruction\\WBIModuleEVAPartDestroyer.cs",
@@ -29,12 +400,11 @@
               "RelativeToolTip": "..\\..\\..\\Sandcastle\\source\\Sandcastle\\PartModules\\EVAConstruction\\WBIModuleEVAPartDestroyer.cs",
               "ViewState": "AgIAAA8BAAAAAAAAAAAuwDcBAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-09-12T03:08:04.438Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-09-12T03:08:04.438Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 25,
               "Title": "ModuleWearableItem.cs",
               "DocumentMoniker": "C:\\Projects\\KSP\\WildBlueIndustries\\WildBlueCore\\source\\WildBlueCore\\PartModules\\KerbalGear\\Wearables\\ModuleWearableItem.cs",
               "RelativeDocumentMoniker": "PartModules\\KerbalGear\\Wearables\\ModuleWearableItem.cs",

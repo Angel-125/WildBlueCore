@@ -41,6 +41,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pathfinder", "..\..\..\Path
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KerbalDataCenters", "..\..\..\KerbalDataCenters\source\KerbalDataCenters\KerbalDataCenters.csproj", "{2F775A17-66BB-433E-A190-8D9DFB26FAF8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WBIAnimations", "..\..\..\WBIAnimations\source\WBIAnimations\WBIAnimations.csproj", "{C268110B-4CA9-4F94-9A7C-50B377F8762C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -123,6 +125,10 @@ Global
 		{2F775A17-66BB-433E-A190-8D9DFB26FAF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2F775A17-66BB-433E-A190-8D9DFB26FAF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2F775A17-66BB-433E-A190-8D9DFB26FAF8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C268110B-4CA9-4F94-9A7C-50B377F8762C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C268110B-4CA9-4F94-9A7C-50B377F8762C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C268110B-4CA9-4F94-9A7C-50B377F8762C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C268110B-4CA9-4F94-9A7C-50B377F8762C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
