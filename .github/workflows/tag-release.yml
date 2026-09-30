@@ -11,8 +11,20 @@ permissions:
 
 jobs:
   publish:
-    uses: Angel-125/WBIReleaseWorkflows/.github/workflows/publish-ksp-mod.yml@v1
+    uses: Angel-125/WBIReleaseWorkflows/.github/workflows/publish-ksp-mod.yml@v2
     with:
       product_name: WildBlueCore
       readme_path: ReleaseFolder/GameData/WildBlueIndustries/00WildBlueCore/Readme.txt
       bundle_wildbluecore: false
+
+  cascade:
+    needs: publish
+    uses: Angel-125/WBIReleaseWorkflows/.github/workflows/dependency-cascade.yml@v2
+    with:
+      upstream_repository: Angel-125/WildBlueCore
+      upstream_tag: ${{ github.ref_name }}
+      automatic: true
+      dry_run: false
+      app_client_id: ${{ vars.WBI_RELEASE_APP_CLIENT_ID }}
+    secrets:
+      app_private_key: ${{ secrets.WBI_RELEASE_APP_PRIVATE_KEY }}

@@ -1,0 +1,46 @@
+name: Dependency Cascade
+
+on:
+  workflow_dispatch:
+    inputs:
+      upstream_repository:
+        description: Registered owner/repository that published the dependency.
+        required: true
+        default: Angel-125/WildBlueCore
+        type: string
+      upstream_tag:
+        description: Exact published WildBlueCore tag, such as v1.6.0.
+        required: true
+        type: string
+      include_dependents:
+        description: Comma-separated names; empty selects every registered dependent.
+        required: false
+        default: ''
+        type: string
+      exclude_dependents:
+        description: Comma-separated names to exclude after inclusion.
+        required: false
+        default: ''
+        type: string
+      dry_run:
+        description: Validate and preview without commits, tags, or pushes.
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  cascade:
+    uses: Angel-125/WBIReleaseWorkflows/.github/workflows/dependency-cascade.yml@v2
+    with:
+      upstream_repository: ${{ inputs.upstream_repository }}
+      upstream_tag: ${{ inputs.upstream_tag }}
+      include_dependents: ${{ inputs.include_dependents }}
+      exclude_dependents: ${{ inputs.exclude_dependents }}
+      dry_run: ${{ inputs.dry_run }}
+      automatic: false
+      app_client_id: ${{ vars.WBI_RELEASE_APP_CLIENT_ID }}
+    secrets:
+      app_private_key: ${{ secrets.WBI_RELEASE_APP_PRIVATE_KEY }}
