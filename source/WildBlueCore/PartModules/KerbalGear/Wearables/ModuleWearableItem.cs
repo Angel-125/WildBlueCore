@@ -154,7 +154,7 @@ namespace WildBlueCore.KerbalGear
     ///         positionOffset = 0.0000, 0.0200, 0.0900
     ///         positionOffsetJetpack = 0,0,0
     ///         rotationOffset = -70.0000, 0.0000, 0.0000
-    ///         showChuteTransforms = false
+    ///         evaChuteModel = None
     ///         hideStockPacksWhenWorn = true
     ///         hideTransformsWhenWorn = displayModel;groundBase
     ///         EVA_PART_MODULE
@@ -218,11 +218,12 @@ namespace WildBlueCore.KerbalGear
         public string hideTransformsWhenWorn;
 
         /// <summary>
-        /// When true, hides the Kerbal's stock backpack, storage pack, jetpack/chute pack, and
-        /// chute models while this item is worn. Defaults to true.
+        /// Explicitly hides stock backpack/storage/jetpack meshes and the packed chute while carried.
+        /// A non-None evaChuteModel preserves the chute as an exception. False leaves stock visibility alone;
+        /// bodyLocation does not imply hiding. Defaults to false. Open canopies remain visible.
         /// </summary>
         [KSPField]
-        public bool hideStockPacksWhenWorn = true;
+        public bool hideStockPacksWhenWorn = false;
 
         /// <summary>
         /// Position offsets (x,y,z).
@@ -244,11 +245,13 @@ namespace WildBlueCore.KerbalGear
         public Vector3 rotationOffset;
 
         /// <summary>
-        /// Flag to indicate whether the compact stock ChuteStTransform should remain visible while this wearable item is equipped on the kerbal's back.
-        /// The kerbal must also be carrying the stock evaChute inventory part.
+        /// None (default) follows stock pack visibility without a chute exception.
+        /// Stock preserves the chute using KSP's model selection. Standalone, Jetpack, or Container
+        /// preserves that stock model while this back wearable is carried, overriding pack hiding for the chute.
+        /// Requires the stock evaChute inventory item and normal crew eligibility.
         /// </summary>
         [KSPField]
-        public bool showChuteTransforms = false;
+        public string evaChuteModel = "None";
 
         /// <summary>
         /// Legacy list of part modules to create on the kerbal when you equip the wearable item.

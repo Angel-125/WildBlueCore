@@ -332,6 +332,8 @@ namespace WildBlueCore.KerbalGear
         /// </summary>
         public override void OnInactive()
         {
+            // Stop global UI callbacks before shutdown tears down motor state.
+            unregisterThrottleGauge();
             if (EngineIgnited)
                 Shutdown();
 
@@ -344,7 +346,6 @@ namespace WildBlueCore.KerbalGear
             generatedThrustObject = null;
             generatedThrustTransform = null;
             unregisterFlyByWire();
-            unregisterThrottleGauge();
             base.OnInactive();
         }
 
@@ -353,9 +354,10 @@ namespace WildBlueCore.KerbalGear
         /// </summary>
         public void OnDestroy()
         {
+            // Canvas rendering can be forced by other mods during scene teardown.
+            unregisterThrottleGauge();
             cleanupRunningSound();
             unregisterFlyByWire();
-            unregisterThrottleGauge();
         }
 
         /// <summary>
@@ -538,7 +540,7 @@ namespace WildBlueCore.KerbalGear
         /// </summary>
         void updateEVAThrottle()
         {
-            if (!HighLogic.LoadedSceneIsFlight || FlightDriver.Pause || vessel == null ||
+            if (!HighLogic.LoadedSceneIsFlight || FlightGlobals.fetch == null || FlightDriver.Pause || vessel == null ||
                 FlightGlobals.ActiveVessel != vessel || !vessel.isEVA)
                 return;
 
@@ -642,7 +644,10 @@ namespace WildBlueCore.KerbalGear
         /// </summary>
         void updateThrottleGauge()
         {
-            if (vessel == null || FlightGlobals.ActiveVessel != vessel || !vessel.isEVA)
+            // ActiveVessel's getter dereferences fetch; checking its result for
+            // null is not sufficient once FlightGlobals has been destroyed.
+            if (!HighLogic.LoadedSceneIsFlight || FlightGlobals.fetch == null ||
+                vessel == null || !vessel.isEVA || FlightGlobals.ActiveVessel != vessel)
                 return;
 
             if (throttleGauge == null)

@@ -15,7 +15,7 @@ This module represents an equippable cargo item that appears as a 3D model on th
                     positionOffset = 0.0000, 0.0200, 0.0900
                     positionOffsetJetpack = 0,0,0
                     rotationOffset = -70.0000, 0.0000, 0.0000
-                    showChuteTransforms = false
+                    evaChuteModel = None
                     hideStockPacksWhenWorn = true
                     hideTransformsWhenWorn = displayModel;groundBase
                     EVA_PART_MODULE
@@ -43,15 +43,15 @@ When true, hides meshTransform on the physical part while it is dropped in fligh
 ### hideTransformsWhenWorn
 Semicolon-delimited names of model transforms to hide on the wearable copy while this part is carried in a Kerbal's inventory. Transform names are case-sensitive. The source part prefab is not changed, so these transforms remain visible when the part is dropped. This field may be placed on a hide-only WBIModuleWearableItem that does not specify an anchorTransform or meshTransform.
 ### hideStockPacksWhenWorn
-When true, hides the Kerbal's stock backpack, storage pack, jetpack/chute pack, and chute models while this item is worn. Defaults to true.
+Explicitly hides stock backpack/storage/jetpack meshes and the packed chute while carried. A non-None evaChuteModel preserves the chute as an exception. False leaves stock visibility alone; bodyLocation does not imply hiding. Defaults to false. Open canopies remain visible.
 ### positionOffset
 Position offsets (x,y,z).
 ### positionOffsetJetpack
 Position offset that is used when the kerbal has a jetpack in addition to the wearable item (x,y,z). Requires bodyLocation = backOrJetpack
 ### rotationOffset
 Rotation offsets in degrees
-### showChuteTransforms
-Flag to indicate whether the compact stock ChuteStTransform should remain visible while this wearable item is equipped on the kerbal's back. The kerbal must also be carrying the stock evaChute inventory part.
+### evaChuteModel
+None (default) follows stock pack visibility without a chute exception. Stock preserves the chute using KSP's model selection. Standalone, Jetpack, or Container preserves that stock model while this back wearable is carried, overriding pack hiding for the chute. Requires the stock evaChute inventory item and normal crew eligibility.
 ### evaModules
 Legacy list of part modules to create on the kerbal when you equip the wearable item. Separate names with a semicolon. Prefer EVA_PART_MODULE child nodes for new configs.
 ## Methods

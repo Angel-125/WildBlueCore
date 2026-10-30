@@ -113,6 +113,8 @@
   <ItemGroup>
     <Compile Include="PartModules\Aero\ModuleParafoil.cs" />
     <Compile Include="PartModules\Aero\ModuleParafoilStabilizer.cs" />
+    <Compile Include="PartModules\Aero\WBIModuleLiftingSurface.cs" />
+    <Compile Include="PartModules\Aero\ParafoilAttitudeMath.cs" />
     <Compile Include="PartModules\Coupling\WBIModuleDockingNode.cs" />
     <Compile Include="PartModules\Coupling\WBIModuleDockingNodeController.cs" />
     <Compile Include="PartModules\Decals\WBIModuleDecal.cs" />

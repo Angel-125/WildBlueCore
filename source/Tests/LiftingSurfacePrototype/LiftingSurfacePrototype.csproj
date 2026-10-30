@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <EnableDefaultCompileItems>true</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../WildBlueCore/PartModules/Aero/WBIModuleLiftingSurface.cs" Link="WBIModuleLiftingSurface.cs" />
+    <Compile Include="../../WildBlueCore/PartModules/Aero/ParafoilAttitudeMath.cs" Link="ParafoilAttitudeMath.cs" />
+  </ItemGroup>
+</Project>

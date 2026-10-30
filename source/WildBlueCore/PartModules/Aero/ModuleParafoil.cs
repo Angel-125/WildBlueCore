@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using UnityEngine;
 
@@ -57,6 +58,43 @@ namespace WildBlueCore.PartModules.Aero
         /// </summary>
         [KSPField]
         public float controlAuthorityRampTime = 1f;
+
+        /// <summary>Enable torque-limited glide stabilization and coordinated steering after full deployment.</summary>
+        [KSPField] public bool enableAttitudeController = false;
+        /// <summary>Allow assistance alongside SAS; false avoids competing attitude controllers.</summary>
+        [KSPField] public bool attitudeControllerWithSAS = false;
+        /// <summary>Use the vessel control reference rather than the chute mounting transform.</summary>
+        [KSPField] public bool attitudeUseVesselReference = true;
+        /// <summary>Local forward direction in the selected attitude reference.</summary>
+        [KSPField] public Vector3 attitudeForwardAxis = Vector3.up;
+        /// <summary>Local dorsal/up direction in the selected attitude reference (KSP uses -Z).</summary>
+        [KSPField] public Vector3 attitudeUpAxis = -Vector3.forward;
+        /// <summary>Neutral nose elevation above the horizon, in degrees.</summary>
+        [KSPField] public float attitudeGlidePitch = -5f;
+        /// <summary>Maximum additional nose elevation commanded by pitch input, in degrees.</summary>
+        [KSPField] public float attitudePitchRange = 15f;
+        /// <summary>Maximum bank commanded by yaw/roll input, in degrees.</summary>
+        [KSPField] public float attitudeMaxBank = 35f;
+        /// <summary>Upper bound on coordinated heading rate, in degrees per second.</summary>
+        [KSPField] public float attitudeMaxTurnRate = 12f;
+        /// <summary>Upper bound on attitude-correction rate, in degrees per second.</summary>
+        [KSPField] public float attitudeMaxCorrectionRate = 35f;
+        /// <summary>Attitude error to desired rotation-rate gain, per second.</summary>
+        [KSPField] public float attitudeResponse = 2f;
+        /// <summary>Rotation-rate error to angular acceleration gain, per second.</summary>
+        [KSPField] public float attitudeDamping = 4f;
+        /// <summary>Integrate angular-rate error to estimate persistent aerodynamic moments.</summary>
+        [KSPField] public float attitudeIntegralGain = 2f;
+        /// <summary>Maximum integrated acceleration contribution, in radians per second squared.</summary>
+        [KSPField] public float attitudeIntegralLimit = 20f;
+        /// <summary>Total assistance torque limit in KSP torque units (kN m).</summary>
+        [KSPField] public float attitudeMaxTorque = 100f;
+        /// <summary>Seconds to ramp assistance after handoff or resuming from SAS.</summary>
+        [KSPField] public float attitudeRampTime = 2f;
+        /// <summary>Seconds to introduce primary lift once assistance has settled the vessel.</summary>
+        [KSPField] public float attitudeLiftRampTime = 4f;
+        /// <summary>Minimum deployed lift fraction during recovery, introduced by the normal lift ramp.</summary>
+        [KSPField] public float attitudeRecoveryLift = 0.05f;
         #endregion
 
         #region Housekeeping
@@ -78,6 +116,28 @@ namespace WildBlueCore.PartModules.Aero
         bool parafoilFlightActive;
         double controlAuthorityRampStartTime;
         float nextDebugLogTime;
+        // Stock exposes no public deflection accessor. Cache a read-only lookup
+        // rather than changing the stock module or its visibility for diagnostics.
+        static readonly FieldInfo controlDeflectionField = typeof(ModuleControlSurface).GetField(
+            "deflection", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        Vessel inputObservationVessel;
+        Vector3 preAutopilotInput;
+        float preAutopilotInputTime;
+        bool hasPreAutopilotInput;
+        bool attitudeInitialized;
+        double attitudeStartTime;
+        Vector3 attitudeHeading;
+        Vector3 attitudeIntegral;
+        Vector3 attitudeTorque;
+        Vector3 attitudeError;
+        Quaternion attitudeTargetRotation = Quaternion.identity;
+        float attitudeTargetPitch;
+        float attitudeTargetBank;
+        float attitudeTargetTurnRate;
+        string attitudeStatus = "inactive";
+        float attitudeLiftAuthority;
+        Vector3 attitudeWorldAngularVelocity;
+        string attitudeTorquePart = "<none>";
         #endregion
 
         #region Overrides
@@ -147,6 +207,8 @@ namespace WildBlueCore.PartModules.Aero
         /// </summary>
         protected override void FixedUpdate()
         {
+            attitudeTorque = Vector3.zero;
+            UpdateInputObservation();
             bool logDiagnostics = ShouldLogDiagnostics();
             if (logDiagnostics)
                 LogDiagnostics("BEFORE ModuleParachute");
@@ -170,6 +232,7 @@ namespace WildBlueCore.PartModules.Aero
 
             if (diagnosticsOnly)
             {
+                ResetAttitudeController("diagnostics-only");
                 if (logDiagnostics)
                     LogDiagnostics("AFTER ModuleParafoil");
 
@@ -194,8 +257,8 @@ namespace WildBlueCore.PartModules.Aero
                 switch (deploymentState)
                 {
                     case deploymentStates.SEMIDEPLOYED:
-                        SetLiftCoefficient(Mathf.Lerp(0f, semiDeployedDeflectionLiftCoeff, deploymentCurveTime));
-                        SetControlSurfaceCoefficient(enableControlInSemiDeploy ? Mathf.Lerp(0f, semiDeployedCtlSfcDeflectionLiftCoeff, deploymentCurveTime) : 0f);
+                        SetLiftCoefficient(enableAttitudeController ? 0f : Mathf.Lerp(0f, semiDeployedDeflectionLiftCoeff, deploymentCurveTime));
+                        SetControlSurfaceCoefficient(!enableAttitudeController && enableControlInSemiDeploy ? Mathf.Lerp(0f, semiDeployedCtlSfcDeflectionLiftCoeff, deploymentCurveTime) : 0f);
                         SetStabilizerAuthority(0f);
                         DisableControlSurface();
                         break;
@@ -203,8 +266,18 @@ namespace WildBlueCore.PartModules.Aero
                     case deploymentStates.DEPLOYED:
                         float deployedStartControlCoeff = enableControlInSemiDeploy ? semiDeployedCtlSfcDeflectionLiftCoeff : 0f;
 
-                        SetLiftCoefficientsFromSemiDeployment(deploymentCurveTime);
-                        SetControlSurfaceCoefficientsFromSemiDeployment(deployedStartControlCoeff, deploymentCurveTime);
+                        if (enableAttitudeController)
+                        {
+                            // Do not introduce wing forces while stock still owns
+                            // inflation. Assistance must settle the vessel first.
+                            SetPrimaryLiftAuthority(parafoilFlightActive ? attitudeLiftAuthority : 0f);
+                            SetControlSurfaceCoefficient(0f);
+                        }
+                        else
+                        {
+                            SetLiftCoefficientsFromSemiDeployment(deploymentCurveTime);
+                            SetControlSurfaceCoefficientsFromSemiDeployment(deployedStartControlCoeff, deploymentCurveTime);
+                        }
 
                         if (parafoilFlightActive)
                         {
@@ -227,12 +300,185 @@ namespace WildBlueCore.PartModules.Aero
                 }
             }
 
+            UpdateAttitudeController();
+            if (enableAttitudeController && parafoilFlightActive)
+                SetPrimaryLiftAuthority(attitudeLiftAuthority);
+
             if (logDiagnostics)
                 LogDiagnostics("AFTER ModuleParafoil");
         }
         #endregion
 
         #region Helpers
+        /// <summary>Remove the observational callback before stock parachute cleanup.</summary>
+        public override void OnDestroy()
+        {
+            if (inputObservationVessel != null)
+                inputObservationVessel.OnPreAutopilotUpdate -= CapturePreAutopilotInput;
+            base.OnDestroy();
+        }
+
+        private void UpdateInputObservation()
+        {
+            Vessel target = (debugMode || enableAttitudeController) && HighLogic.LoadedSceneIsFlight ? vessel : null;
+            if (inputObservationVessel == target)
+                return;
+            if (inputObservationVessel != null)
+                inputObservationVessel.OnPreAutopilotUpdate -= CapturePreAutopilotInput;
+            inputObservationVessel = target;
+            hasPreAutopilotInput = false;
+            if (inputObservationVessel != null)
+                inputObservationVessel.OnPreAutopilotUpdate += CapturePreAutopilotInput;
+        }
+
+        private void CapturePreAutopilotInput(FlightCtrlState state)
+        {
+            // Observe only: never modify the shared FlightCtrlState.
+            preAutopilotInput = new Vector3(state.pitch, state.roll, state.yaw);
+            preAutopilotInputTime = Time.fixedTime;
+            hasPreAutopilotInput = true;
+        }
+
+        private void ResetAttitudeController(string status)
+        {
+            attitudeInitialized = false;
+            attitudeIntegral = attitudeTorque = attitudeError = Vector3.zero;
+            attitudeTargetPitch = attitudeTargetBank = attitudeTargetTurnRate = 0f;
+            attitudeStatus = status;
+            attitudeTorquePart = "<none>";
+        }
+
+        private void UpdateAttitudeController()
+        {
+            if (!enableAttitudeController || !parafoilFlightActive || deploymentState != deploymentStates.DEPLOYED ||
+                vessel == null || part.Rigidbody == null || part.packed || vessel.LandedOrSplashed ||
+                part.ShieldedFromAirstream || part.dynamicPressurekPa < 0.01)
+            {
+                ResetAttitudeController("inactive");
+                attitudeLiftAuthority = 0f;
+                return;
+            }
+            if (!attitudeControllerWithSAS && vessel.ActionGroups[KSPActionGroup.SAS])
+            {
+                ResetAttitudeController("SAS-active");
+                attitudeLiftAuthority = Mathf.MoveTowards(attitudeLiftAuthority, 1f,
+                    attitudeLiftRampTime <= 0f ? 1f : TimeWarp.fixedDeltaTime / attitudeLiftRampTime);
+                return;
+            }
+            if (!IsAttitudeControllerLeader())
+            {
+                ResetAttitudeController("another-parafoil-controls");
+                return;
+            }
+            Transform reference = vessel.ReferenceTransform;
+            if (reference == null)
+            {
+                ResetAttitudeController("missing-reference");
+                return;
+            }
+            Quaternion controlledRotation = attitudeUseVesselReference ? reference.rotation : part.partTransform.rotation;
+            // KSP stores vessel.angularVelocity in its control-reference frame.
+            // Do not feed a potentially flexing chute rigidbody's local motion
+            // into a controller sized from the inertia of the entire vessel.
+            attitudeWorldAngularVelocity = reference.rotation * vessel.angularVelocity;
+            Vector3 up = ((Vector3)vessel.upAxis).normalized;
+            Vector3 velocity = Vector3.ProjectOnPlane((Vector3)vessel.srf_velocity, up);
+            float dt = TimeWarp.fixedDeltaTime;
+            if (dt <= 0f || up.sqrMagnitude < 0.5f || !ParafoilAttitudeMath.IsFinite(velocity))
+            {
+                ResetAttitudeController("invalid-flight-frame");
+                return;
+            }
+            if (!attitudeInitialized)
+            {
+                attitudeHeading = velocity.sqrMagnitude > 1f ? velocity.normalized :
+                    Vector3.ProjectOnPlane(controlledRotation * attitudeForwardAxis, up).normalized;
+                if (attitudeHeading.sqrMagnitude < 0.5f)
+                    attitudeHeading = ((Vector3)vessel.north).normalized;
+                attitudeStartTime = Planetarium.GetUniversalTime();
+                attitudeInitialized = true;
+            }
+            // Use observed pre-autopilot controls, never SAS's correction commands.
+            // Drop stale input rather than retaining a key command indefinitely.
+            Vector3 input = hasPreAutopilotInput && Time.fixedTime - preAutopilotInputTime <= Mathf.Max(0.1f, 2f * dt)
+                ? preAutopilotInput : Vector3.zero;
+            float turn = Mathf.Clamp(input.z + input.y, -1f, 1f);
+            attitudeTargetBank = turn * Mathf.Clamp(attitudeMaxBank, 0f, 60f);
+            float speed = Mathf.Max(15f, velocity.magnitude);
+            float gravity = ((Vector3)vessel.graviticAcceleration).magnitude;
+            attitudeTargetTurnRate = Mathf.Clamp(gravity * Mathf.Tan(attitudeTargetBank * Mathf.Deg2Rad) / speed,
+                -Mathf.Max(0f, attitudeMaxTurnRate) * Mathf.Deg2Rad, Mathf.Max(0f, attitudeMaxTurnRate) * Mathf.Deg2Rad);
+            // If the heading-rate cap engages at low speed, reduce bank to match it.
+            attitudeTargetBank = gravity > 0.0001f
+                ? Mathf.Atan(speed * attitudeTargetTurnRate / gravity) * Mathf.Rad2Deg : 0f;
+            float ramp = attitudeRampTime <= 0f ? 1f : Mathf.Clamp01((float)
+                ((Planetarium.GetUniversalTime() - attitudeStartTime) / attitudeRampTime));
+            attitudeHeading = Quaternion.AngleAxis(attitudeTargetTurnRate * Mathf.Rad2Deg * dt * ramp, up) *
+                Vector3.ProjectOnPlane(attitudeHeading, up).normalized;
+            attitudeTargetPitch = Mathf.Clamp(attitudeGlidePitch + Mathf.Clamp(input.x, -1f, 1f) * attitudePitchRange, -45f, 45f);
+            Quaternion target;
+            if (!ParafoilAttitudeMath.TryTargetRotation(attitudeHeading, up, attitudeForwardAxis,
+                attitudeUpAxis, attitudeTargetPitch, attitudeTargetBank * ramp, out target))
+            {
+                ResetAttitudeController("invalid-configured-axes");
+                return;
+            }
+            attitudeError = ParafoilAttitudeMath.RotationError(controlledRotation, target);
+            attitudeTargetRotation = target;
+            Vector3 untrimmedTorque = ParafoilAttitudeMath.CalculateTorque(attitudeError, attitudeWorldAngularVelocity,
+                up * attitudeTargetTurnRate * ramp, reference.rotation, vessel.MOI, attitudeResponse, attitudeDamping,
+                Mathf.Max(0f, attitudeMaxCorrectionRate) * Mathf.Deg2Rad, Vector3.zero, float.MaxValue);
+            // Trim the inner rate loop, not the large outer attitude error. The
+            // latter keeps accumulating while rotation is intentionally limited
+            // and caused a limit cycle in the disturbance regression test.
+            Vector3 rateError = ParafoilAttitudeMath.DesiredRate(attitudeError, up * attitudeTargetTurnRate * ramp,
+                attitudeResponse, Mathf.Max(0f, attitudeMaxCorrectionRate) * Mathf.Deg2Rad) - attitudeWorldAngularVelocity;
+            attitudeIntegral = ParafoilAttitudeMath.IntegrateTrim(attitudeIntegral, rateError, dt * ramp,
+                attitudeIntegralGain, attitudeIntegralLimit, untrimmedTorque, reference.rotation, vessel.MOI, attitudeMaxTorque);
+            Vector3 torque = ParafoilAttitudeMath.CalculateTorque(attitudeError, attitudeWorldAngularVelocity,
+                up * attitudeTargetTurnRate * ramp, reference.rotation, vessel.MOI, attitudeResponse, attitudeDamping,
+                Mathf.Max(0f, attitudeMaxCorrectionRate) * Mathf.Deg2Rad, attitudeIntegral, Mathf.Max(0f, attitudeMaxTorque));
+            attitudeTorque = torque * ramp;
+            Part torquePart = vessel.GetReferenceTransformPart();
+            if (torquePart == null || torquePart.Rigidbody == null)
+                torquePart = vessel.rootPart;
+            if (torquePart == null || torquePart.Rigidbody == null)
+            {
+                ResetAttitudeController("missing-torque-body");
+                attitudeLiftAuthority = 0f;
+                return;
+            }
+            torquePart.AddTorque((Vector3d)attitudeTorque);
+            attitudeTorquePart = torquePart.name;
+            attitudeStatus = "controlling";
+            attitudeLiftAuthority = ParafoilAttitudeMath.UpdateLiftAuthority(attitudeLiftAuthority,
+                attitudeError.magnitude * Mathf.Rad2Deg, attitudeWorldAngularVelocity.magnitude * Mathf.Rad2Deg,
+                dt, attitudeLiftRampTime, attitudeRecoveryLift);
+        }
+
+        private void SetPrimaryLiftAuthority(float authority)
+        {
+            if (liftingSurfaces == null || deployedLiftCoefficients == null)
+                return;
+            for (int i = 0; i < liftingSurfaces.Count; i++)
+                liftingSurfaces[i].deflectionLiftCoeff = deployedLiftCoefficients[i] * Mathf.Clamp01(authority);
+        }
+
+        private bool IsAttitudeControllerLeader()
+        {
+            // Only one configured parafoil may assist a vessel at a time.
+            foreach (Part vesselPart in vessel.parts)
+            {
+                foreach (ModuleParafoil candidate in vesselPart.FindModulesImplementing<ModuleParafoil>())
+                {
+                    if (!candidate.enabled || !candidate.enableAttitudeController || candidate.diagnosticsOnly || !candidate.parafoilFlightActive)
+                        continue;
+                    return candidate == this;
+                }
+            }
+            return true;
+        }
+
         private bool ShouldLogDiagnostics()
         {
             if (!debugMode || !HighLogic.LoadedSceneIsFlight)
@@ -259,6 +505,27 @@ namespace WildBlueCore.PartModules.Aero
             message.Append(" maximum_drag=").Append(part != null ? part.maximum_drag.ToString("F3") : "<null>");
             message.Append(" parafoilFlightActive=").Append(parafoilFlightActive);
             message.Append(" diagnosticsOnly=").Append(diagnosticsOnly);
+            message.Append(" fixedTime=").Append(Time.fixedTime.ToString("F4"));
+            message.Append(" attitude.status=").Append(attitudeStatus);
+            message.Append(" attitude.targetPitchDeg=").Append(attitudeTargetPitch.ToString("F3"));
+            message.Append(" attitude.targetBankDeg=").Append(attitudeTargetBank.ToString("F3"));
+            message.Append(" attitude.targetTurnRateDPS=").Append((attitudeTargetTurnRate * Mathf.Rad2Deg).ToString("F3"));
+            message.Append(" attitude.errorDeg=").Append((attitudeError.magnitude * Mathf.Rad2Deg).ToString("F3"));
+            message.Append(" attitude.errorWorldRad=").Append(FormatVector(attitudeError));
+            message.Append(" attitude.targetWorldQuat=").Append(FormatQuaternion(attitudeTargetRotation));
+            message.Append(" attitude.measuredWorldQuat=").Append(vessel != null && vessel.ReferenceTransform != null
+                ? FormatQuaternion(attitudeUseVesselReference ? vessel.ReferenceTransform.rotation : part.partTransform.rotation) : "<none>");
+            message.Append(" attitude.torque=").Append(FormatVector(attitudeTorque));
+            message.Append(" attitude.headingWorld=").Append(FormatVector(attitudeHeading));
+            message.Append(" attitude.integralAccel=").Append(FormatVector(attitudeIntegral));
+            message.Append(" attitude.usesVesselReference=").Append(attitudeUseVesselReference);
+            message.Append(" attitude.liftAuthority=").Append(attitudeLiftAuthority.ToString("F4"));
+            message.Append(" attitude.worldAngularVelocity=").Append(FormatVector(attitudeWorldAngularVelocity));
+            message.Append(" attitude.vesselMOI=").Append(vessel != null ? FormatVector(vessel.MOI) : "<none>");
+            message.Append(" attitude.torquePart=").Append(attitudeTorquePart);
+            message.Append(" attitude.torqueLimit=").Append(attitudeMaxTorque.ToString("F3"));
+            message.Append(" attitude.integralLimit=").Append(attitudeIntegralLimit.ToString("F3"));
+            message.Append(" attitude.recoveryLift=").Append(attitudeRecoveryLift.ToString("F4"));
 
             if (canopy != null)
             {
@@ -295,7 +562,10 @@ namespace WildBlueCore.PartModules.Aero
             }
 
             if (vessel != null)
+            {
                 message.Append(" vessel.srfVelocity=").Append(FormatVector(vessel.srf_velocity));
+                AppendFlightDiagnostics(message);
+            }
 
             int liftingSurfaceCount = liftingSurfaces != null ? liftingSurfaces.Count : 0;
             message.Append(" liftingSurface.count=").Append(liftingSurfaceCount);
@@ -333,6 +603,10 @@ namespace WildBlueCore.PartModules.Aero
                     .Append(controlSurface.ctrlSurfaceRange.ToString("F4"));
                 message.Append(" controlSurface[").Append(index).Append("].area=")
                     .Append(controlSurface.ctrlSurfaceArea.ToString("F4"));
+                message.Append(" controlSurface[").Append(index).Append("].deflectionDeg=")
+                    .Append(controlDeflectionField != null
+                        ? ((float)controlDeflectionField.GetValue(controlSurface)).ToString("F4")
+                        : "<unavailable>");
                 message.Append(" controlSurface[").Append(index).Append("].ignorePitch=")
                     .Append(controlSurface.ignorePitch);
                 message.Append(" controlSurface[").Append(index).Append("].ignoreRoll=")
@@ -361,6 +635,50 @@ namespace WildBlueCore.PartModules.Aero
             Debug.Log(message.ToString());
         }
 
+        private void AppendFlightDiagnostics(StringBuilder message)
+        {
+            Vector3 up = ((Vector3)vessel.upAxis).normalized;
+            Vector3 velocity = (Vector3)vessel.srf_velocity;
+            Vector3 horizontalVelocity = Vector3.ProjectOnPlane(velocity, up);
+            message.Append(" vessel.verticalSpeedMps=").Append(vessel.verticalSpeed.ToString("F4"));
+            message.Append(" vessel.descentSpeedMps=").Append(Math.Max(0.0, -vessel.verticalSpeed).ToString("F4"));
+            message.Append(" vessel.horizontalSpeedMps=").Append(horizontalVelocity.magnitude.ToString("F4"));
+            message.Append(" vessel.courseDeg=").Append(horizontalVelocity.sqrMagnitude > 0.01f
+                ? FormatCompassHeading(horizontalVelocity) : "<undefined>");
+            message.Append(" vessel.SAS=").Append(vessel.ActionGroups[KSPActionGroup.SAS]);
+            message.Append(" control.preAutopilotPitchRollYaw=")
+                .Append(hasPreAutopilotInput ? FormatVector(preAutopilotInput) : "<unavailable>");
+            message.Append(" control.preAutopilotFixedTime=")
+                .Append(hasPreAutopilotInput ? preAutopilotInputTime.ToString("F4") : "<unavailable>");
+            if (vessel.ctrlState != null)
+            {
+                message.Append(" control.effectivePitchRollYaw=")
+                    .Append(FormatVector(new Vector3(vessel.ctrlState.pitch, vessel.ctrlState.roll, vessel.ctrlState.yaw)));
+                message.Append(" control.trimPitchRollYaw=")
+                    .Append(FormatVector(new Vector3(vessel.ctrlState.pitchTrim, vessel.ctrlState.rollTrim, vessel.ctrlState.yawTrim)));
+            }
+
+            Transform reference = vessel.ReferenceTransform;
+            if (reference == null)
+                return;
+            // KSP's reference +Y is the nose; +X is the right axis. At level
+            // flight, nose cross local vertical defines the unbanked right axis.
+            Vector3 nose = reference.up;
+            Vector3 horizontalNose = Vector3.ProjectOnPlane(nose, up);
+            Vector3 levelRight = Vector3.Cross(nose, up);
+            message.Append(" vessel.referenceHeadingDeg=").Append(horizontalNose.sqrMagnitude > 0.000001f
+                ? FormatCompassHeading(horizontalNose) : "<undefined>");
+            message.Append(" vessel.referenceBankDeg=").Append(levelRight.sqrMagnitude > 0.000001f
+                ? Vector3.SignedAngle(levelRight, reference.right, nose).ToString("F4") : "<undefined>");
+        }
+
+        private string FormatCompassHeading(Vector3 direction)
+        {
+            float heading = Mathf.Atan2(Vector3.Dot(direction, (Vector3)vessel.east),
+                Vector3.Dot(direction, (Vector3)vessel.north)) * Mathf.Rad2Deg;
+            return Mathf.Repeat(heading, 360f).ToString("F4");
+        }
+
         private string FormatVector(Vector3 value)
         {
             return string.Format("({0:F4},{1:F4},{2:F4})", value.x, value.y, value.z);
@@ -384,6 +702,7 @@ namespace WildBlueCore.PartModules.Aero
         private void BeginParafoilFlight()
         {
             parafoilFlightActive = true;
+            attitudeLiftAuthority = 0f;
             controlAuthorityRampStartTime = Planetarium.GetUniversalTime();
 
             // ModuleLiftingSurface, ModuleParafoilStabilizer, and ModuleControlSurface replace the deployed
@@ -401,6 +720,8 @@ namespace WildBlueCore.PartModules.Aero
         private void EndParafoilFlight()
         {
             parafoilFlightActive = false;
+            attitudeLiftAuthority = 0f;
+            ResetAttitudeController("inactive");
             DisableAerodynamicSurfaces();
         }
 

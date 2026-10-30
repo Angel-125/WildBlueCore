@@ -1,12 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
 namespace WildBlueCore.KerbalGear
 {
+    /// <summary>Stock EVA parachute model selected by an equipped back wearable.</summary>
+    public enum EVAChuteModel
+    {
+        /// <summary>Use stock inventory-based selection.</summary>
+        Stock,
+        /// <summary>Use ChuteStTransform, against the Kerbal's body.</summary>
+        Standalone,
+        /// <summary>Use ChuteJetpackTransform.</summary>
+        Jetpack,
+        /// <summary>Use ChuteContainerTransform.</summary>
+        Container,
+        /// <summary>Follow stock pack visibility without preserving a packed chute.</summary>
+        None
+    }
+
     /// <summary>
     /// Receives a single notification after KerbalGear has reconciled an EVA inventory change.
     /// Implement this interface when an active EVA module needs to refresh data derived from
@@ -124,10 +140,8 @@ namespace WildBlueCore.KerbalGear
         /// </summary>
         public Vector3 rotationOffset;
 
-        /// <summary>
-        /// Flag to indicate whether the compact stock ChuteStTransform should remain visible while the prop is equipped on the kerbal's back.
-        /// </summary>
-        public bool showChuteTransforms;
+        /// <summary>Requested stock chute model for this prop.</summary>
+        public EVAChuteModel evaChuteModel;
     }
     #endregion
 
@@ -166,6 +180,16 @@ namespace WildBlueCore.KerbalGear
         #region Housekeeping
         KerbalEVA kerbalEVA;
         ModuleEvaChute evaChute;
+        static readonly MethodInfo updateStockPackModels = typeof(KerbalEVA).GetMethod(
+            "UpdatePackModels", BindingFlags.Instance | BindingFlags.NonPublic);
+        Transform stockStandaloneChute;
+        Transform stockJetpackChute;
+        Transform stockContainerChute;
+        bool stockChuteTransformsCaptured;
+        EVAChuteModel selectedChuteModel = EVAChuteModel.None;
+        bool packedChuteVisibilityReported;
+        bool stockPackVisibilityOverridden;
+        readonly Dictionary<FlagDecal, bool> hiddenStockPackFlags = new Dictionary<FlagDecal, bool>();
         ModuleInventoryPart inventory;
         WBIPropOffsetGUI propOffsetView = null;
         Dictionary<string, List<SWearableProp>> wearablePartProps;
@@ -286,6 +310,7 @@ namespace WildBlueCore.KerbalGear
             inventoryEventsSubscribed = true;
 
             reconcileInventory();
+            updateChuteModelSelection();
 
             if (debugMode)
             {
@@ -318,9 +343,10 @@ namespace WildBlueCore.KerbalGear
         /// </summary>
         public void LateUpdate()
         {
-            if (!HighLogic.LoadedSceneIsFlight || kerbalEVA == null)
+            if (!HighLogic.LoadedSceneIsFlight || kerbalEVA == null || inventory == null)
                 return;
 
+            updateChuteModelSelection();
             hidePackMeshes();
         }
 
@@ -330,6 +356,7 @@ namespace WildBlueCore.KerbalGear
         /// </summary>
         public void OnDestroy()
         {
+            restoreStockChuteReferences();
             if (propOffsetView != null)
                 propOffsetView.SetVisible(false);
 
@@ -929,29 +956,6 @@ namespace WildBlueCore.KerbalGear
             }
         }
 
-        private bool hasBackpackProp()
-        {
-            if (hasStockPackHidingPart())
-                return true;
-
-            List<SWearableProp> wearableProps;
-            SWearableProp wearableProp;
-            string[] keys = wearablePartProps.Keys.ToArray();
-            int count;
-            for (int index = 0; index < keys.Length; index++)
-            {
-                wearableProps = wearablePartProps[keys[index]];
-                count = wearableProps.Count;
-                for (int propIndex = 0; propIndex < count; propIndex++)
-                {
-                    wearableProp = wearableProps[propIndex];
-                    if (inventory.ContainsPart(wearableProp.partName) && (wearableProp.bodyLocation == BodyLocations.back || wearableProp.bodyLocation == BodyLocations.backOrJetpack))
-                        return true;
-                }
-            }
-            return false;
-        }
-
         private bool hasStockPackHidingPart()
         {
             foreach (string partName in wearablePartsHidingStockPacks)
@@ -962,7 +966,7 @@ namespace WildBlueCore.KerbalGear
             return false;
         }
 
-        private bool shouldShowChuteTransforms()
+        private bool shouldPreservePackedChute()
         {
             if (!inventory.ContainsPart(kChutePartName))
                 return false;
@@ -978,7 +982,7 @@ namespace WildBlueCore.KerbalGear
                 for (int propIndex = 0; propIndex < count; propIndex++)
                 {
                     wearableProp = wearableProps[propIndex];
-                    if (wearableProp.showChuteTransforms &&
+                    if (wearableProp.evaChuteModel != EVAChuteModel.None &&
                         inventory.ContainsPart(wearableProp.partName) &&
                         (wearableProp.bodyLocation == BodyLocations.back || wearableProp.bodyLocation == BodyLocations.backOrJetpack))
                         return true;
@@ -989,54 +993,242 @@ namespace WildBlueCore.KerbalGear
 
         private void hidePackMeshes()
         {
+            if (!stockChuteTransformsCaptured)
+                return;
             bool hideAllStockPacks = hasStockPackHidingPart();
+            // Explicit chute visibility takes precedence over a wearable's
+            // opt-in request to hide the other stock packs.
+            bool showChute = shouldPreservePackedChute();
+            bool chuteDeployed = evaChute != null &&
+                (evaChute.deploymentState == ModuleParachute.deploymentStates.SEMIDEPLOYED ||
+                 evaChute.deploymentState == ModuleParachute.deploymentStates.DEPLOYED);
 
-            // Make sure we have a backpack prop
-            if (!hideAllStockPacks && !hasBackpackProp())
+            // These are not just packed backpack meshes: the stock chute's
+            // canopy and deployment animation live under the same hierarchies.
+            // Once deployment starts, stock owns both its selected hierarchy and
+            // its visibility. Hiding ChuteContainer/ChuteJetpack (or their pack
+            // parents) here can leave a functioning but invisible parachute.
+            // Do not call SetCanopy either: it explicitly hides the selected canopy.
+            if (chuteDeployed)
             {
+                packedChuteVisibilityReported = false;
+                Transform animationTransform = evaChute.Anim != null ? evaChute.Anim.transform : null;
+                ensureChuteHierarchyVisible(animationTransform);
                 return;
             }
 
-            List<FlagDecal> flags = part.FindModulesImplementing<FlagDecal>();
-            FlagDecal decal;
-            int flagCount = flags.Count;
-            for (int flagIndex = 0; flagIndex < flagCount; flagIndex++)
+            // Back attachment by itself no longer implies pack suppression.
+            // Restore stock's inventory-based visibility once when the last
+            // explicit hiding request disappears. Defer this while a chute is open.
+            if (!hideAllStockPacks && stockPackVisibilityOverridden)
             {
-                decal = flags[flagIndex];
-                if ((decal.textureQuadName.Contains("EVAStorage") && (kerbalEVA.StorageTransform.gameObject.activeSelf || kerbalEVA.StorageSlimTransform.gameObject.activeSelf)) ||
-                    (decal.textureQuadName.Contains("kbEVA_flagDecals") && inventory.ContainsPart("evaJetpack")))
+                if (updateStockPackModels != null)
                 {
-                    decal.flagDisplayed = false;
-                    decal.UpdateDisplay();
+                    updateStockPackModels.Invoke(kerbalEVA, null);
+                    restoreStockPackFlags();
+                    stockPackVisibilityOverridden = false;
                 }
             }
 
-            kerbalEVA.BackpackTransform.gameObject.SetActive(false);
-            kerbalEVA.BackpackStTransform.gameObject.SetActive(false);
-            kerbalEVA.StorageTransform.gameObject.SetActive(false);
-            kerbalEVA.StorageSlimTransform.gameObject.SetActive(false);
-            kerbalEVA.ChuteJetpackTransform.gameObject.SetActive(false);
-            if (!hideAllStockPacks && shouldShowChuteTransforms())
+            Transform selectedRoot = null;
+            if (showChute && evaChute != null && evaChute.CanCrewMemberUseParachute())
+                selectedRoot = selectedChuteModel != EVAChuteModel.Stock && selectedChuteModel != EVAChuteModel.None
+                    ? getChuteModelRoot(selectedChuteModel)
+                    : findSelectedChuteRoot(evaChute.Anim != null ? evaChute.Anim.transform : null);
+
+            if (hideAllStockPacks)
             {
-                // A wearable counts as an additional inventory item, which makes stock KSP select
-                // ChuteContainerTransform. Stock UpdatePackModels can make that selection again
-                // without notifying this controller, so keep ModuleEvaChute pointed at the compact
-                // hierarchy until deployment starts. Once semi-deployed, SetCanopy must not be
-                // called because it deliberately hides the canopy it selects.
-                if (evaChute != null &&
-                    (evaChute.deploymentState == ModuleParachute.deploymentStates.STOWED ||
-                     evaChute.deploymentState == ModuleParachute.deploymentStates.ACTIVE))
+                stockPackVisibilityOverridden = true;
+
+                List<FlagDecal> flags = part.FindModulesImplementing<FlagDecal>();
+                FlagDecal decal;
+                int flagCount = flags.Count;
+                for (int flagIndex = 0; flagIndex < flagCount; flagIndex++)
                 {
-                    evaChute.SetCanopy(kerbalEVA.ChuteStTransform);
+                    decal = flags[flagIndex];
+                    if ((decal.textureQuadName.Contains("EVAStorage") && (kerbalEVA.StorageTransform.gameObject.activeSelf || kerbalEVA.StorageSlimTransform.gameObject.activeSelf)) ||
+                        (decal.textureQuadName.Contains("kbEVA_flagDecals") && inventory.ContainsPart("evaJetpack")))
+                    {
+                        if (!hiddenStockPackFlags.ContainsKey(decal))
+                            hiddenStockPackFlags.Add(decal, decal.flagDisplayed);
+                        decal.flagDisplayed = false;
+                        decal.UpdateDisplay();
+                    }
                 }
-                kerbalEVA.ChuteContainerTransform.gameObject.SetActive(false);
-                kerbalEVA.ChuteStTransform.gameObject.SetActive(true);
+
+                // Keep the permitted chute and its ancestors active. Disabling
+                // and re-enabling them each frame can restart component/animation
+                // behavior even though the selected model has not changed.
+                hideStockPackUnlessRequired(kerbalEVA.BackpackTransform, selectedRoot);
+                hideStockPackUnlessRequired(kerbalEVA.BackpackStTransform, selectedRoot);
+                hideStockPackUnlessRequired(kerbalEVA.StorageTransform, selectedRoot);
+                hideStockPackUnlessRequired(kerbalEVA.StorageSlimTransform, selectedRoot);
+                hideStockPackUnlessRequired(stockJetpackChute, selectedRoot);
+                hideStockPackUnlessRequired(stockStandaloneChute, selectedRoot);
+                hideStockPackUnlessRequired(stockContainerChute, selectedRoot);
             }
-            else
+            if (showChute)
             {
-                kerbalEVA.ChuteStTransform.gameObject.SetActive(false);
-                kerbalEVA.ChuteContainerTransform.gameObject.SetActive(false);
+                // Stock already bound the chosen canopy and animation. Only make
+                // its hierarchy visible; SetCanopy here would reset the canopy.
+                if (evaChute != null && evaChute.CanCrewMemberUseParachute())
+                    showPackedChute(selectedRoot);
             }
+        }
+
+        private static void hideStockPackUnlessRequired(Transform pack, Transform selectedChute)
+        {
+            if (pack == null || (selectedChute != null && selectedChute.IsChildOf(pack)))
+                return;
+            if (pack.gameObject.activeSelf)
+                pack.gameObject.SetActive(false);
+        }
+
+        private void restoreStockPackFlags()
+        {
+            foreach (KeyValuePair<FlagDecal, bool> entry in hiddenStockPackFlags)
+            {
+                if (entry.Key == null)
+                    continue;
+                entry.Key.flagDisplayed = entry.Value;
+                entry.Key.UpdateDisplay();
+            }
+            hiddenStockPackFlags.Clear();
+        }
+
+        private Transform getChuteModelRoot(EVAChuteModel model)
+        {
+            return model == EVAChuteModel.Standalone ? stockStandaloneChute :
+                (model == EVAChuteModel.Jetpack ? stockJetpackChute : stockContainerChute);
+        }
+
+        private void showPackedChute(Transform selectedRoot)
+        {
+            if (selectedRoot == null)
+            {
+                if (!packedChuteVisibilityReported)
+                    Debug.LogWarning("[KerbalGear] Packed EVA chute root unavailable for model " + selectedChuteModel);
+                packedChuteVisibilityReported = true;
+                return;
+            }
+            ensureChuteHierarchyVisible(selectedRoot);
+            bool closed = evaChute.deploymentState == ModuleParachute.deploymentStates.STOWED ||
+                evaChute.deploymentState == ModuleParachute.deploymentStates.ACTIVE;
+            if (!closed)
+                return;
+
+            // Inspect stock's base/canopy state without forcing children active or
+            // resetting its animation. Model selection already binds this hierarchy.
+            Transform packedBase = Part.FindHeirarchyTransform(selectedRoot, evaChute.baseName);
+            Transform canopy = Part.FindHeirarchyTransform(selectedRoot, evaChute.canopyName);
+
+            if (!packedChuteVisibilityReported)
+            {
+                Debug.Log("[KerbalGear] Packed EVA chute model=" + selectedChuteModel +
+                    " state=" + evaChute.deploymentState +
+                    " root=" + selectedRoot.name + " rootVisible=" + selectedRoot.gameObject.activeInHierarchy +
+                    " base=" + (packedBase != null ? packedBase.name : "<missing>") +
+                    " baseVisible=" + (packedBase != null && packedBase.gameObject.activeInHierarchy) +
+                    " baseScale=" + (packedBase != null ? packedBase.localScale.ToString("F4") : "<missing>") +
+                    " canopyVisible=" + (canopy != null && canopy.gameObject.activeInHierarchy) +
+                    " animation=" + (evaChute.Anim != null ? evaChute.Anim.name : "<missing>"));
+                packedChuteVisibilityReported = true;
+            }
+        }
+
+        private Transform findSelectedChuteRoot(Transform animationTransform)
+        {
+            if (animationTransform == null)
+                return null;
+            if (animationTransform.IsChildOf(stockStandaloneChute))
+                return stockStandaloneChute;
+            if (animationTransform.IsChildOf(stockContainerChute))
+                return stockContainerChute;
+            if (animationTransform.IsChildOf(stockJetpackChute))
+                return stockJetpackChute;
+            return null;
+        }
+
+        private void ensureChuteHierarchyVisible(Transform root)
+        {
+            for (Transform node = root; node != null && node != part.transform; node = node.parent)
+            {
+                if (!node.gameObject.activeSelf)
+                    node.gameObject.SetActive(true);
+            }
+        }
+
+        private EVAChuteModel getRequestedChuteModel()
+        {
+            foreach (List<SWearableProp> props in wearablePartProps.Values)
+            {
+                foreach (SWearableProp prop in props)
+                {
+                    if (prop.evaChuteModel != EVAChuteModel.None &&
+                        inventory.ContainsPart(prop.partName) &&
+                        (prop.bodyLocation == BodyLocations.back || prop.bodyLocation == BodyLocations.backOrJetpack))
+                        return prop.evaChuteModel;
+                }
+            }
+            return EVAChuteModel.None;
+        }
+
+        private void updateChuteModelSelection()
+        {
+            if (kerbalEVA == null || inventory == null || wearablePartProps == null || evaChute == null)
+                return;
+            if (!stockChuteTransformsCaptured)
+            {
+                if (kerbalEVA.ChuteStTransform == null || kerbalEVA.ChuteJetpackTransform == null ||
+                    kerbalEVA.ChuteContainerTransform == null)
+                    return;
+                stockStandaloneChute = kerbalEVA.ChuteStTransform;
+                stockJetpackChute = kerbalEVA.ChuteJetpackTransform;
+                stockContainerChute = kerbalEVA.ChuteContainerTransform;
+                stockChuteTransformsCaptured = true;
+            }
+
+            EVAChuteModel requested = getRequestedChuteModel();
+            if (requested == selectedChuteModel)
+                return;
+            // Keep an open chute's hierarchy/animation intact. Apply an inventory
+            // change once it is packed, armed, or cut instead of hiding its canopy.
+            if (evaChute.deploymentState == ModuleParachute.deploymentStates.SEMIDEPLOYED ||
+                evaChute.deploymentState == ModuleParachute.deploymentStates.DEPLOYED)
+                return;
+            if (updateStockPackModels == null)
+            {
+                Debug.LogWarning("[KerbalGear] Cannot select EVA chute model: stock UpdatePackModels was not found.");
+                return;
+            }
+
+            restoreStockChuteReferences();
+            Transform selected = getChuteModelRoot(requested);
+            if (requested != EVAChuteModel.Stock && requested != EVAChuteModel.None)
+            {
+                // Stock UpdatePackModels picks by inventory count and jetpack.
+                // Point each choice at the requested original hierarchy so later
+                // stock refreshes select the same canopy too, without moving it.
+                kerbalEVA.ChuteStTransform = selected;
+                kerbalEVA.ChuteJetpackTransform = selected;
+                kerbalEVA.ChuteContainerTransform = selected;
+                ensureChuteHierarchyVisible(selected);
+            }
+            selectedChuteModel = requested;
+            packedChuteVisibilityReported = false;
+            // Refresh once on selection changes, not every LateUpdate. This is
+            // stock's inventory/eligibility/animation binding path and runs only
+            // while the canopy is closed. No transform offsets are changed.
+            updateStockPackModels.Invoke(kerbalEVA, null);
+        }
+
+        private void restoreStockChuteReferences()
+        {
+            if (!stockChuteTransformsCaptured || kerbalEVA == null)
+                return;
+            kerbalEVA.ChuteStTransform = stockStandaloneChute;
+            kerbalEVA.ChuteJetpackTransform = stockJetpackChute;
+            kerbalEVA.ChuteContainerTransform = stockContainerChute;
         }
 
         private void setupWearableParts()
@@ -1115,7 +1307,15 @@ namespace WildBlueCore.KerbalGear
                         wearableProp.positionOffset = wearableItem.positionOffset;
                         wearableProp.positionOffsetJetpack = wearableItem.positionOffsetJetpack;
                         wearableProp.rotationOffset = wearableItem.rotationOffset;
-                        wearableProp.showChuteTransforms = wearableItem.showChuteTransforms;
+                        EVAChuteModel chuteModel;
+                        if (!Enum.TryParse(wearableItem.evaChuteModel, true, out chuteModel) ||
+                            !Enum.IsDefined(typeof(EVAChuteModel), chuteModel))
+                        {
+                            Debug.LogWarning("[KerbalGear] Invalid evaChuteModel '" + wearableItem.evaChuteModel +
+                                "' on " + availablePart.name + "; using None.");
+                            chuteModel = EVAChuteModel.None;
+                        }
+                        wearableProp.evaChuteModel = chuteModel;
 
                         // Setup configurable EVA module requests. Explicit EVA_PART_MODULE nodes
                         // take precedence over legacy evaModules entries with no overrides.

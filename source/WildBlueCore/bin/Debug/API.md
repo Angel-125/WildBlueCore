@@ -21,6 +21,42 @@ Control surface lift coefficient when the chute is semi-deployed (not fully open
 Flag indicating whether or not the parafoil can be steered when in the semi-deployed state.
 ### controlAuthorityRampTime
 Time, in seconds, to ramp the control surface and passive stabilizers from zero to their configured authority after the parafoil takes control.
+### enableAttitudeController
+Enable torque-limited glide stabilization and coordinated steering after full deployment.
+### attitudeControllerWithSAS
+Allow assistance alongside SAS; false avoids competing attitude controllers.
+### attitudeUseVesselReference
+Use the vessel control reference rather than the chute mounting transform.
+### attitudeForwardAxis
+Local forward direction in the selected attitude reference.
+### attitudeUpAxis
+Local dorsal/up direction in the selected attitude reference (KSP uses -Z).
+### attitudeGlidePitch
+Neutral nose elevation above the horizon, in degrees.
+### attitudePitchRange
+Maximum additional nose elevation commanded by pitch input, in degrees.
+### attitudeMaxBank
+Maximum bank commanded by yaw/roll input, in degrees.
+### attitudeMaxTurnRate
+Upper bound on coordinated heading rate, in degrees per second.
+### attitudeMaxCorrectionRate
+Upper bound on attitude-correction rate, in degrees per second.
+### attitudeResponse
+Attitude error to desired rotation-rate gain, per second.
+### attitudeDamping
+Rotation-rate error to angular acceleration gain, per second.
+### attitudeIntegralGain
+Integrate angular-rate error to estimate persistent aerodynamic moments.
+### attitudeIntegralLimit
+Maximum integrated acceleration contribution, in radians per second squared.
+### attitudeMaxTorque
+Total assistance torque limit in KSP torque units (kN m).
+### attitudeRampTime
+Seconds to ramp assistance after handoff or resuming from SAS.
+### attitudeLiftRampTime
+Seconds to introduce primary lift once assistance has settled the vessel.
+### attitudeRecoveryLift
+Minimum deployed lift fraction during recovery, introduced by the normal lift ramp.
 ## Methods
 
 
@@ -33,10 +69,49 @@ Overrides base OnStart to provide custom functionality.
 ### FixedUpdate
 Lets ModuleParachute control deployment, then hands fully deployed flight to the parafoil lifting and control surfaces.
 
+### OnDestroy
+Remove the observational callback before stock parachute cleanup.
+
 # PartModules.Aero.ModuleParafoilStabilizer
             
 Identifies a ModuleLiftingSurface as a passive parafoil stabilizer. ModuleParafoil keeps the surface disabled until the parafoil is fully deployed, then ramps it to its configured deflectionLiftCoeff.
         
+
+# PartModules.Aero.WBIModuleLiftingSurface
+            
+Stock lifting-surface curves with independent orientation, velocity sampling, and force application. ModuleParafoil can manage this module as a primary wing.
+        
+## Fields
+
+### followTransformRotation
+Follow the named transform's rotation; otherwise capture its part-relative rotation at OnStart.
+### orientationOffset
+Additional Euler rotation in degrees relative to the selected aerodynamic reference.
+### velocitySampleOffset
+Airflow sampling position in part-local coordinates, independent of transformName.
+### usePartLiftOffset
+Use the part's CoLOffset instead of liftForceOffset.
+### liftForceOffset
+Lift application position in part-local coordinates when usePartLiftOffset is false.
+### usePartDragOffset
+Use the part's CoPOffset instead of dragForceOffset.
+### dragForceOffset
+Drag application position in part-local coordinates when usePartDragOffset is false.
+### debugMode
+Log observations of this module's force calculation.
+### debugLogInterval
+Seconds between diagnostic lines; zero logs every physics update.
+## Methods
+
+
+### OnStart(PartModule.StartState)
+Load stock curves and capture the selected orientation relative to the part.
+
+### FixedUpdate
+Own the Unity physics message: never call base.FixedUpdate, which would apply a second set of forces at the stock positions.
+
+### OnCenterOfLiftQuery(CenterOfLiftQuery)
+Use the same orientation and lift application position for editor/ILiftProvider queries.
 
 # PartModules.Coupling.WBIModuleDockingNodeController
             
@@ -1202,7 +1277,7 @@ This module represents an equippable cargo item that appears as a 3D model on th
                     positionOffset = 0.0000, 0.0200, 0.0900
                     positionOffsetJetpack = 0,0,0
                     rotationOffset = -70.0000, 0.0000, 0.0000
-                    showChuteTransforms = false
+                    evaChuteModel = None
                     hideStockPacksWhenWorn = true
                     hideTransformsWhenWorn = displayModel;groundBase
                     EVA_PART_MODULE
@@ -1230,15 +1305,15 @@ When true, hides meshTransform on the physical part while it is dropped in fligh
 ### hideTransformsWhenWorn
 Semicolon-delimited names of model transforms to hide on the wearable copy while this part is carried in a Kerbal's inventory. Transform names are case-sensitive. The source part prefab is not changed, so these transforms remain visible when the part is dropped. This field may be placed on a hide-only WBIModuleWearableItem that does not specify an anchorTransform or meshTransform.
 ### hideStockPacksWhenWorn
-When true, hides the Kerbal's stock backpack, storage pack, jetpack/chute pack, and chute models while this item is worn. Defaults to true.
+Explicitly hides stock backpack/storage/jetpack meshes and the packed chute while carried. A non-None evaChuteModel preserves the chute as an exception. False leaves stock visibility alone; bodyLocation does not imply hiding. Defaults to false. Open canopies remain visible.
 ### positionOffset
 Position offsets (x,y,z).
 ### positionOffsetJetpack
 Position offset that is used when the kerbal has a jetpack in addition to the wearable item (x,y,z). Requires bodyLocation = backOrJetpack
 ### rotationOffset
 Rotation offsets in degrees
-### showChuteTransforms
-Flag to indicate whether the compact stock ChuteStTransform should remain visible while this wearable item is equipped on the kerbal's back. The kerbal must also be carrying the stock evaChute inventory part.
+### evaChuteModel
+None (default) follows stock pack visibility without a chute exception. Stock preserves the chute using KSP's model selection. Standalone, Jetpack, or Container preserves that stock model while this back wearable is carried, overriding pack hiding for the chute. Requires the stock evaChute inventory item and normal crew eligibility.
 ### evaModules
 Legacy list of part modules to create on the kerbal when you equip the wearable item. Separate names with a semicolon. Prefer EVA_PART_MODULE child nodes for new configs.
 ## Methods
@@ -1261,6 +1336,23 @@ Gets copies of the explicitly configured EVA_PART_MODULE requests.
 
 ### RequestsEVAModule(System.String)
 Reports whether this wearable requests the named EVA module through either the new EVA_PART_MODULE nodes or the legacy semicolon-delimited evaModules field.
+
+# KerbalGear.EVAChuteModel
+            
+Stock EVA parachute model selected by an equipped back wearable.
+        
+## Fields
+
+### Stock
+Use stock inventory-based selection.
+### Standalone
+Use ChuteStTransform, against the Kerbal's body.
+### Jetpack
+Use ChuteJetpackTransform.
+### Container
+Use ChuteContainerTransform.
+### None
+Follow stock pack visibility without preserving a packed chute.
 
 # KerbalGear.IKerbalGearInventoryListener
             
@@ -1339,8 +1431,8 @@ Position offset of the prop.
 Position offset of the prop if the kerbal has a jetpack and bodyLocation is backOrJetpack.
 ### rotationOffset
 Rotation offset of the prop.
-### showChuteTransforms
-Flag to indicate whether the compact stock ChuteStTransform should remain visible while the prop is equipped on the kerbal's back.
+### evaChuteModel
+Requested stock chute model for this prop.
 
 # KerbalGear.WBIModuleWearablesController
             
